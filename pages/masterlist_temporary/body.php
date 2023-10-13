@@ -12,9 +12,8 @@
 							<?php include('main_menu.php'); ?>
 						</div>
 				   </div>
-<!--  -->
 					<div class="col-sm-12">
-						<div class="panel panel-info">
+						<div class="panel panel-info" style="overflow:scroll;">
 							<div class="panel-heading"><i class="fa fa-file fa-lg"> For Review</i></div>
 							<div class="panel-body">
 								<div class="col-sm-12">
@@ -28,33 +27,33 @@
 								</div><br><br>
 								<div class="row">
 									<div class="col-sm-12">
-										<table class="table table-condensed table-bordered table-responsive" id="tbl_special_acceptance">
-										<!-- <table class="box-body table-responsive" id="tbl_special_acceptance"> -->
+										<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary">
 											<thead>
 												<tr>
 													<th></th>
 													<th><span class="fa fa-cogs"></span></th>
+													<th>Document ID</th>
 													<th>Document Status</th>
-													<th>Disposition</th>
-													<th>Number of Review</th><!---->
+													<!-- <th>Disposition</th> -->
+													<!-- <th>Number of Review</th> -->
 													<th>Date Received</th>
-													<th>Model</th>
+													 <th>Model</th>
 													<th>Title</th>
 													<th>Document No.</th>
 													<th>Rev No.</th>
-													<!-- <th><span class="fa fa-attachment"></span>File Attachment</th> -->
-													<th>Orignator Code</th>
+													<!--<th>Orignator Code</th>
 													<th>Document Type</th>
 													<th>Effectivity Date</th>
-													<th>Expiration Date</th>
-													<th>Reviewed by</th>
+													<th>Expiration Date</th> -->
+
+													<!-- <th>Reviewed by</th>
 													<th>Date of review</th>
 													<th>Person in charge</th>
 													<th>Due Date</th>
 													<th>Recommitment Date</th>
-													<th>Date of DCC Email</th><!-- created_at-->
-													<th>Process Owner Remarks</th><!---->
-													<th>DCC Remarks</th><!---->
+													<th>Date of DCC Email</th>
+													<th>Process Owner Remarks</th>
+													<th>DCC Remarks</th> -->
 												</tr>
 											</thead>
 										</table>
@@ -63,12 +62,13 @@
 							</div>
 						</div>
 					</div>
-<!--  -->
+					<!--  -->
 				</div>
 			</section>
 		</section>
 	</section>
-
+	
+	<!-- <th><span class="fa fa-attachment"></span>File Attachment</th> -->
 <!---------------------
 	Modals - Start 
 ---------------------->
@@ -131,8 +131,16 @@
 </div><!-- /.modal -->
 
 <script>
-	var query_from_acdcs = <?php echo json_encode($_GET['query']); ?>; // Don't forget the extra semicolon!
-	console.log('asdasdas',query_from_acdcs);
+	var dt_special_acceptance = $('#tbl_masterlist_temporary').DataTable({
+		"aaSorting"	: [],
+		"bProcessing": true,
+        "bServerSide": true,
+		"sAjaxSource": "server_side_scripts/dt_masterlist_temporary.php",
+		"drawCallback": function( settings ) {
+			$('#tbl_special_acceptance').attr('style','width:100%;');
+		}
+	});
+
 	/* Date Range Picker */
 	function date_time_picker(id) {
 		$('#'+id).daterangepicker(
@@ -164,6 +172,7 @@
 			$('body').addClass('modal-open');
 		}    
 	});
+
 	
 	/* ***************************
 		Test Functions - Start

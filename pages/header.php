@@ -55,84 +55,17 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 	
 	<aside class="sidebar">
 		<ul class="sidebar-nav">
-			<li class="active" id="li_dashboard"><a href="#dashboard" data-toggle="tab"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+			<li class="active" id="li_dashboard"><a href="#dashboard" data-toggle="tab"><i class="fa fa-dashboard"></i> <span>Temporary Documents</span></a></li>
 			<?php 
 				/* Check if there is a read role on one IQC modules */
 				$user_iqc_read_access = false;
 				foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-					if($subsystem_code == "IQC" && $user_role['read'][$key] == 1){ 
+					if($subsystem_code == "IQC" && $user_role['read'][$key] == 1){
 						$user_iqc_read_access = true;
 					}
 				}
 				if( $user_iqc_read_access ){
 					echo '<li id="li_iqc"><a href="#" data-toggle="tab"><i class="fa fa-puzzle-piece"></i> <span>IQC</span></a></li>';
-				}
-				/* Check if there is a read role on one IPQC modules */
-				$user_ipqc_read_access = false;
-				foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-					if($subsystem_code == "IPQC" && $user_role['read'][$key] == 1){ 
-						$user_ipqc_read_access = true;
-					}
-				}
-				if( $user_ipqc_read_access ){
-					echo '<li id="li_ipqc"><a href="#" data-toggle="tab"><i class="fa fa-puzzle-piece"></i> <span>IPQC</span></a></li>';
-				}
-				/* Check if there is a read role on one OQC modules */
-				$user_oqc_read_access = false;
-				foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-					if($subsystem_code == "OQC" && $user_role['read'][$key] == 1){ 
-						$user_oqc_read_access = true;
-					}
-				}
-				if( $user_oqc_read_access ){
-					echo '<li id="li_oqc"><a href="#" data-toggle="tab"><i class="fa fa-puzzle-piece"></i> <span>OQC</span></a></li>';
-				}
-				/* Check if there is a read role on one YPD modules */
-				$user_ypd_read_access = false;
-				foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-					if($subsystem_code == "YPD" && $user_role['read'][$key] == 1){ 
-						$user_ypd_read_access = true;
-					}
-				}
-				if( $user_ypd_read_access ){
-					echo '<li id="li_ypd"><a href="#" data-toggle="tab"><i class="fa fa-line-chart"></i> <span>Yield Performance Data</span></a></li>';
-				}
-				/* Check if there is a read role on one QFR modules */
-				$user_qfr_read_access = false;
-				foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-					if($subsystem_code == "QFR" && $user_role['read'][$key] == 1){ 
-						$user_qfr_read_access = true;
-					}
-				}
-				if( $user_qfr_read_access ){
-					echo '<li id="li_qfr"><a href="#" data-toggle="tab"><i class="fa fa-file"></i> <span>Quality Feedback Report</span></a></li>';
-				}
-				/* Check if there is a read role on one ETR modules */
-				$user_etr_read_access = false;
-				foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-					if($subsystem_code == "ETR" && $user_role['read'][$key] == 1){ 
-						$user_etr_read_access = true;
-					}
-				}
-				if( $user_etr_read_access ){
-					echo '<li id="li_etr"><a href="#" data-toggle="tab"><i class="fa fa-users"></i> <span>Qualification & Certification</span></a></li>';
-				}
-				/* Check if there is a read role on one CCTE modules */
-				$user_ccte_read_access = false;
-				foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-					if($subsystem_code == "CCTE" && $user_role['read'][$key] == 1){ 
-						$user_ccte_read_access = true;
-					}
-				}
-				if( $user_ccte_read_access ){
-					echo '<li id="li_ccte"><a href="#" data-toggle="tab"><i class="fa fa-edit"></i> <span>Theoretical Exam</span></a></li>';
-				}
-				/* user configuration only ISS admin and main user should have this */
-				// if($_SESSION['rapid_account_type'] == 1 || $_SESSION['rapid_account_type'] == 2){
-				if($_SESSION['username'] == 'judcata' || // Authorized user; might be change once user is resigned
-					$_SESSION['username'] == 'cnpoblete' || // Authorized user; might be change once user is resigned
-					$_SESSION['rapid_account_type'] == 2){ // ISS
-					echo '<li id="li_configuration"><a href="#" data-toggle="tab"><i class="fa fa-cogs"></i> <span>Configuration</span></a></li>';
 				}
 			?>
 		</ul>
