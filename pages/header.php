@@ -4,6 +4,7 @@
 <title>ACDCS Document Review Process</title>
 <head>
 <?php 
+
 require_once('libraries/includes.php'); 
 require_once('get_user_roles.php');
 echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
@@ -31,14 +32,11 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 		<div class="">
 			<div class="navbar-header">
 				<a href="#" class="navbar-brand">
-					<span class="hidden-xs">ACDCS</span>
+					<span class="hidden-xs">ACDCS <?php echo $_SESSION['username']; ?></span>
 				</a>
-
 				<p class="navbar-text">
-					
 				</p>
 			</div>
-
 			<div class="navbar-collapse collapse" id="navbar-collapse-main">
 				<ul class="nav navbar-nav navbar-left">
 					<li>
@@ -57,7 +55,8 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 		<ul class="sidebar-nav">
 			<li class="active" id="li_dashboard"><a href="#dashboard" data-toggle="tab"><i class="fa fa-dashboard"></i> <span>Temporary Documents</span></a></li>
 			<?php 
-				/* Check if there is a read role on one IQC modules */
+				/*omodify
+				 Check if there is a read role on one IQC modules
 				$user_iqc_read_access = false;
 				foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
 					if($subsystem_code == "IQC" && $user_role['read'][$key] == 1){
@@ -67,13 +66,16 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 				if( $user_iqc_read_access ){
 					echo '<li id="li_iqc"><a href="#" data-toggle="tab"><i class="fa fa-puzzle-piece"></i> <span>IQC</span></a></li>';
 				}
+				*/
 			?>
 		</ul>
 	</aside>
 	
 	<script>
 		var script_url = '';
+		var username = '<?php echo $_SESSION['username']?>';
 		var handler = 'handler/handler.php';
+		
 		var selected_menu = $('#txt_selected_menu').val();
 		$(function () { $('[data-toggle="popover"]').popover(); });
 

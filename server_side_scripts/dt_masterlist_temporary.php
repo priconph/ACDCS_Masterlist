@@ -17,6 +17,16 @@
     // echo 'true';
     // return;
 
+	// $aColumns = array( 
+    //             'id',
+    //             'fkid_document',
+	// 			'document_status',
+    //             'is_expiration_date_exist',
+	// 			'deleted_at',
+	// 			'created_at',
+	// 			'updated_at',
+	// 			// "(SELECT `vw_role`.`role` FROM `vw_user_roles` `vw_role` WHERE `vw_role`.`user` = '".$_GET['username']."' AND `vw_role`.`module` = 'Special Acceptance' AND `vw_role`.`subsystem_code` = 'QFR' AND `vw_role`.`logdel` = '0') as role",
+	// 			);
 	$aColumns = array( 
                 'id',
                 'fkid_document',
@@ -245,10 +255,11 @@
 /* 
     Document Status
 */
-        $getActiveDocumentById = getActiveDocumentById($aRow['fkid_document']);
-        
+		$temporary_document_id = $aRow['id'];
+		$fkid_document = $aRow['fkid_document'];
+        $getActiveDocumentById = getActiveDocumentById($fkid_document);
 		$row[]= '<center><input class="form-control" type="checkbox"> </center>';
-		$row[]= '<center><button class="btn btn-primary btn-sm" type="button">Edit</button></center>';
+		$row[]= '<center><button class="btn btn-sm fa fa-edit" type="button" style="background-color:yellow;color:black;" id="btnReviewDocu" data-id="'.$temporary_document_id.'"> Review</button></center>';
 		$row[]= $getActiveDocumentById['fkid_document'];
 
         if($getActiveDocumentById['document_status'] == 1){
@@ -263,6 +274,7 @@
 		$row[]= $getActiveDocumentById['doc_no'];
 		$row[]= $getActiveDocumentById['rev_no'];
 		array_push($output['aaData'],$row);
+
 	}
 	echo json_encode( $output );
 
@@ -273,18 +285,17 @@
     {
         require_once('../class/oop_acdcs.php');
         $return = $_POST;
-		$array_fields = array('  `masterlist`.id AS `doc_review_masterlist_id` , `masterlist`.document_status,
-                                 `masterlist`.created_at, `active`. * , `docs`.`pkid` AS `doc_pkid` , `docs`.`section`
-                        ');
-
-		$table 	   	= '`tbl_active_docs` active';
+		$array_fields = array('	masterlist.id AS doc_review_masterlist_id,masterlist.document_status,
+								masterlist.created_at, active. *,docs.pkid AS doc_pkid,docs.section'
+		);
+		$table 	   	= 'tbl_active_docs active';
 		$joins 	   	= 'LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document';
-		$joins 	   	.=' RIGHT JOIN `tbl_doc_review_masterlist` masterlist ON masterlist.fkid_document = docs.pkid';
+		$joins 	   	.=' RIGHT JOIN tbl_doc_review_masterlist masterlist ON masterlist.fkid_document = docs.pkid';
 		$sql_where 	=  'WHERE active.view_status = 1';
-		$sql_where 	.= ' AND active.`logdel` = 0';
+		$sql_where 	.= ' AND active.logdel = 0';
 		$sql_where 	.= ' AND masterlist.fkid_document = '.$fkid_document.'';
 		$sql_where 	.= ' AND masterlist.deleted_at IS NULL';
-		$sql_order 	= 'ORDER BY `active`.`doc_no` DESC';
+		$sql_order 	= 'ORDER BY active.doc_no DESC';
 		$sql_limit 	= '';
 		$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 		$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
@@ -303,42 +314,45 @@
         }
         return $return;
     }
+
 /*
-    SELECT `masterlist`.id AS `doc_review_masterlist_id` , `masterlist`.document_status, `masterlist`.created_at, `active`. * , `docs`.`pkid` AS `doc_pkid` , `docs`.`section`
-    FROM `tbl_active_docs` active
-    LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document
-    RIGHT JOIN `tbl_doc_review_masterlist` masterlist ON masterlist.fkid_document = docs.pkid
-    WHERE active.view_status =1
-    AND active.`logdel` =0
-    AND docs.doc_status =1
-    AND masterlist.deleted_at IS NULL
-    ORDER BY `masterlist`.`created_at`
-    LIMIT 0 , 10
+====GROUP BY originator code===
 
+SELECT originator_code, COUNT( * )
+FROM `tbl_active_docs` active
+WHERE originator_code IS NOT NULL
+GROUP BY originator_code
+ORDER BY `active`.`originator_code` DESC
+LIMIT 0 , 100
+========================
 
-    SELECT FROM ACDCS Module
-    SELECT `masterlist`.id as `doc_review_masterlist_id`,`masterlist`.document_status,`masterlist`.created_at , `active`. * , `docs`.`pkid` AS `doc_pkid`, `docs`.`section`
-    FROM `tbl_active_docs` active
-    LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document
-    RIGHT JOIN `tbl_doc_review_masterlist` masterlist ON masterlist.fkid_document = docs.pkid
-    WHERE active.view_status =1
-    AND active.`logdel` =0
-    AND docs.doc_status =1
-    AND masterlist.id = '.$fkid_document.'
-    AND masterlist.deleted_at IS NULL
-    ORDER BY `active`.`doc_no` DESC
-    LIMIT 0 , 10
-    '
-    document_status
-    date_received
-    model
-    doc_title
-    doc_no
-    rev_no
-    originator_code
-    doc_type
-    effectivity_date
-    expiration_status
-    created_at
+SELECT `masterlist`.id AS `doc_review_masterlist_id` , `masterlist`.document_status, `masterlist`.created_at, `active`. * , `docs`.`pkid` AS `doc_pkid` , `docs`.`section`
+FROM `tbl_active_docs` active
+LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document
+RIGHT JOIN `tbl_doc_review_masterlist` masterlist ON masterlist.fkid_document = docs.pkid
+WHERE active.view_status =1
+AND active.`logdel` =0
+AND docs.doc_status =1
+AND masterlist.deleted_at IS NULL
+ORDER BY `masterlist`.`created_at`
+LIMIT 0 , 10
+
+SELECT SQL_CALC_FOUND_ROWS  `masterlist`.id AS `doc_review_masterlist_id` , `masterlist`.document_status,
+`masterlist`.created_at, `active`. * , `docs`.`pkid` AS `doc_pkid` , `docs`.`section`
+FROM `tbl_active_docs` active LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document 
+RIGHT JOIN `tbl_doc_review_masterlist` masterlist ON masterlist.fkid_document = docs.pkid 
+WHERE active.view_status = 1 AND active.`logdel` = 0 AND masterlist.fkid_document = 142587 AND masterlist.deleted_at IS NULL
+ORDER BY `active`.`doc_no` DESC;
+
+SELECT `active`. * , `docs`.`pkid` AS `doc_pkid`, `docs`.`section`
+FROM `tbl_active_docs` active
+LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document
+RIGHT JOIN `tbl_doc_review_masterlist` masterlist ON masterlist.fkid_document = docs.pkid
+WHERE active.view_status =1
+AND active.`logdel` =0
+AND docs.doc_status =1
+ORDER BY `active`.`doc_no` DESC
+LIMIT 0 , 10
+    
 */
 ?>

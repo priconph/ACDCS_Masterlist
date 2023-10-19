@@ -2,90 +2,92 @@
 var handler_common_handler		= "handler/common_handler.php";
 
 /* Call basic ajax for submit */
-// function call_ajax(data, handler, fn) {
-    // data = $.param(data);
-    // $.ajax({
-        // type: "post",
-        // dataType: "json",
-        // data: data,
-        // url: handler,
-        // success: function (result) {
-            // fn(result);
-        // },
-        // error: function (result) {
-            // fn(result);
-        // }
-    // });
-// }
+function call_ajax(data, handler, fn) {
+	data = $.param(data);
+	$.ajax({
+		type: "post",
+		dataType: "json",
+		data: data,
+		url: handler,
+		success: function (result) {
+			fn(result);
+		},
+		error: function (result) {
+			fn(result);
+		}
+	});
+}
 
-// function call_ajax_serialize(data, serialized_data, handler, fn) {
-    // data = $.param(data) + '&' + serialized_data;
-	// $.ajax({
-        // type: "post",
-        // dataType: "json",
-        // data: data,
-        // url: handler,
-        // success: function (result) {
-            // fn(result);
-        // },
-        // error: function (result) {
-            // alert('error ajax');
-        // }
-    // });
-// }
+function call_ajax_serialize(data, serialized_data, handler, fn) {
+	data = $.param(data) + '&' + serialized_data;
+	$.ajax({
+		type: "post",
+		dataType: "json",
+		data: data,
+		url: handler,
+		success: function (result) {
+			fn(result);
+		},
+		error: function (result) {
+			alert('error ajax');
+		}
+	});
+}
 
-// function call_ajax_async_false(data, handler, fn) {
-    // data = $.param(data);
-    // $.ajax({
-        // type: "post",
-        // dataType: "json",
-        // data: data,
-        // url: handler,
-		// async: false,
-        // success: function (result) {
-            // fn(result);
-        // },
-        // error: function (result) {
-            // alert('error ajax');
-        // }
-    // });
-// }
+function call_ajax_attachment(serialized_data, handler, fn) {
+	$.ajax({
+		url				: handler, 		
+		type			: "POST",          
+		data			: serialized_data, 
+		contentType		: false,       
+		dataType		: 'json',
+		cache			: false,             
+		processData		: false,     
+		success			: function(result)  
+		{
+			fn(result);
+		}, error : function (result) {
+			alert('ERROR: '+result['upload_msg']);
+		}
+	}); 
+}
+
+function call_ajax_async_false(data, handler, fn) {
+	data = $.param(data);
+	$.ajax({
+		type: "post",
+		dataType: "json",
+		data: data,
+		url: handler,
+		async: false,
+		success: function (result) {
+			fn(result);
+		},
+		error: function (result) {
+			alert('error ajax');
+		}
+	});
+}
+
+
 
 function create_table(table_id, table_class, array_theader, array_tbody) {
-    var html = '<table id="' + table_id + '" class="' + table_class + '">';
-    /* Generate table header */
+	var html = '<table id="' + table_id + '" class="' + table_class + '">';
+	/* Generate table header */
 	html += '	<thead>';
 	for(x=0;x<array_theader.length;x++){
 		html += '	<th>' + array_theader[x] + '</th>';
-    }
+	}
 	html += '	</thead>'
 	/* Generate table body */
 	html += '	<tbody>';
 	for(x=0;x<array_theader.length;x++){
 		html += '	<td>' + array_tbody[x] + '</td>';
-    }
+	}
 	html += '	</tbody>';
 	html += '</table>';
 	return html;
 }
-
-// function call_ajax_attachment(serialized_data, handler, fn) {
-	// $.ajax({
-		// url				: handler, 		
-		// type			: "POST",          
-		// data			: serialized_data, 
-		// contentType		: false,       
-		// dataType		: 'json',
-		// cache			: false,             
-		// processData		: false,     
-		// success			: function(result)  
-		// {
-			// fn(result);
-		// }, error : function (result) {
-			// alert('ERROR: '+result['upload_msg']);
-		// }
-	// }); 
-// }
 
 function table_loading_screen(tbl_id,colspan){
 	var html  = '<tr>';
@@ -182,54 +184,3 @@ function fn_get_emp_name_by_username_array(username_array, txt_id){
 		$('#'+txt_id).val(result['emp_name']);
 	});
 }
-
-
-/* 
-	YPICS Common Functions 
-*/
-function get_po_details(text_id,po_number,callback){
-	var data = {
-		"action"	: "get_po_details",
-		"po_number"	: po_number
-	}
-	call_ajax(data, handler_common_handler, function(result){
-		callback(result);
-	});
-}
-
-function fn_get_partcode_datalist(datalist_id,pattern){
-	var data = {
-		"action"	: "get_partcode_datalist",
-		"pattern"	: pattern
-	}
-	call_ajax(data, handler_common_handler, function(result){
-		console.log(result);
-		$('#'+datalist_id).empty();
-		$('#'+datalist_id).append(result['html']);
-	});
-}
-
-function fn_get_po_number_datalist(datalist_id,pattern){
-	var data = {
-		"action"	: "get_po_datalist",
-		"pattern"	: pattern
-	}
-	call_ajax(data, handler_common_handler, function(result){
-		console.log(result);
-		$('#'+datalist_id).empty();
-		$('#'+datalist_id).append(result['html']);
-	});
-}
-
-function fn_get_partname_by_partcode(input_field_id,partcode){
-	console.log('common handler to CNYPICS');
-	var data = {
-		"action"	: "get_partname_by_partcode",
-		"partcode"	: partcode
-	}
-	call_ajax(data, handler_common_handler, function(result){
-		console.log(result);
-		$('#'+input_field_id).val(result['partname']);
-	});
-}
-

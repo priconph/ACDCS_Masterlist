@@ -9,7 +9,7 @@
 	
 						</ol>
 						<div class="row" id="container_menu">
-							<?php include('main_menu.php'); ?>
+							<?php //include('main_menu.php'); omodify ?>
 						</div>
 				   </div>
 					<div class="col-sm-12">
@@ -80,7 +80,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title"><i class="fa fa-question-circle-o"></i> System Confirmation</h4>
       </div>
-	  <form id="frm_remove_attachment">
+	  <form id="form_remove_attachment_confirmation">
 		  <div class="modal-body">
 			<div class="row">
 				<div class="col-sm-12" id="">				
@@ -106,6 +106,73 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+<!---------------------
+	Modals - Add Review 
+---------------------->
+<!-- Modal for system message -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalReviewDocu">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><i class="fa fa-plus"></i> Add Review</h4>
+      </div>
+	  <form id="formReviewDocu">
+		  <div class="modal-body">
+				<div class="row">
+					<div class="col-sm-12">		
+						<input type="text" name="doc_review_masterlist_id" id="doc_review_masterlist_id" class="form-control">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">		
+						<label>Disposition</label>
+					</div>
+					<div class="col-sm-12">				
+						<select class="form-control" id="disposition" name="disposition" style="width:100%;" required>
+							<option value="" selected disabled>--Select--</option>
+							<option value="1">Revision</option>
+							<option value="2">Retain</option>
+							<option value="3">Obsolete</option>
+							<option value="4">Extended</option>
+						</select>
+					</div>
+				</div>
+				<div class="row" id="isRevisionRow" style="display:none;">
+					<div class="col-sm-12">				
+						<label>Person in charge</label>
+					</div>
+					<div class="col-sm-12">
+						<!-- <input type="text"> -->
+						<select class="form-control" id="person_in_charge" name="person_in_charge" style="width:100%;"></select>
+					</div>
+					<div class="col-sm-12">				
+						<label>Due Date</label>
+					</div>
+					<div class="col-sm-12">				
+						<input type="date" class="form-control" id="due_date" name="due_date" style="width:100%;" required>
+					</div>
+				</div>
+				<div class="row" id="isExtension" style="display:none;">
+					<div class="col-sm-12">				
+						<label>Extension Date</label>
+					</div>
+					<div class="col-sm-12">				
+						<input type="date" class="form-control" id="extension_date" name="extension_date" style="width:100%;" required>
+					</div>
+					<div class="col-sm-12">				
+						<input type="file" class="form-control" id="file_memo" name="file_memo" style="width:100%;">
+					</div>
+				</div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="submit" class="btn btn-primary fa fa-save" id="btn_yes_remove_attachment"> Save</button>
+			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Close</button>
+		  </div>
+		</form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <!-- Modal for system message -->
 <div class="modal fade" tabindex="-1" role="dialog" id="modal_system_message">
@@ -124,23 +191,15 @@
 		</div>
 	  </div>
 	  <div class="modal-footer">
-		<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Close</button>
+		<button type="button" class="btn btn-default fa fa-save" data-dismiss="modal" id="btn_close"> Close</button>
 	  </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<script src="js/common_functions.js?12345"></script>
 <script>
-	var dt_special_acceptance = $('#tbl_masterlist_temporary').DataTable({
-		"aaSorting"	: [],
-		"bProcessing": true,
-        "bServerSide": true,
-		"sAjaxSource": "server_side_scripts/dt_masterlist_temporary.php",
-		"drawCallback": function( settings ) {
-			$('#tbl_special_acceptance').attr('style','width:100%;');
-		}
-	});
-
+$(document).ready(function () {
 	/* Date Range Picker */
 	function date_time_picker(id) {
 		$('#'+id).daterangepicker(
@@ -173,21 +232,83 @@
 		}    
 	});
 
-	
 	/* ***************************
-		Test Functions - Start
+				Start
 	*************************** */
+	var handler_ = 'handler_qfr';
+	var masterlist_temporary_handler = 'handler/masterlist_temporary_handler.php'
+	var $formReviewDocu = $('#formReviewDocu');
+	var dt_special_acceptance = $(tbl_masterlist_temporary).DataTable({
+		"aaSorting"	: [],
+		"bProcessing": true,
+        "bServerSide": true,
+		"sAjaxSource": "server_side_scripts/dt_masterlist_temporary.php",
+		"drawCallback": function( settings ) {
+			$('#tbl_special_acceptance').attr('style','width:100%;')
+		}
+	});
+	
+	$(tbl_masterlist_temporary).on('click','#btnReviewDocu',function (e) { 
+		e.preventDefault()
+		$('#modalReviewDocu').modal()
+		$formReviewDocu.find('#doc_review_masterlist_id').val($(this).attr('data-id'))
+		re_initialize_select2_server_side('#modalReviewDocu #person_in_charge','#modalReviewDocu #formReviewDocu',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
 
-	// setTimeout(function(){
-       // $('#container_menu #a_di').trigger('click');
-       // $('#container_menu #a_di').trigger('click');
-    // },100);
+	});
+
+	function readTemporaryReviewDocu(dataId){
+		let data = {'action':'read_temporary_review_docu','temporary_document_id':dataId}
+		call_ajax(data, masterlist_temporary_handler,function(result){
+			console.log(result);
+		})
+	}
+
+	$('#disposition').change(function (e) { 
+		e.preventDefault()
+		console.log($(this).val())
+		if($(this).val() === '1'){
+			$('#isRevisionRow').show()
+			$('#isExtension').hide()
+			$formReviewDocu.find('#due_date').attr('required',true)
+			$formReviewDocu.find('#extension_date').removeAttr('required',true)
+		}
+		else if($(this).val() === '4'){
+			$('#isRevisionRow').hide()
+			$('#isExtension').show()
+			$formReviewDocu.find('#due_date').removeAttr('required',true)
+			$formReviewDocu.find('#extension_date').attr('required',true)
+		}
+		else{
+			$('#isRevisionRow').hide()
+			$('#isExtension').hide()
+			$formReviewDocu.find('#due_date').removeAttr('required',true)
+			$formReviewDocu.find('#extension_date').removeAttr('required',true)
+		}
+	});
 	
-	// fn_display_sub_page('container_menu');
-	// fn_display_sub_page('container_di');
+	$formReviewDocu.submit(function (e) { 
+		e.preventDefault();
+		// let data = {
+		// 	'action':'temporary_create_review_docu'
+		// };
+		// let serialized_data = $(this).serialize();
+		// call_ajax_serialize(data,serialized_data,masterlist_temporary_handler,function(result){
+		// 	console.log('dsad')
+		// })
+		var form_data = new FormData(this);
+		
+		form_data.append("action","temporary_create_review_docu");
+		// form_data.append("pkid",$('#modal_sa_edit').data('id'));
+		// form_data.append("username",username);
+
+		call_ajax_attachment(form_data, masterlist_temporary_handler, function(result){
+			alert('asddsa');
+		});
+	});
 	/* ***************************
-		Test Functions - End	
+			
 	*************************** */
+});
 </script>
 
 
