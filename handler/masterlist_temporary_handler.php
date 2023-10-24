@@ -25,7 +25,6 @@ error_reporting(E_ALL);
 		}
 		public static function activeDocs($fkid_document) {
 			require_once('../class/oop_acdcs.php');
-			$fkid_document;
 			$request = $_POST;
 			$array_fields = array('expiration_date');
 			$table 	   	= 'tbl_active_docs';
@@ -37,6 +36,51 @@ error_reporting(E_ALL);
 			$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 			while($row = mysqli_fetch_array($query)){
 				$request['expiration_date'] = $row['expiration_date'];
+			}
+			return $request;
+		}
+		public static function folderPath($folder_name) {
+			// tbl_folder_path
+			require_once('../class/oop_acdcs.php');
+			// return $folder_name;
+			$request = $_POST;
+			$array_fields = array('folder_path');
+			$table 	   	= 'tbl_folder_path';
+			$joins 	   	= '';
+			$sql_where 	= 'WHERE folder_name = "'.$folder_name.'"';
+			$sql_order 	= '';
+			$sql_limit 	= 'LIMIT 0,1';
+			$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+			$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+			while($row = mysqli_fetch_array($query)){
+				$request['folder_path'] = $row['folder_path'];
+			}
+			return $request;
+		}
+
+		public static function uploadDocument($target_directory,$file_memo_tmp,$target_file){
+			if(file_exists($target_file)){
+				return 2; //failed file is already exist
+			}
+			return $value = move_uploaded_file($file_memo_tmp,$target_file); //success
+		}
+
+		public static function selectQuery($file_name) {
+			require_once('../class/oop_acdcs.php');
+			$request = $_POST;
+			$array_fields = array('*');
+			$table 	   	= 'tbl_doc_review_disposition';
+			$joins 	   	= '';
+			$sql_where 	= 'WHERE memo_file_name = "'.$file_name.'"';
+			$sql_order 	= '';
+			$sql_limit 	= 'LIMIT 0,1';
+			$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+			$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+			if($row = mysqli_fetch_array($query)){
+				$request['memo_file_name'] = $row['memo_file_name'];
+				$request['is_exist'] = 'true';
+			}else{
+				$request['is_exist'] = 'false';
 			}
 			return $request;
 		}
@@ -77,84 +121,83 @@ error_reporting(E_ALL);
 		}
 	*/
 
-	function temporary_create_review_docu(){
+	function temporary_create_review_docu()
+	{
 		try{
 			require_once('../class/oop_acdcs.php');
 			$return = $_POST ;
+			$response = array();
 			$username = $_SESSION['username'];
 			$disposition = $return['disposition'];
 			$datetime_today = date('Y-m-d H:i:s');
 			$doc_review_masterlist_id = $return['doc_review_masterlist_id'];
 			$request = new CommonClass();
 			$doc_review_masterlist = $request->docReviewMasterlist($doc_review_masterlist_id);
-			
+			$dcc_emailed_at = $doc_review_masterlist['created_at'];
+
 			$table = 'tbl_doc_review_disposition';
 			if($disposition == 1){ //Revision
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','created_at');
-				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$email_date['created_at'],$datetime_today);
+				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$datetime_today);
 			}
 			if($disposition == 2 || $disposition == 3 ){ //Retain & Obsolete
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','created_at');
-				$array_values = array($return['doc_review_masterlist_id'],$disposition,$username,$doc_review_masterlist['created_at'],$datetime_today);
+				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$datetime_today);
 			}
 			if($disposition == 4){//Extended
 				$fkid_document =  $doc_review_masterlist['fkid_document'];
 				$active_docs = $request->activeDocs($fkid_document);
-				// echo $active_docs['expiration_date'];
+				
 				$date_difference = date_diff(date_create($return['extension_date']),date_create($active_docs['expiration_date']));
-				echo $date_difference->format("%m");
-				return;
+				$month = $date_difference->format("%m"); //get the month only
+				$year = $date_difference->format("%y");//get only the year if the month is >= 12
+ 				// NOTE: Make every special character into underscore ( _ ) to locate the filename prevent problem in downloading of file 			
 				$file_memo_tmp = $_FILES['file_memo']['tmp_name'];
-				$file_memo_name = $_FILES['file_memo']['name'];
-/*
-	Make every special character into underscore ( _ ) to prevent problem in downloading of file 
-*/			
-				$filename = $file_memo_name; //'/etc/hosts/@Álix Ãxel likes - beer?!.jpg';
-				$filename = Slug($filename, '_', '.'); // etc_hosts_alix_axel_likes_beer.jpg
-/*
-	Check if the file uploaded, the process required to upload MEMO
-*/
+				$file_memo_name = $_FILES['file_memo']['name'];//'/etc/hosts/@Álix Ãxel likes - beer?!.pdf';
+				$filtered_filename = '_'.Slug($file_memo_name, '_', '.'); // _etc_hosts_alix_axel_likes_beer.pdf
+ 				// NOTE: Check if the file uploaded, the process required to upload MEMO
 				if($file_memo_tmp == ""){
-					if($date_difference >= 9){ //>=9 months
-						$return['erro_msg'] = "Please upload the Memorandum";
-						echo json_encode($return['erro_msg']);
+					if($month >= 9 || $year >= 1){
+						$response['error_msg'] = "Please upload the Memorandum";
+						 echo json_encode($return['error_msg']);
 						return;
 					}
 					$array_fields = array('tbl_doc_review_masterlist_id','disposition','extension_date','reviewed_by','dcc_email','created_at');
+					$array_values = array($doc_review_masterlist_id,$disposition,$return['extension_date'],$username,$dcc_emailed_at,$datetime_today);
 				}
 				if($file_memo_tmp != ""){
-					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_name','extension_date','reviewed_by','dcc_email','created_at');
+					$is_file_name_existed = $request->selectQuery($file_memo_name);
+					if($is_file_name_existed['is_exist']=='true'){
+						$response['is_success'] ='false';
+						$response['result_msg'] = 'Filename is already existed!';
+						echo json_encode($response);
+						return;
+					}
+					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_filtered_name','extension_date','reviewed_by','dcc_email');
+					$array_values = array($doc_review_masterlist_id,$disposition,$file_memo_name,$filtered_filename,$return['extension_date'],$username,$dcc_emailed_at);
+					$doc_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values);
+				
+					$tbl_folder_path = $request->folderPath('temporary_document');
+					$target_file = $tbl_folder_path['folder_path'].$doc_review_disposition_id.$filtered_filename;
+					$request_upload_docu = $request->uploadDocument($tbl_folder_path['folder_path'],$file_memo_tmp,$target_file);
+
+					$response['is_success'] = ($request_upload_docu == 1) ? 'true' : 'false';
+					$response['result_msg'] = ($response['is_success'] == 'true') ? 'File uploaded successfully !': 'Uploading Failed. Please Try Again!';
+					echo json_encode($response);
+					return;
 				}
-				$array_values = array('Extended');
 			}
-			// $result = ACDCS::getInstance()->insert_query($table,$array_fields,$array_values);
-			// $script = ACDCS::getInstance()->insert_query_script($table,$array_fields,$array_values);
-			echo json_encode($array_fields);
+			$response['is_success'] = 'true';
+			$response['result_msg'] =  'Save Successfully';
+			$script = ACDCS::getInstance()->insert_query($table,$array_fields,$array_values); 
+			echo json_encode($response);
 			return;
 		}catch(\Exception $e){
 			echo json_encode($e);
 			return;
 		}
-		
-		/*
-		return 'true';
-		require_once('../class/oop_acdcs.php');
-		$date_time_today 	 = date('Y-m-d H:i:s');
-		
-		$fkid = $return['pkid'];
-		$remarks = $return['remarks'];
-		$username = $return['username'];
-		$table = 'tbl_qfr_sa_for_revision';
-		$array_fields = array('created_by','fk_special_acceptance','revision_count','remarks','username','created_at','updated_at');
-		foreach($array_fields as $key => $value){
-			if(!isset($return[$value]) || $return[$value] == ""){
-				$return[$value] = "";
-			}
-		}
-		$array_values = array($username,$fkid,1,$remarks,$username,$date_time_today,'');
-		$result = TQTS::getInstance()->insert_query($table,$array_fields,$array_values);
-		*/
 	}
+
 	function Slug($string, $slug = '-', $extra = null)
 	{
 		return strtolower(trim(preg_replace('~[^0-9a-z' . preg_quote($extra, '~') . ']+~i', $slug, Unaccent($string)), $slug));

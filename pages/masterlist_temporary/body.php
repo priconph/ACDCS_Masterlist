@@ -106,6 +106,30 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- Modal for system message -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal_alert">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><i class="fa fa fa-warning"></i> Error Found</h4>
+      </div>
+		<div class="modal-body">
+		<div class="row">
+			<div class="col-sm-12" id="">				
+				<div class="alert alert-danger" role="alert" id="alert_type">
+					<li class="fa fa-warning" style="font-size:36px;"></li> <h4 id="alert_message"></h4>
+				</div>
+			</div>
+		</div>
+		</div>
+		<div class="modal-footer">
+		<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Close</button>
+		</div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <!---------------------
 	Modals - Add Review 
 ---------------------->
@@ -197,7 +221,8 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<script src="js/common_functions.js?12345"></script>
+
+<script src="js/common_functions.js?23456"></script>
 <script>
 $(document).ready(function () {
 	/* Date Range Picker */
@@ -288,26 +313,26 @@ $(document).ready(function () {
 	
 	$formReviewDocu.submit(function (e) { 
 		e.preventDefault();
-		// let data = {
-		// 	'action':'temporary_create_review_docu'
-		// };
-		// let serialized_data = $(this).serialize();
-		// call_ajax_serialize(data,serialized_data,masterlist_temporary_handler,function(result){
-		// 	console.log('dsad')
-		// })
 		var form_data = new FormData(this);
-		
-		form_data.append("action","temporary_create_review_docu");
+		form_data.append("action","temporary_create_review_docu")
 		// form_data.append("pkid",$('#modal_sa_edit').data('id'));
 		// form_data.append("username",username);
-
-		call_ajax_attachment(form_data, masterlist_temporary_handler, function(result){
-			alert('asddsa');
+		call_ajax_attachment(form_data, masterlist_temporary_handler, function(response){
+			if(response['is_success'] === 'true'){
+				$('#modalReviewDocu').modal('hide')
+				notif_success('Save Successfully')
+			}else{
+				$('#modalReviewDocu').modal('hide');
+				$('#alert_message').text(response['result_msg'])
+				$('#modal_alert').modal();
+			}
 		});
 	});
+
 	/* ***************************
 			
 	*************************** */
+	
 });
 </script>
 
