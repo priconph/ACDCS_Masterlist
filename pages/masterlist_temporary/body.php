@@ -291,6 +291,11 @@ $(document).ready(function () {
 	$('#disposition').change(function (e) { 
 		e.preventDefault()
 		console.log($(this).val())
+		$formReviewDocu.find('#person_in_charge').empty()
+		$formReviewDocu.find('#due_date').val('')
+		$formReviewDocu.find('#extension_date').val('')
+		$formReviewDocu.find('#file_memo').val('')
+
 		if($(this).val() === '1'){
 			$('#isRevisionRow').show()
 			$('#isExtension').hide()
@@ -324,11 +329,17 @@ $(document).ready(function () {
 			}else{
 				$('#modalReviewDocu').modal('hide');
 				$('#alert_message').text(response['result_msg'])
-				$('#modal_alert').modal();
+				$('#modal_alert').modal()
 			}
 		});
 	});
+	$('#modalReviewDocu').on('hidden.bs.modal', function (e) {
+		$formReviewDocu[0].reset();
+		$('#person_in_charge').empty();
+		$('#isRevisionRow').hide()
+		$('#isExtension').hide()
 
+	});
 	/* ***************************
 			
 	*************************** */

@@ -47,7 +47,7 @@ function call_ajax_attachment(serialized_data, handler, fn) {
 		{
 			fn(result);
 		}, error : function (result) {
-			alert('ERROR: '+result['upload_msg']);
+			alert('ERROR: '+result['upload_msg']+'Please contact the ISS !');
 		}
 	}); 
 }
