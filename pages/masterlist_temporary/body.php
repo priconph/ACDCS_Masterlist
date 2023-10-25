@@ -18,14 +18,13 @@
 							<div class="panel-body">
 								<div class="col-sm-12">
 									<?php
-										if($sa_user_access){
-											echo '<button class="btn btn-success fa fa-plus pull-right" id="btn_sa"> New Special Acceptance</button>';
-										}
+										// if($sa_user_access){
+										// 	echo '<button class="btn btn-success fa fa-plus pull-right" id="btn_sa"> New Special Acceptance</button>';
+										// }
 									?>
-									<!-- <button class="btn btn-success fa fa-plus pull-right" id="btn_sa"> New Special Acceptance</button> -->
+									<button class="btn btn-success btn-lg fa pull-right" id="btnBatchApproval"> Approval <span id="count">(5)</span> </button>
 
-								</div><br><br>
-								<div class="row">
+								</div> <br><br><br>
 									<div class="col-sm-12">
 										<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary">
 											<thead>
@@ -34,7 +33,7 @@
 													<th><span class="fa fa-cogs"></span></th>
 													<th>Document ID</th>
 													<th>Document Status</th>
-													<!-- <th>Disposition</th> -->
+													<th>Disposition</th>
 													<!-- <th>Number of Review</th> -->
 													<th>Date Received</th>
 													 <th>Model</th>
@@ -107,7 +106,35 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!-- Modal for system message -->
+<!-- Modal for Approver Decision -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal_approver_decision">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><i class="fa fa-question-circle-o"></i> System Confirmation</h4>
+      </div>
+	  <form id="form_remove_attachment_confirmation">
+		  <div class="modal-body">
+			<div class="row" id="">
+				<div class="col-sm-12" id="">				
+					<label>If yes, please write the reason:</label>
+				</div>
+				<div class="col-sm-12">				
+					<textarea id="reason" name="reason" style="width:100%;" required></textarea>
+				</div>
+			</div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="submit" class="btn btn-primary fa fa-trash" id="btn_yes_remove_attachment"> Yes</button>
+			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Disapproved</button>
+		  </div>
+		</form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Modal Modal Alert -->
 <div class="modal fade" tabindex="-1" role="dialog" id="modal_alert">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
@@ -130,10 +157,10 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
 <!---------------------
 	Modals - Add Review 
 ---------------------->
-<!-- Modal for system message -->
 <div class="modal fade" tabindex="-1" role="dialog" id="modalReviewDocu">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
@@ -198,29 +225,6 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!-- Modal for system message -->
-<div class="modal fade" tabindex="-1" role="dialog" id="modal_system_message">
-  <div class="modal-dialog modal-md" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"><i class="fa fa-question-circle-o"></i> System Confirmation</h4>
-      </div>
-	  <div class="modal-body">
-		<div class="row">
-			<div class="col-sm-12" id="">				
-				<div class="alert alert-success" role="alert" id="container_message">					
-				</div>
-			</div>
-		</div>
-	  </div>
-	  <div class="modal-footer">
-		<button type="button" class="btn btn-default fa fa-save" data-dismiss="modal" id="btn_close"> Close</button>
-	  </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
 
 <script src="js/common_functions.js?23456"></script>
 <script>
@@ -260,6 +264,7 @@ $(document).ready(function () {
 	/* ***************************
 				Start
 	*************************** */
+	var arr_doc_review_masterlist_id = [];
 	var handler_ = 'handler_qfr';
 	var masterlist_temporary_handler = 'handler/masterlist_temporary_handler.php'
 	var $formReviewDocu = $('#formReviewDocu');
@@ -272,7 +277,14 @@ $(document).ready(function () {
 			$('#tbl_special_acceptance').attr('style','width:100%;')
 		}
 	});
-	
+
+	function readTemporaryReviewDocu(dataId)
+	{
+		let data = {'action':'read_temporary_review_docu','temporary_document_id':dataId}
+		call_ajax(data, masterlist_temporary_handler,function(result){
+			console.log(result);
+		})
+	}
 	$(tbl_masterlist_temporary).on('click','#btnReviewDocu',function (e) { 
 		e.preventDefault()
 		$('#modalReviewDocu').modal()
@@ -281,16 +293,32 @@ $(document).ready(function () {
 
 	});
 
-	function readTemporaryReviewDocu(dataId){
-		let data = {'action':'read_temporary_review_docu','temporary_document_id':dataId}
-		call_ajax(data, masterlist_temporary_handler,function(result){
-			console.log(result);
-		})
-	}
+	$(tbl_masterlist_temporary).on('click','#cBoxBatchSelect' ,function () {
+		let doc_review_masterlist_id = $(this).attr('data-id');
+		if ($(this).prop('checked')) {
+			$(this).each(function () {
+				arr_doc_review_masterlist_id.push(doc_review_masterlist_id);
+				console.log('Checked '+arr_doc_review_masterlist_id);
+			});
+		}else{
+			$(this).each(function () {
+				let index = arr_doc_review_masterlist_id.indexOf(doc_review_masterlist_id);
+				arr_doc_review_masterlist_id.splice(index, 1);
+				console.log('Unchecked '+arr_doc_review_masterlist_id);
+			});
+		}
+	});
 
+	$('#btnBatchApproval').click(function (e) { 
+		e.preventDefault();
+		const filtered_doc_review_masterlist_id = Array.from(new Set(arr_doc_review_masterlist_id));
+		console.log(filtered_doc_review_masterlist_id);
+		$('#modal_approver_decision').modal();
+
+	});
+	
 	$('#disposition').change(function (e) { 
 		e.preventDefault()
-		console.log($(this).val())
 		$formReviewDocu.find('#person_in_charge').empty()
 		$formReviewDocu.find('#due_date').val('')
 		$formReviewDocu.find('#extension_date').val('')
@@ -315,6 +343,7 @@ $(document).ready(function () {
 			$formReviewDocu.find('#extension_date').removeAttr('required',true)
 		}
 	});
+
 	
 	$formReviewDocu.submit(function (e) { 
 		e.preventDefault();
@@ -333,16 +362,18 @@ $(document).ready(function () {
 			}
 		});
 	});
+	
+	
+
+	/* ***************************
+			Closing of Modal
+	*************************** */
 	$('#modalReviewDocu').on('hidden.bs.modal', function (e) {
-		$formReviewDocu[0].reset();
-		$('#person_in_charge').empty();
+		$formReviewDocu[0].reset()
+		$('#person_in_charge').empty()
 		$('#isRevisionRow').hide()
 		$('#isExtension').hide()
-
 	});
-	/* ***************************
-			
-	*************************** */
 	
 });
 </script>

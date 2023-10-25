@@ -51,14 +51,21 @@
 	$sTable = "tbl_doc_review_masterlist";
 	
 	$database_config = '../db_config/config_acdcs.php';
-	
-	if(!file_exists($database_config)){
+	$common_function_handler = '../handler/common_function_handler.php';
+
+	if(file_exists($database_config)){
+		require_once($database_config);
+	} else {
 		echo "config file does not exist!";
 		exit;
-	} else {
-		require_once($database_config);
 	}
-	
+
+	if(file_exists($common_function_handler)){
+		require_once($common_function_handler);
+	} else {
+		echo "common_function_handler file does not exist!";
+		exit;
+	}
 	/* Database connection information */
 	$gaSql['user']       = $username;
 	$gaSql['password']   = $password;
@@ -248,26 +255,56 @@
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
 	);
+/*
+	Class Object
+*/
+	$request_doc_review_disposition = new DocuReviewDisposition;
+
 	while ( $aRow = mysql_fetch_array( $rResult ) )
     {
 		$row = array();
 		unset($row);
+
+		$doc_review_masterlist_id = $aRow['id'];
+		$fkid_document = $aRow['fkid_document'];
+/* 
+    Button
+*/
+        $getActiveDocumentById = getActiveDocumentById($fkid_document);
+		if($getActiveDocumentById['document_status'] == 1){
+			$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-edit" type="button" style="background-color:yellow;color:black;"> Review</button></center>';
+        }else if($getActiveDocumentById['document_status'] == 2){
+            $button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDetails" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
+        }
 /* 
     Document Status
 */
-		$temporary_document_id = $aRow['id'];
-		$fkid_document = $aRow['fkid_document'];
-        $getActiveDocumentById = getActiveDocumentById($fkid_document);
-		$row[]= '<center><input class="form-control" type="checkbox"> </center>';
-		$row[]= '<center><button class="btn btn-sm fa fa-edit" type="button" style="background-color:yellow;color:black;" id="btnReviewDocu" data-id="'.$temporary_document_id.'"> Review</button></center>';
-		$row[]= $getActiveDocumentById['fkid_document'];
-
         if($getActiveDocumentById['document_status'] == 1){
             $status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
-        }else{
-            $status = '';
+        }else if($getActiveDocumentById['document_status'] == 2){
+            $status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
         }
+/* 
+    Disposition
+*/
+		$arr_doc_review_disposition = $request_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
+		if($arr_doc_review_disposition['disposition'] == 1){
+			$doc_review_disposition = '<span class="badge">Revision</span>';
+		}else if($arr_doc_review_disposition['disposition'] == 2){
+			$doc_review_disposition = '<span class="badge">Retain</span>';
+		}else if($arr_doc_review_disposition['disposition'] == 3){
+			$doc_review_disposition = '<span class="">Obsolete</span>';
+		}else if($arr_doc_review_disposition['disposition'] == 4){
+			$doc_review_disposition = '<span class="badge">Extended</span>';
+		}else{
+			$doc_review_disposition = '';
+		}
+
+		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
+		$row[]= $button;
+		$row[]= $getActiveDocumentById['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
+		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
 		$row[]= $getActiveDocumentById['date_received'];
 		$row[]= $getActiveDocumentById['model'];
 		$row[]= $getActiveDocumentById['doc_title'];

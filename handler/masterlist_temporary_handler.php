@@ -6,7 +6,8 @@ error_reporting(E_ALL);
 
 	class CommonClass{
 
-		public static function docReviewMasterlist($doc_review_masterlist_id) {
+		public static function docReviewMasterlist($doc_review_masterlist_id) 
+		{
 			require_once('../class/oop_acdcs.php');
 			$request = $_POST;
 			$array_fields = array('created_at,fkid_document');
@@ -23,7 +24,8 @@ error_reporting(E_ALL);
 			}
 			return $request;
 		}
-		public static function activeDocs($fkid_document) {
+		public static function activeDocs($fkid_document) 
+		{
 			require_once('../class/oop_acdcs.php');
 			$request = $_POST;
 			$array_fields = array('expiration_date');
@@ -39,7 +41,8 @@ error_reporting(E_ALL);
 			}
 			return $request;
 		}
-		public static function folderPath($folder_name) {
+		public static function folderPath($folder_name) 
+		{
 			// tbl_folder_path
 			require_once('../class/oop_acdcs.php');
 			// return $folder_name;
@@ -58,14 +61,16 @@ error_reporting(E_ALL);
 			return $request;
 		}
 
-		public static function uploadDocument($target_directory,$file_memo_tmp,$target_file){
+		public static function uploadDocument($target_directory,$file_memo_tmp,$target_file)
+		{
 			if(file_exists($target_file)){
 				return 2; //failed file is already exist
 			}
 			return $value = move_uploaded_file($file_memo_tmp,$target_file); //success
 		}
 
-		public static function selectQuery($file_name) {
+		public static function selectDispositionByFilename($file_name) 
+		{
 			require_once('../class/oop_acdcs.php');
 			$request = $_POST;
 			$array_fields = array('*');
@@ -85,6 +90,22 @@ error_reporting(E_ALL);
 			return $request;
 		}
 
+		function changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status)
+		{
+			try {
+				require_once('../class/oop_acdcs.php');
+				$request = $_POST;
+				$table = 'tbl_doc_review_masterlist';
+				$array_fields = array('document_status');
+				$array_values = array($new_status);
+				$sql_where = 'WHERE id = '.$doc_review_masterlist_id.' ';
+				$script = ACDCS::getInstance()->update_query_script($table,$array_fields,$array_values,$sql_where);
+				$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$sql_where);
+				return $query;
+			} catch (\Throwable $th) {
+				throw $th;
+			}
+		}
 	}
 
 	if(is_ajax()) {
@@ -134,15 +155,19 @@ error_reporting(E_ALL);
 			$request = new CommonClass();
 			$doc_review_masterlist = $request->docReviewMasterlist($doc_review_masterlist_id);
 			$dcc_emailed_at = $doc_review_masterlist['created_at'];
-
+			$new_status = 2;
+			
 			$table = 'tbl_doc_review_disposition';
 			if($disposition == 1){ //Revision
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','created_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$datetime_today);
+				
 			}
 			if($disposition == 2 || $disposition == 3 ){ //Retain & Obsolete
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','created_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$datetime_today);
+				//$request->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
+				// return;
 			}
 			if($disposition == 4){//Extended
 				$fkid_document =  $doc_review_masterlist['fkid_document'];
@@ -153,8 +178,8 @@ error_reporting(E_ALL);
 				$year = $date_difference->format("%y");//get only the year if the month is >= 12
  				// NOTE: Make every special character into underscore ( _ ) to locate the filename prevent problem in downloading of file 			
 				$file_memo_tmp = $_FILES['file_memo']['tmp_name'];
-				$file_memo_name = $_FILES['file_memo']['name'];//'/etc/hosts/@Álix Ãxel likes - beer?!.pdf';
-				$filtered_filename = '_'.Slug($file_memo_name, '_', '.'); // _etc_hosts_alix_axel_likes_beer.pdf
+				$file_memo_name = $_FILES['file_memo']['name'];				//'/etc/hosts/@Álix Ãxel likes - beer?!.pdf';
+				$filtered_filename = '_'.Slug($file_memo_name, '_', '.');	 // _etc_hosts_alix_axel_likes_beer.pdf
  				// NOTE: Check if the file uploaded, the process required to upload MEMO
 				if($file_memo_tmp == ""){
 					if($month >= 9 || $year >= 1){
@@ -166,7 +191,7 @@ error_reporting(E_ALL);
 					$array_values = array($doc_review_masterlist_id,$disposition,$return['extension_date'],$username,$dcc_emailed_at,$datetime_today);
 				}
 				if($file_memo_tmp != ""){
-					$is_file_name_existed = $request->selectQuery($file_memo_name);
+					$is_file_name_existed = $request->selectDispositionByFilename($file_memo_name);
 					if($is_file_name_existed['is_exist']=='true'){
 						$response['is_success'] ='false';
 						$response['result_msg'] = 'Filename is already existed!';
@@ -176,7 +201,9 @@ error_reporting(E_ALL);
 					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_filtered_name','extension_date','reviewed_by','dcc_email');
 					$array_values = array($doc_review_masterlist_id,$disposition,$file_memo_name,$filtered_filename,$return['extension_date'],$username,$dcc_emailed_at);
 					$doc_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values);
-				
+				/* 
+					Uploading of Data 
+				*/
 					$tbl_folder_path = $request->folderPath('temporary_document');
 					$target_file = $tbl_folder_path['folder_path'].$doc_review_disposition_id.$filtered_filename;
 					$request_upload_docu = $request->uploadDocument($tbl_folder_path['folder_path'],$file_memo_tmp,$target_file);
@@ -189,7 +216,7 @@ error_reporting(E_ALL);
 			}
 			$response['is_success'] = 'true';
 			$response['result_msg'] =  'Save Successfully';
-			$script = ACDCS::getInstance()->insert_query($table,$array_fields,$array_values); 
+			// $script = ACDCS::getInstance()->insert_query($table,$array_fields,$array_values); 
 			echo json_encode($response);
 			return;
 		}catch(\Exception $e){
@@ -197,7 +224,8 @@ error_reporting(E_ALL);
 			return;
 		}
 	}
-
+	
+	
 	function Slug($string, $slug = '-', $extra = null)
 	{
 		return strtolower(trim(preg_replace('~[^0-9a-z' . preg_quote($extra, '~') . ']+~i', $slug, Unaccent($string)), $slug));
