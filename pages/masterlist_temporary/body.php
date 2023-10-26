@@ -355,6 +355,7 @@ $(document).ready(function () {
 			if(response['is_success'] === 'true'){
 				$('#modalReviewDocu').modal('hide')
 				notif_success('Save Successfully')
+				dt_special_acceptance.draw()
 			}else{
 				$('#modalReviewDocu').modal('hide');
 				$('#alert_message').text(response['result_msg'])

@@ -4,6 +4,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+require_once('../class/send_email.php');
+use Email\EmailDetail as EmailDetail;
+
 	class CommonClass{
 
 		public static function docReviewMasterlist($doc_review_masterlist_id) 
@@ -24,6 +27,7 @@ error_reporting(E_ALL);
 			}
 			return $request;
 		}
+
 		public static function activeDocs($fkid_document) 
 		{
 			require_once('../class/oop_acdcs.php');
@@ -41,6 +45,7 @@ error_reporting(E_ALL);
 			}
 			return $request;
 		}
+
 		public static function folderPath($folder_name) 
 		{
 			// tbl_folder_path
@@ -90,7 +95,7 @@ error_reporting(E_ALL);
 			return $request;
 		}
 
-		function changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status)
+		public static function changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status)
 		{
 			try {
 				require_once('../class/oop_acdcs.php');
@@ -106,7 +111,9 @@ error_reporting(E_ALL);
 				throw $th;
 			}
 		}
+
 	}
+
 
 	if(is_ajax()) {
 		if(isset($_POST["action"]) && !empty($_POST["action"])) {
@@ -146,13 +153,16 @@ error_reporting(E_ALL);
 	{
 		try{
 			require_once('../class/oop_acdcs.php');
+			// require_once('../class/send_email.php');
+
 			$return = $_POST ;
 			$response = array();
 			$username = $_SESSION['username'];
 			$disposition = $return['disposition'];
 			$datetime_today = date('Y-m-d H:i:s');
 			$doc_review_masterlist_id = $return['doc_review_masterlist_id'];
-			$request = new CommonClass();
+			$request = new CommonClass;
+			$send_email = new EmailDetail;
 			$doc_review_masterlist = $request->docReviewMasterlist($doc_review_masterlist_id);
 			$dcc_emailed_at = $doc_review_masterlist['created_at'];
 			$new_status = 2;
@@ -166,8 +176,24 @@ error_reporting(E_ALL);
 			if($disposition == 2 || $disposition == 3 ){ //Retain & Obsolete
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','created_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$datetime_today);
-				//$request->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
-				// return;
+			
+				// $docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values); 
+
+				$tbl_name = 'tbl_doc_review_disposition';
+				$docu_review_disposition_id = 1;
+				$to = 'mclegaspi@pricon.ph';
+				$from = 'cdcasuyon@pricon.ph';
+				$cc = '';
+				$subject = 'Testing Auto Emailer'.date('Y-m-d H:i:s').'';
+				$message = 'Testing Auto Emailer';
+				$date_start = date('Y-m-d');
+				$frequency = 3;
+				$testing[] = $send_email->send_scheduled_email($tbl_name, $docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
+				echo json_encode($testing);
+				// $request->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status); //change status
+				$response['is_success'] = 'true';
+				$response['result_msg'] =  'Save Successfully';
+				return;
 			}
 			if($disposition == 4){//Extended
 				$fkid_document =  $doc_review_masterlist['fkid_document'];
@@ -183,7 +209,8 @@ error_reporting(E_ALL);
  				// NOTE: Check if the file uploaded, the process required to upload MEMO
 				if($file_memo_tmp == ""){
 					if($month >= 9 || $year >= 1){
-						$response['error_msg'] = "Please upload the Memorandum";
+						$response['is_success'] ='false';
+						$response['result_msg'] = 'Please submit the memo!';
 						 echo json_encode($return['error_msg']);
 						return;
 					}

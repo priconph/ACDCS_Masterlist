@@ -255,9 +255,9 @@
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
 	);
-/*
-	Class Object
-*/
+	/*
+		Class Object
+	*/
 	$request_doc_review_disposition = new DocuReviewDisposition;
 
 	while ( $aRow = mysql_fetch_array( $rResult ) )
@@ -267,35 +267,35 @@
 
 		$doc_review_masterlist_id = $aRow['id'];
 		$fkid_document = $aRow['fkid_document'];
-/* 
-    Button
-*/
+	/* 
+		Button
+	*/
         $getActiveDocumentById = getActiveDocumentById($fkid_document);
 		if($getActiveDocumentById['document_status'] == 1){
 			$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-edit" type="button" style="background-color:yellow;color:black;"> Review</button></center>';
         }else if($getActiveDocumentById['document_status'] == 2){
             $button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDetails" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
         }
-/* 
-    Document Status
-*/
+	/* 
+		Document Status
+	*/
         if($getActiveDocumentById['document_status'] == 1){
             $status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
         }else if($getActiveDocumentById['document_status'] == 2){
             $status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
         }
-/* 
-    Disposition
-*/
+	/* 
+		Disposition
+	*/
 		$arr_doc_review_disposition = $request_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
 		if($arr_doc_review_disposition['disposition'] == 1){
-			$doc_review_disposition = '<span class="badge">Revision</span>';
+			$doc_review_disposition = 'Revision';
 		}else if($arr_doc_review_disposition['disposition'] == 2){
-			$doc_review_disposition = '<span class="badge">Retain</span>';
+			$doc_review_disposition = 'Retain';
 		}else if($arr_doc_review_disposition['disposition'] == 3){
-			$doc_review_disposition = '<span class="">Obsolete</span>';
+			$doc_review_disposition = '<span class="">Obsolete';
 		}else if($arr_doc_review_disposition['disposition'] == 4){
-			$doc_review_disposition = '<span class="badge">Extended</span>';
+			$doc_review_disposition = 'Extended';
 		}else{
 			$doc_review_disposition = '';
 		}
@@ -311,13 +311,12 @@
 		$row[]= $getActiveDocumentById['doc_no'];
 		$row[]= $getActiveDocumentById['rev_no'];
 		array_push($output['aaData'],$row);
-
 	}
 	echo json_encode( $output );
 
-/* 
-    Functions 
-*/
+	/* 
+		Functions 
+	*/
     function getActiveDocumentById($fkid_document)
     {
         require_once('../class/oop_acdcs.php');
