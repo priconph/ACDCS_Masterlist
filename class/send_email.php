@@ -238,9 +238,7 @@ class EmailDetail extends RapidEmailer{
 		return $return;
 	}
 
-	public function test_email_details($mail_data) {
-		return $mail_data;
-	}
+
 
 }
 
