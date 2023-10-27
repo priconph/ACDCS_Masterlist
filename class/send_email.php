@@ -1,10 +1,11 @@
 <?php
 namespace Email;
-class RapidEmailer{
+require_once('../class/oop_mailer.php');
 
+use MAILER as Mailer;
+class RapidEmailer{
     /* Scheduled e-mail */
 	function send_with_auto_mailer($mail_data){
-		require_once('../class/oop_mailer.php');
 		$result = "";
 		/* 
 			Instructions for data values
@@ -20,12 +21,12 @@ class RapidEmailer{
 			9. send_date_time
 		*/
 		$table				 = 'tbl_auto_mailer';
-		$array_fields_values = get_fields_values($mail_data,array('username'));
+		$array_fields_values = $this->get_fields_values($mail_data,array('username'));
 		$array_fields		 = $array_fields_values['array_fields']; 
 		$array_values		 = $array_fields_values['array_values']; 
 		$array_fields[]		 = 'date_created'; $array_values[] = date('Y-m-d H:i:s');
-		$result = MAILER::getInstance()->insert_query($table,$array_fields,$array_values);
-		$script = MAILER::getInstance()->insert_query_script($table,$array_fields,$array_values);
+		$result = Mailer::getInstance()->insert_query($table,$array_fields,$array_values);
+		$script = Mailer::getInstance()->insert_query_script($table,$array_fields,$array_values);
 		return $script;
 	}
 
@@ -188,7 +189,8 @@ class EmailDetail extends RapidEmailer{
 			"from_name"				=> 'ACDCSystemNotification@pricon.ph',
 			"subject"				=> $subject,
 			"date_start"			=> $date_start,
-			// "message"				=> $message,
+			"last_date_time_sent"	=> date('Y-m-d').' 07:30:00',
+			"message"				=> $message,
 			"frequency"				=> $frequency,
 			"system_name"			=> 'ACDCS_DRM',
 			"created_by"			=> $from

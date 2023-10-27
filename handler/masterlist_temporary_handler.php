@@ -178,19 +178,22 @@ use Email\EmailDetail as EmailDetail;
 				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$datetime_today);
 			
 				// $docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values); 
-
+				
+/* Email Alert Testing
 				$tbl_name = 'tbl_doc_review_disposition';
 				$docu_review_disposition_id = 1;
 				$to = 'mclegaspi@pricon.ph';
 				$from = 'cdcasuyon@pricon.ph';
 				$cc = '';
-				$subject = 'Testing Auto Emailer'.date('Y-m-d H:i:s').'';
+				$subject = 'Testing Auto Emailer'.date('Y-m-d').' 07:30:00';
 				$message = 'Testing Auto Emailer';
 				$date_start = date('Y-m-d');
-				$frequency = 3;
-				$testing[] = $send_email->send_scheduled_email($tbl_name, $docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
+				$frequency = 2;
+
+				$send_email[] = $send_email->send_scheduled_email($tbl_name, $docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
 				echo json_encode($testing);
-				// $request->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status); //change status
+*/
+				$request->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status); //change status
 				$response['is_success'] = 'true';
 				$response['result_msg'] =  'Save Successfully';
 				return;

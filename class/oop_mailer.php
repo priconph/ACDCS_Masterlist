@@ -1,6 +1,7 @@
 <?php
 //Set Class name here, it's a good practice to Capitalize the first letter, I've just read it somewhere on the internet... so its up to you if will follow...
-class MAILER extends mysqli 
+
+class Mailer extends mysqli 
 {
 	private static $instance = null;
 	
