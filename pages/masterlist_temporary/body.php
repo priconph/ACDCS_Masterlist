@@ -177,7 +177,14 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-12">		
-						<label>Disposition</label>
+						<label>Approved by:</label>
+					</div>
+					<div class="col-sm-12">		
+						<select class="form-control" id="sec_heads_username" name="sec_heads_username" style="width:100%;" required>
+						</select>
+					</div>
+					<div class="col-sm-12">		
+						<label>Disposition:</label>
 					</div>
 					<div class="col-sm-12">				
 						<select class="form-control" id="disposition" name="disposition" style="width:100%;" required>
@@ -278,18 +285,19 @@ $(document).ready(function () {
 		}
 	});
 
-	function readTemporaryReviewDocu(dataId)
-	{
+	function readTemporaryReviewDocu(dataId){
 		let data = {'action':'read_temporary_review_docu','temporary_document_id':dataId}
 		call_ajax(data, masterlist_temporary_handler,function(result){
 			console.log(result);
 		})
 	}
+
 	$(tbl_masterlist_temporary).on('click','#btnReviewDocu',function (e) { 
 		e.preventDefault()
 		$('#modalReviewDocu').modal()
 		$formReviewDocu.find('#doc_review_masterlist_id').val($(this).attr('data-id'))
 		re_initialize_select2_server_side('#modalReviewDocu #person_in_charge','#modalReviewDocu #formReviewDocu',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
+		re_initialize_select2_server_side('#modalReviewDocu #sec_heads_username','#modalReviewDocu #formReviewDocu',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
 
 	});
 
@@ -371,6 +379,7 @@ $(document).ready(function () {
 	*************************** */
 	$('#modalReviewDocu').on('hidden.bs.modal', function (e) {
 		$formReviewDocu[0].reset()
+		$('#sec_heads_username').empty()
 		$('#person_in_charge').empty()
 		$('#isRevisionRow').hide()
 		$('#isExtension').hide()

@@ -1,11 +1,33 @@
 <?php
-namespace Email;
+namespace SendEmail;
 require_once('../class/oop_mailer.php');
 
 use MAILER as Mailer;
 class RapidEmailer{
-    /* Scheduled e-mail */
-	function send_with_auto_mailer($mail_data){
+	function get_fields_values($passed_param,$excluded_value)
+	{
+		$array_fields = array();
+		$array_values = array();
+		foreach($passed_param as $key => $value){
+		   if(in_array($key,$excluded_value)){
+			   continue;
+		   }
+		   $array_fields[] = $key;
+		   if(is_array($value)){
+			   $array_values[] = implode(',',$value);
+		   }else{
+			   $array_values[] = $value;
+		   }
+	   }
+	   $return = array();
+	   $return['array_fields'] = $array_fields;
+	   $return['array_values'] = $array_values;
+	   return $return;
+   	}
+
+    /*Save Scheduled e-mail in tbl_auto_mailer */
+	function send_with_auto_mailer($mail_data)
+	{
 		$result = "";
 		/* 
 			Instructions for data values
@@ -29,36 +51,41 @@ class RapidEmailer{
 		$script = Mailer::getInstance()->insert_query_script($table,$array_fields,$array_values);
 		return $script;
 	}
-
-	function get_fields_values($passed_param,$excluded_value){
-		$array_fields = array();
-		$array_values = array();
-		foreach($passed_param as $key => $value){
-		   if(in_array($key,$excluded_value)){
-			   continue;
-		   }
-		   $array_fields[] = $key;
-		   if(is_array($value)){
-			   $array_values[] = implode(',',$value);
-		   }else{
-			   $array_values[] = $value;
-		   }
-	   }
-	   $return = array();
-	   $return['array_fields'] = $array_fields;
-	   $return['array_values'] = $array_values;
-	   return $return;
-   }
+	
+	/*Save E-mail in tbl_mailer */
+	function send_with_mailer($mail_data)
+	{
+		require_once('../class/oop_mailer.php');
+		$result = "";
+		/* 
+			Instructions for data values
+			Array should contain the following data:
+			1. to			= separator is comma
+			2. cc			= separator is comma
+			3. bcc			= separator is comma
+			4. from			
+			5. from_name
+			6. subject
+			7. message
+			8. system_name
+			9. send_date_time
+		*/
+		$table				 = 'tbl_mailer';
+		$array_fields_values = $this->get_fields_values($mail_data,array('username'));
+		$array_fields		 = $array_fields_values['array_fields']; 
+		$array_values		 = $array_fields_values['array_values']; 
+		$array_fields[]		 = 'date_created'; $array_values[] = date('Y-m-d H:i:s');
+		$array_fields[]		 = 'created_by'; $array_values[] = $mail_data['username'];
+		$result = MAILER::getInstance()->insert_query($table,$array_fields,$array_values);
+		$script = MAILER::getInstance()->insert_query_script($table,$array_fields,$array_values);
+		return $script;
+	}
 }
 
-class EmailDetail extends RapidEmailer{
-	public static function send_email($to, $from, $cc, $subject, $message) {
-		$common_function = '../handler/common_function.php';
-		if(file_exists($common_function)){
-			require_once($common_function);
-		}else{
-			return "Common function not found";
-		}
+class EmailDetail extends RapidEmailer {
+	public static function send_email($to, $from, $cc, $subject, $message) 
+	{
+		// return $subject;
 		$return 	= array();
 		$mail_data  = array();
 		$message .= "<br><br>
@@ -68,25 +95,25 @@ class EmailDetail extends RapidEmailer{
 		$mail_data  = array(
 			"`to`"				=> $to,
 			"cc"				=> $cc,
-			// "`to`"			=> 'rdfernandez@pricon.ph',
-			// "cc"				=> 'rdfernandez@pricon.ph',
 			"bcc"				=> 'mclegaspi@pricon.ph',
 			"`from`"			=> $from,
-			"from_name"			=> 'TQTSystemNotification@pricon.ph',
+			"from_name"			=> 'ACDCSystemNotification@pricon.ph',
 			"subject"			=> $subject,
 			"message"			=> $message,
 			"send_date_time"	=> date('Y-m-d H:i:s'),
-			"system_name"		=> 'TQTS',
+			"system_name"		=> 'ACDCS_DRM',
 			"username"			=> $from
 		);
-		$mail_result = send_with_mailer($mail_data);
+		$rapid_mailer = new RapidEmailer;
+		$mail_result = $rapid_mailer->send_with_mailer($mail_data);
 		// $mail_result = send_with_auto_mailer($mail_data);
 		$return['mail_result'] 		= $mail_result;
 		$return['mail_data'] 		= $mail_data;
 		return $return;
 	}
 	
-	public static function send_email_with_attachment($to, $from, $cc, $subject, $message, $attachment_filename, $attachment) {
+	public static function send_email_with_attachment($to, $from, $cc, $subject, $message, $attachment_filename, $attachment) 
+	{
 		/* 
 			NOTE: PLEASE READ!!
 			Attachment should be delimited by comma
@@ -124,7 +151,7 @@ class EmailDetail extends RapidEmailer{
 			"subject"				=> $subject,
 			"message"				=> $message,
 			"send_date_time"		=> date('Y-m-d H:i:s'),
-			"system_name"			=> 'TQTS',
+			"system_name"			=> 'ACDCS_DRM',
 			"attachment_filename" 	=> $attachment_filename, 
 			"attachment" 			=> $attachment, 
 			"username"				=> $from
@@ -135,7 +162,8 @@ class EmailDetail extends RapidEmailer{
 		return $return;
 	}
 	
-	public static function send_email_detailed($to, $from, $from_name, $cc, $bcc, $subject, $message, $send_date_time, $username) {
+	public static function send_email_detailed($to, $from, $from_name, $cc, $bcc, $subject, $message, $send_date_time, $username) 
+	{
 		$common_function = '../handler/common_function.php';
 		if(file_exists($common_function)){
 			require_once($common_function);
@@ -153,11 +181,11 @@ class EmailDetail extends RapidEmailer{
 			"cc"				=> $cc,
 			"bcc"				=> $bcc,
 			"`from`"			=> $from,
-			"from_name"			=> 'TQTSystemNotification@pricon.ph',
+			"from_name"			=> 'ACDCSystemNotification@pricon.ph',
 			"subject"			=> $subject,
 			"message"			=> $message,
 			"send_date_time"	=> $send_date_time,
-			"system_name"		=> 'TQTS',
+			"system_name"		=> 'ACDCS_DRM',
 			"username"			=> $username
 		);
 		$mail_result = send_with_mailer($mail_data);
@@ -165,14 +193,9 @@ class EmailDetail extends RapidEmailer{
 		$return['mail_data'] 		= $mail_data;
 		return $return;
 	}
-	
-	public static function send_scheduled_email($tbl_name, $fkid, $to, $from, $cc, $subject, $message , $date_start, $frequency) {
-		// $common_function = '../handler/common_function.php';
-		// if(file_exists($common_function)){
-		// 	require_once($common_function);
-		// }else{
-		// 	return "Common function not found";
-		// }
+
+	public static function send_scheduled_email($tbl_name, $fkid, $to, $from, $cc, $subject, $message , $date_start, $frequency)
+	{
 		$return 	= array();
 		$mail_data  = array();
 		$message .= "<br><br>
@@ -189,7 +212,7 @@ class EmailDetail extends RapidEmailer{
 			"from_name"				=> 'ACDCSystemNotification@pricon.ph',
 			"subject"				=> $subject,
 			"date_start"			=> $date_start,
-			"last_date_time_sent"	=> date('Y-m-d').' 07:30:00',
+			// "last_date_time_sent"	=> date('Y-m-d').' 07:30:00',
 			"message"				=> $message,
 			"frequency"				=> $frequency,
 			"system_name"			=> 'ACDCS_DRM',
@@ -222,12 +245,12 @@ class EmailDetail extends RapidEmailer{
 			"cc"					=> $cc,
 			"bcc"					=> 'mclegaspi@pricon.ph',
 			"`from`"				=> $from,
-			"from_name"				=> 'TQTSystemNotification@pricon.ph',
+			"from_name"				=> 'ACDCSystemNotification@pricon.ph',
 			"subject"				=> $subject,
 			"date_start"			=> $date_start,
 			"message"				=> $message,
 			"frequency"				=> $frequency,
-			"system_name"			=> 'TQTS',
+			"system_name"			=> 'ACDCS_DRM',
 			"attachment_filename" 	=> $attachment_filename, 
 			"attachment" 			=> $attachment, 
 			"created_by"			=> $from
@@ -237,7 +260,6 @@ class EmailDetail extends RapidEmailer{
 		$return['mail_data'] 		= $mail_data;
 		return $return;
 	}
-
 
 
 }
