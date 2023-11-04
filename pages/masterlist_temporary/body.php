@@ -356,7 +356,7 @@ $(document).ready(function () {
 	$formReviewDocu.submit(function (e) { 
 		e.preventDefault();
 		var form_data = new FormData(this);
-		form_data.append("action","temporary_create_review_docu")
+		form_data.append("action","create_disposition_details")
 		// form_data.append("pkid",$('#modal_sa_edit').data('id'));
 		// form_data.append("username",username);
 		call_ajax_attachment(form_data, masterlist_temporary_handler, function(response){

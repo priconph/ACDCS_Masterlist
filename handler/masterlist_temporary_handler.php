@@ -185,7 +185,7 @@ use SendEmail\EmailDetail;
 			$action = $_POST["action"];
 			switch($action) {	
 				case "read_temporary_review_docu" 					: read_temporary_review_docu(); break; 
-				case "temporary_create_review_docu" 				: temporary_create_review_docu(); break; 
+				case "create_disposition_details" 				: create_disposition_details(); break; 
 			}	
 		}
 	}
@@ -214,7 +214,7 @@ use SendEmail\EmailDetail;
 		}
 	*/
 
-	function temporary_create_review_docu()
+	function create_disposition_details()
 	{
 		try{
 			require_once('../class/oop_acdcs.php');
@@ -241,6 +241,9 @@ use SendEmail\EmailDetail;
 /* Scheduled email to Process owner
 	$scheduled_email[] = $common_class->sendScheduledEmailToProcessOwner($docu_review_disposition_id,$return['person_in_charge']);
 */
+/*
+ ! Enable the Email to PO and Approvers, Change the email format 
+ */
 /* Approval Details	and Send Email to Approvers */
 	$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username);
 

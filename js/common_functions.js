@@ -186,7 +186,7 @@ function fn_get_emp_name_by_username_array(username_array, txt_id){
 }
 
 /* ***************************
-	Special Acceptance - End
+	End
 /****************************/
 /**
  * !Toaster Notification
