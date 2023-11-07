@@ -32,6 +32,7 @@
                 'fkid_document',
 				'document_status',
                 'is_expiration_date_exist',
+                'originator_code',
 				'deleted_at',
 				'created_at',
 				'updated_at',
@@ -258,6 +259,7 @@
 	/*
 		Class Object
 	*/
+	use Handler\DocuReviewDisposition;
 	$request_doc_review_disposition = new DocuReviewDisposition;
 
 	while ( $aRow = mysql_fetch_array( $rResult ) )
@@ -310,6 +312,7 @@
 		$row[]= $getActiveDocumentById['doc_title'];
 		$row[]= $getActiveDocumentById['doc_no'];
 		$row[]= $getActiveDocumentById['rev_no'];
+		$row[]= $aRow['originator_code'];
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );

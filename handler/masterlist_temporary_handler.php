@@ -4,16 +4,17 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once('../class/send_email.php');
-use SendEmail\EmailDetail;
+require_once('../common_class/send_email.php');
+require_once('./common_function_handler.php');
+use CommonClass\EmailDetail;
+use Handler\DocuReviewDisposition;
 
 	class CommonClass{
 
 		public static function docReviewMasterlist($doc_review_masterlist_id) 
 		{
-			require_once('../class/oop_acdcs.php');
 			$request = $_POST;
-			$array_fields = array('created_at,fkid_document');
+			$array_fields = array('*');
 			$table 	   	= 'tbl_doc_review_masterlist';
 			$joins 	   	= '';
 			$sql_where 	= 'WHERE id = '.$doc_review_masterlist_id.'';
@@ -28,28 +29,32 @@ use SendEmail\EmailDetail;
 			return $request;
 		}
 
-		public static function activeDocs($fkid_document) 
-		{
-			require_once('../class/oop_acdcs.php');
-			$request = $_POST;
-			$array_fields = array('expiration_date');
-			$table 	   	= 'tbl_active_docs';
-			$joins 	   	= '';
-			$sql_where 	= 'WHERE fkid_document = '.$fkid_document.'';
-			$sql_order 	= '';
-			$sql_limit 	= 'LIMIT 0,1';
-			$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-			$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-			while($row = mysqli_fetch_array($query)){
-				$request['expiration_date'] = $row['expiration_date'];
-			}
-			return $request;
-		}
+		// public static function getDocReviewDispositionById($doc_review_masterlist_id) 
+		// {
+		// 	require_once('../class/oop_acdcs.php');
+		// 	$request = $_POST;
+		// 	$array_fields = array('*');
+		// 	$table 	   	= 'tbl_doc_review_disposition';
+		// 	$joins 	   	= '';
+		// 	$sql_where 	=  'WHERE id = '.$doc_review_masterlist_id.' AND deleted_at IS NULL';
+		// 	$sql_order 	= '';
+		// 	$sql_limit 	= '';
+		// 	$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		// 	$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		// 	if($query->num_rows > 0){
+		// 		while($row = mysqli_fetch_array($query)){
+		// 			$return['tbl_doc_review_masterlist_id'] = $row['tbl_doc_review_masterlist_id'];
+		// 		}
+		// 		$return['result'] = 1;
+		// 	}else{
+		// 		$return['result'] = 0; //no data
+		// 	}
+		// 	return $return;
+		// }
 
 		public static function folderPath($folder_name) 
 		{
 			// tbl_folder_path
-			require_once('../class/oop_acdcs.php');
 			// return $folder_name;
 			$request = $_POST;
 			$array_fields = array('folder_path');
@@ -77,7 +82,6 @@ use SendEmail\EmailDetail;
 		public static function selectDispositionByFilename($file_name) 
 		{
 			try {
-				require_once('../class/oop_acdcs.php');
 				$request = $_POST;
 				$array_fields = array('*');
 				$table 	   	= 'tbl_doc_review_disposition';
@@ -102,7 +106,6 @@ use SendEmail\EmailDetail;
 		public static function changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status)
 		{
 			try {
-				// require_once('../class/oop_acdcs.php');
 				$request = $_POST;
 				$table = 'tbl_doc_review_masterlist';
 				$array_fields = array('document_status');
@@ -116,46 +119,61 @@ use SendEmail\EmailDetail;
 			}
 		}
 
-		public static function createApprovalDetails($review_disposition_id,$sec_heads_username)
+		public static function createApprovalDetails($doc_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id)
 		{
 			try {
 				/* 	Select if the approver is already exist, the soft deleted the details by 
-						tbl_review_disposition_id column deleted_at is NULL
+						tbl_doc_review_disposition_id column deleted_at is NULL
 				*/
 				$request = $_POST;
-				$array_fields = array('tbl_review_disposition_id');
+				$array_fields = array('tbl_doc_review_disposition_id');
 				$table = 'tbl_doc_review_disposition_approval_details';
 				$joins 	   	= '';
-				$sql_where 	= 'WHERE tbl_review_disposition_id = '.$review_disposition_id.' AND deleted_at IS NULL' ;
+				$sql_where 	= 'WHERE tbl_doc_review_disposition_id = '.$doc_review_disposition_id.' AND deleted_at IS NULL' ;
 				$sql_order 	= '';
 				$sql_limit 	= 'LIMIT 0,1';
-				$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+				return $script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 				$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 				if($query->num_rows > 0){
 					$array_fields = array('deleted_at');
 					$array_values = array(date('Y-m-d H:i:s'));
-					$where 	= 'WHERE tbl_review_disposition_id = '.$review_disposition_id.' AND deleted_at IS NULL';
+					$where 	= 'WHERE tbl_doc_review_disposition_id = '.$doc_review_disposition_id.' AND deleted_at IS NULL';
 					$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where); 
 				}
 				/* Create new approval details*/
-				$array_fields = array('tbl_review_disposition_id','sec_heads_username','created_at');
-				$array_values = array($review_disposition_id,$sec_heads_username,date('Y-m-d H:i:s'));
+				$array_fields = array('tbl_doc_review_disposition_id','sec_heads_username','created_at');
+				$array_values = array($doc_review_disposition_id,$sec_heads_username,date('Y-m-d H:i:s'));
 				$query = ACDCS::getInstance()->insert_query($table,$array_fields,$array_values);
-				// CommonClass::sendEmailToApprover($review_disposition_id,$sec_heads_username);
+				/* Email to Approver */ //nedit
+				CommonClass::sendEmailToApprover($doc_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 				return $query;
 			} catch (\Throwable $th) {
 				throw $th;
 			}
 		}
 
-		public static function sendEmailToApprover($doc_review_masterlist_id,$sec_heads_username)
+		public static function sendEmailToApprover($doc_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id)
 		{
-			$to = 'mclegaspi@pricon.ph';
+			$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($doc_review_masterlist_id);
+			$active_docs = DocuReviewDisposition::activeDocs($get_doc_review_masterlist_id['fkid_document']);
+
+			// $from = $_SESSION['username'];//nedit
+			// $to 	 = $sec_heads_username; 
+			// $cc 	 = $_SESSION['username'];
 			$from = 'cbretusto@pricon.ph';
+			$to = 'mclegaspi@pricon.ph'; 
 			$cc = '';
-			$subject = 'FOR APPROVAL: ACDCS Document Review';
-			$message = 'Details: <br>';
-			$message .= 'Sample';
+			$subject = 'FOR APPROVAL: ACDCS Document Review'.' | Doc No. : '.$active_docs['doc_no'].' ';
+			$message = 'Please be informed that you have ACDCS Document Review for approval <br><br>';
+			$message .= 'Request Details	: <br>';
+			$message .= 'Date Received		: '.$active_docs['date_received'].'<br>';
+			$message .= 'Model				: '.$active_docs['model'].' <br>';
+			$message .= 'Originator			: '.$active_docs['originator_code'].'<br>';
+			$message .= 'Title				: '.$active_docs['doc_title'].'<br>';
+			$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
+			$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
+			$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
+
 			return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 		}
 
@@ -219,6 +237,12 @@ use SendEmail\EmailDetail;
 		try{
 			require_once('../class/oop_acdcs.php');
 			/* Class List */
+			/*
+				TODO: ACDCS Email format DCC to Process owner with table of data
+				TODO: Enable the Email to PO and Approvers 
+				TODO: change the folder path of memo
+				* nedit
+			*/
 			$common_class = new CommonClass;
 
 			$return = $_POST ;
@@ -232,23 +256,20 @@ use SendEmail\EmailDetail;
 			$doc_review_masterlist = $common_class->docReviewMasterlist($doc_review_masterlist_id);
 			$dcc_emailed_at = $doc_review_masterlist['created_at'];
 			$new_status = 2;
-			
+
 			$table = 'tbl_doc_review_disposition';
 			if($disposition == 1){ //Revision
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','created_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$datetime_today);
 				$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values); 
-/* Scheduled email to Process owner
-	$scheduled_email[] = $common_class->sendScheduledEmailToProcessOwner($docu_review_disposition_id,$return['person_in_charge']);
-*/
-/*
- ! Enable the Email to PO and Approvers, Change the email format 
- */
-/* Approval Details	and Send Email to Approvers */
-	$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username);
+			/* nedit Scheduled email to Process owner 
+				$scheduled_email[] = $common_class->sendScheduledEmailToProcessOwner($docu_review_disposition_id,$return['person_in_charge']);
+			*/
+				/* Approval Details	and Send Email to Approvers */
+				$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 
 				/* Change status*/
-					$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
+				$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
 
 				$response['is_success'] = 'true';
 				$response['result_msg'] =  'Save Successfully';
@@ -260,11 +281,10 @@ use SendEmail\EmailDetail;
 				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$datetime_today);
 				$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values); 
 
-/* Approval Details	and Send Email to Approvers */
-	$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username);
+				/* Approval Details	and Send Email to Approvers */
+				$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 				/* Change status*/
-					$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
-
+				$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
 
 				$response['is_success'] = 'true';
 				$response['result_msg'] =  'Save Successfully';
@@ -272,9 +292,10 @@ use SendEmail\EmailDetail;
 				return;
 			}
 			if($disposition == 4){//Extended
+				// echo json_encode($active_docs);
+				// return;
 				$fkid_document =  $doc_review_masterlist['fkid_document'];
-				$active_docs = $common_class->activeDocs($fkid_document);
-				
+				$active_docs = DocuReviewDisposition::activeDocs($fkid_document);
 				$date_difference = date_diff(date_create($return['extension_date']),date_create($active_docs['expiration_date']));
 				$month = $date_difference->format("%m"); //get the month only
 				$year = $date_difference->format("%y");//get only the year if the month is >= 12
@@ -294,16 +315,16 @@ use SendEmail\EmailDetail;
 					/* saved extended disposition w/o memo file */
 					$array_fields = array('tbl_doc_review_masterlist_id','disposition','extension_date','reviewed_by','dcc_email','created_at');
 					$array_values = array($doc_review_masterlist_id,$disposition,$return['extension_date'],$username,$dcc_emailed_at,$datetime_today);
-					$doc_review_disposition = ACDCS::getInstance()->insert_query($table,$array_fields,$array_values);
+					$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values);
 					
-/* Approval Details	and Send Email to Approvers	*/
-	$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username);
+					/* Approval Details	and Send Email to Approvers	*/
+					$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 					/* Change status*/
 					$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
 					
 					$response['is_success'] ='true';
 					$response['result_msg'] = 'Save successfully !';
-					echo json_encode($response);
+					echo json_encode($email);
 					return;
 				}
 				if($file_memo_tmp != ""){
@@ -314,20 +335,20 @@ use SendEmail\EmailDetail;
 						echo json_encode($response);
 						return;
 					}
-				/* saved extended disposition w/ memo file */
+					/* saved extended disposition w/ memo file */
 					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_filtered_name','extension_date','reviewed_by','dcc_email');
 					$array_values = array($doc_review_masterlist_id,$disposition,$file_memo_name,$filtered_filename,$return['extension_date'],$username,$dcc_emailed_at);
 					$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values);
-				/* 
-					Uploading of Data 
-				*/
-					$tbl_folder_path = $common_class->folderPath('temporary_document');
+					/* 
+						Uploading of Data 
+					*/
+					$tbl_folder_path = $common_class->folderPath('temporary_document'); //nedit //change temporary_document to memo
 					$target_file = $tbl_folder_path['folder_path'].$docu_review_disposition_id.$filtered_filename;
 					$request_upload_docu = $common_class->uploadDocument($tbl_folder_path['folder_path'],$file_memo_tmp,$target_file);
-/* Approval Details	and Send Email to Approvers	*/
-	$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username);
+					/* Approval Details	and Send Email to Approvers	*/
+					$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 					/* Change status*/
-						$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
 
 					$response['is_success'] = ($request_upload_docu == 1) ? 'true' : 'false';
 					$response['result_msg'] = ($response['is_success'] == 'true') ? 'File uploaded successfully !': 'Uploading Failed. Please Try Again!';

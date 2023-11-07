@@ -2,7 +2,7 @@
 		<section class="tab-content" id="tab-content">
 		   <section class="tab-pane active fade in content" id="iqc">
 				<div class="row">
-				   <div class="col-xs-12">
+				   	<div class="col-xs-12">
 						<legend style="margin-bottom:0px;"><a href="#" id="a_menu"><i class="fa fa-puzzle-piece"></i> ACDCS Document Review Process</a></legend>
 					    <ol class="breadcrumb">
 						  <li id="bc_menu"><a href="#" class="active"><i class="fa fa-home"></i> Home</a></li>
@@ -11,7 +11,7 @@
 						<div class="row" id="container_menu">
 							<?php //include('main_menu.php'); omodify ?>
 						</div>
-				   </div>
+				   	</div>
 					<div class="col-sm-12">
 						<div class="panel panel-info" style="overflow:scroll;">
 							<div class="panel-heading"><i class="fa fa-file fa-lg"> For Review</i></div>
@@ -40,8 +40,8 @@
 													<th>Title</th>
 													<th>Document No.</th>
 													<th>Rev No.</th>
-													<!--<th>Orignator Code</th>
-													<th>Document Type</th>
+													<th>Orignator Code</th>
+													<!--<th>Document Type</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th> -->
 
