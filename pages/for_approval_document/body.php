@@ -279,7 +279,7 @@ $(document).ready(function () {
 		"aaSorting"	: [],
 		"bProcessing": true,
         "bServerSide": true,
-		"sAjaxSource": "server_side_scripts/dt_masterlist_temporary.php",
+		"sAjaxSource": "server_side_scripts/dt_masterlist_for_approval.php",
 		"drawCallback": function( settings ) {
 			$('#tbl_special_acceptance').attr('style','width:100%;')
 		}

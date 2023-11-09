@@ -22,8 +22,6 @@
 										// 	echo '<button class="btn btn-success fa fa-plus pull-right" id="btn_sa"> New Special Acceptance</button>';
 										// }
 									?>
-									<button class="btn btn-success btn-lg fa pull-right" id="btnBatchApproval"> Approval <span id="count">(5)</span> </button>
-
 								</div> <br><br><br>
 									<div class="col-sm-12">
 										<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary">

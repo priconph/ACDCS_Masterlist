@@ -1,6 +1,4 @@
-<?php 
-	include_once('get_is_approver');
-?>
+
 <section class="main">
 		<section class="tab-content" id="tab-content">
 		   <section class="tab-pane active fade in content" id="dashboard">
@@ -28,13 +26,14 @@
 									<div class="panel-body" style="height:750px;overflow:auto;">
 										<?php 
 											/* Check if there is a read role on one IQC modules */
-											echo $username;
-											$user_iqc_read_access = false;
-											foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-												if($subsystem_code == "IQC" && $user_role['read'][$key] == 1){ 
-													$user_iqc_read_access = true;
-												}
-											}
+											// echo $query;
+											
+											// $user_iqc_read_access = false;
+											// foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
+											// 	if($subsystem_code == "IQC" && $user_role['read'][$key] == 1){ 
+											// 		$user_iqc_read_access = true;
+											// 	}
+											// }
 											
 											echo '<div class="col-xs-3">
 													<a href="#" id="router" link-id="temporaryDocu">
@@ -63,72 +62,34 @@
 														</div>
 													</a>
 												</div>';
-
-											echo '<div class="col-xs-3">
-													<a href="#" id="router" link-id="For Approval">
-														<div class="panel panel-success" style="padding:0px;">
-															<div class="panel-heading">
-															<div class="row">
-																<div class="col-xs-5">
-																<i class="fa fa-search fa-5x"></i>
-																</div>
-																<div class="col-xs-7 text-right">
-																<p class="announcement-heading"></p>
-																<p class="announcement-text fa-2x"> For Approval Documents</p>
-																</div>
+											if( $data['approver_count'] >0 ){
+												echo '<div class="col-xs-3">
+												<a href="#" id="router" link-id="forApproval">
+													<div class="panel panel-success" style="padding:0px;">
+														<div class="panel-heading">
+														<div class="row">
+															<div class="col-xs-5">
+															<i class="fa fa-search fa-5x"></i>
 															</div>
-															</div>
-															<div class="panel-footer announcement-bottom">
-																<div class="row">
-																<div class="col-xs-6">
-																	Open
-																</div>
-																<div class="col-xs-6 text-right">
-																	<i class="fa fa-arrow-circle-right"></i>
-																</div>
-																</div>
+															<div class="col-xs-7 text-right">
+															<p class="announcement-heading"></p>
+															<p class="announcement-text fa-2x"> For Approval Documents</p>
 															</div>
 														</div>
-													</a>
-												</div>';
-											
-											/* Check if there is a read role on one IPQC modules */
-											$user_ipqc_read_access = false;
-											foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-												if($subsystem_code == "IPQC" && $user_role['read'][$key] == 1){ 
-													$user_ipqc_read_access = true;
-												}
-											}
-											if( $user_ipqc_read_access ){
-												echo '<div class="col-xs-12">
-														<a href="#" id="a_dashboard_menu_ipqc">
-															<div class="panel panel-info" style="padding:0px;">
-															  <div class="panel-heading">
-																<div class="row">
-																  <div class="col-xs-5">
-																	<i class="fa fa-search fa-5x"></i>
-																  </div>
-																  <div class="col-xs-7 text-right">
-																	<p class="announcement-heading"></p>
-																	<p class="announcement-text fa-2x"> IPQC</p>
-																  </div>
-																</div>
-															  </div>
-															 
-																<div class="panel-footer announcement-bottom">
-																  <div class="row">
-																	<div class="col-xs-6">
-																	  Open
-																	</div>
-																	<div class="col-xs-6 text-right">
-																	  <i class="fa fa-arrow-circle-right"></i>
-																	</div>
-																  </div>
-																</div>
-															 
+														</div>
+														<div class="panel-footer announcement-bottom">
+															<div class="row">
+															<div class="col-xs-6">
+																Open
 															</div>
-														</a>
-													</div>';
+															<div class="col-xs-6 text-right">
+																<i class="fa fa-arrow-circle-right"></i>
+															</div>
+															</div>
+														</div>
+													</div>
+												</a>
+											</div>';
 											}
 										?>
 									</div>
@@ -143,9 +104,10 @@
 <script src="js/common_functions.js?1234"></script>
 <script>
 	$(document).ready(function () {
-		$('#router').click(function (e) { 
+		$('a').click(function (e) { 
 			e.preventDefault();
 			let linkId = $(this).attr('link-id');
+			alert(linkId)
 			fnGetPageLink(linkId)
 			// window.load.location('pages/masterlist_temporary/index.php');
 			// window.location.href = "index.php?page="+result['page'];

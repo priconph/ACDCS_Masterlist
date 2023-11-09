@@ -24,6 +24,7 @@ error_reporting(E_ALL);
 		switch($link_id){
 			case "dashboard"  		: $return['page'] = "dashboard"; break;
 			case "temporaryDocu"  	: $return['page'] = "temporaryDocu"; break;
+			case "forApproval"  	: $return['page'] = "forApproval"; break;
 			default					: $return['page'] = "";
 		}
 		echo json_encode($return);
