@@ -1,5 +1,5 @@
 <?php
-namespace SendEmail;
+namespace Model;
 require_once('../class/oop_mailer.php');
 
 use MAILER as Mailer;

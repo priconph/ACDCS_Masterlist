@@ -1,5 +1,5 @@
 /* Note: you need to call jquery or other library for these to work */
-var handler_common_handler		= "handler/common_handler.php";
+var handler_common_handler		= "handler/handler_common_handler.php";
 
 /* Call basic ajax for submit */
 function call_ajax(data, handler, fn) {
@@ -183,6 +183,21 @@ function fn_get_emp_name_by_username_array(username_array, txt_id){
 	call_ajax(data, handler_common_handler, function(result){
 		$('#'+txt_id).val(result['emp_name']);
 	});
+}
+/**
+ * GetPageLink 
+ * @param {*} linkId 
+ */
+
+function fnGetPageLink(linkId){
+	var data = {
+		"action"	: "get_page_link",
+		"link_id"	: linkId
+	}
+	call_ajax(data, 'handler/route_handler.php', function (result) {
+		window.location.href = "index.php?page="+result['page'];
+	});
+	// link_handler
 }
 
 /* ***************************

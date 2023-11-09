@@ -4,9 +4,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once('../common_class/send_email.php');
+require_once('../model/send_email.php');
 require_once('./common_function_handler.php');
-use CommonClass\EmailDetail;
+use Model\EmailDetail;
 use Handler\DocuReviewDisposition;
 
 	class CommonClass{
@@ -132,7 +132,7 @@ use Handler\DocuReviewDisposition;
 				$sql_where 	= 'WHERE tbl_doc_review_disposition_id = '.$doc_review_disposition_id.' AND deleted_at IS NULL' ;
 				$sql_order 	= '';
 				$sql_limit 	= 'LIMIT 0,1';
-				return $script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+				$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 				$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 				if($query->num_rows > 0){
 					$array_fields = array('deleted_at');
@@ -191,7 +191,7 @@ use Handler\DocuReviewDisposition;
 				$frequency = 3;
 				return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
 			} catch (\Throwable $th) {
-				//throw $th;
+				throw $th;
 			}
 		}
 
@@ -231,18 +231,18 @@ use Handler\DocuReviewDisposition;
 
 		}
 	*/
-
+	/*
+		TODO: ACDCS Email format DCC to Process owner with table of data
+		TODO: Enable the Email to PO and Approvers 
+		TODO: change the folder path of memo
+		* nedit
+	*/
 	function create_disposition_details()
 	{
 		try{
 			require_once('../class/oop_acdcs.php');
+			
 			/* Class List */
-			/*
-				TODO: ACDCS Email format DCC to Process owner with table of data
-				TODO: Enable the Email to PO and Approvers 
-				TODO: change the folder path of memo
-				* nedit
-			*/
 			$common_class = new CommonClass;
 
 			$return = $_POST ;
@@ -262,9 +262,9 @@ use Handler\DocuReviewDisposition;
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','created_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$datetime_today);
 				$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values); 
-			/* nedit Scheduled email to Process owner 
-				$scheduled_email[] = $common_class->sendScheduledEmailToProcessOwner($docu_review_disposition_id,$return['person_in_charge']);
-			*/
+				/* nedit Scheduled email to Process owner 
+					$scheduled_email[] = $common_class->sendScheduledEmailToProcessOwner($docu_review_disposition_id,$return['person_in_charge']);
+				*/
 				/* Approval Details	and Send Email to Approvers */
 				$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 
@@ -357,8 +357,7 @@ use Handler\DocuReviewDisposition;
 				}
 			}
 		}catch(\Exception $e){
-			echo json_encode($e);
-			return;
+			throw $th;
 		}
 	}
 	

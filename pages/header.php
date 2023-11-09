@@ -53,7 +53,7 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 	
 	<aside class="sidebar">
 		<ul class="sidebar-nav">
-			<li class="active" id="li_dashboard"><a href="#dashboard" data-toggle="tab"><i class="fa fa-dashboard"></i> <span>Temporary Documents</span></a></li>
+			<li class="active" link-id="dashboard"><a href="#dashboard" data-toggle="tab"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
 			<?php 
 				/*omodify
 				 Check if there is a read role on one IQC modules
@@ -70,7 +70,7 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 			?>
 		</ul>
 	</aside>
-	
+	<script src="./js/common_functions.js?21345"></script>
 	<script>
 		var script_url = '';
 		var username = '<?php echo $_SESSION['username']?>';
@@ -83,8 +83,9 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 			$(".wrapper").toggleClass("toggled");
 		});
 		
-		$('.sidebar li').click(function(){
-			fn_get_page(this.id);
+		$('.sidebar li').click( function (){
+			let linkId = $(this).attr('link-id');
+			fnGetPageLink(linkId);
 		});
 		
 		display_loading_screent();
@@ -93,26 +94,6 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 			setTimeout(function(){
 				document.getElementById("loading_overlay").style.display = "none";
 			},300);
-		}
-		
-		function fn_get_page(page_id){
-			var data = {
-				"action"	: "fn_get_page",
-				"page_id"	: page_id
-			}
-			data = $.param(data);
-			$.ajax({
-				type	: "post",
-				dataType: "json",
-				data 	: data,
-				url 	: handler,
-				success	:function(result){
-					console.log(result);
-					window.location.href = "index.php?page="+result['page'];
-				},error	: function(result){
-					console.log(result);
-				}
-			});
 		}
 		
 		fn_set_active_nav(selected_menu);

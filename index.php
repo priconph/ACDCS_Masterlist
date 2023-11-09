@@ -1,19 +1,13 @@
 <?php
+session_start();
 /* changes here must also be applied in handler fn_get_page() */
-/* you may use any file from pages as your homepage
+/* you may use any file from pages as your homepage*/
 if( isset($_GET['page']) ){
-	$page = $_GET['page'];
+	echo $page = $_GET['page'];
 	switch($page){
-		case "dashboard" 	: $page_link = 'pages/dashboard/index.php'; break;
-		case "iqc" 			: $page_link = 'pages/iqc/index.php'; break;
-		case "ipqc"			: $page_link = 'pages/ipqc/index.php'; break;
-		case "oqc"			: $page_link = 'pages/oqc/index.php'; break;
-		case "qfr" 			: $page_link = 'pages/qfr/index.php'; break;
-		case "etr" 			: $page_link = 'pages/etr/index.php'; break;
-		case "ypd" 			: $page_link = 'pages/ypd/index.php'; break;
-		case "ccte" 		: $page_link = 'pages/ccte/index.php'; break;
-		case "configuration": $page_link = 'pages/configuration/index.php'; break;
-		default 			: $page_link = 'pages/redirect_page/index.php';
+		case "dashboard" 		: $page_link = 'pages/dashboard/index.php'; break;
+		case "temporaryDocu" 	: $page_link = 'pages/masterlist_temporary/index.php'; break;
+		default 				: $page_link = 'pages/redirect_page/index.php';
 	}
 	$selected_menu = $page;
 	include($page_link);
@@ -22,12 +16,13 @@ if( isset($_GET['page']) ){
 	$selected_menu 	= 'dashboard';
 	include($page_link);
 }
-*/
+
 // echo 'test';
 // echo ($_GET['page']);
 // return;
-session_start();
-$page_link 	= 'pages/masterlist_temporary/index.php';
-include($page_link);
+
+// $page_link 	= 'pages/masterlist_temporary/index.php';//masterlist_temporary
+// $page_link 	= 'pages/dashboard/index.php';//masterlist_temporary
+// include($page_link);
 
 ?>
