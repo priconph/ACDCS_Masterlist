@@ -152,7 +152,9 @@ LIMIT 0 , 10
         return;
     */
 
-	/* Individual column filtering */
+	/* 
+		Individual column filtering 
+	*/
 	for ( $i=0 ; $i<count($aColumns) ; $i++ )
 	{
 		if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )

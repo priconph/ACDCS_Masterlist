@@ -279,6 +279,9 @@ $(document).ready(function () {
 		"aaSorting"	: [],
 		"bProcessing": true,
         "bServerSide": true,
+		"columnDefs":[
+            {"orderable":false,"targets":[0,1,2,3,4]}
+        ],
 		"sAjaxSource": "server_side_scripts/dt_masterlist_for_approval.php",
 		"drawCallback": function( settings ) {
 			$('#tbl_special_acceptance').attr('style','width:100%;')

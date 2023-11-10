@@ -3,7 +3,7 @@ session_start();
 /* changes here must also be applied in handler fn_get_page() */
 /* you may use any file from pages as your homepage*/
 if( isset($_GET['page']) ){
-	echo $page = $_GET['page'];
+	$page = $_GET['page'];
 	switch($page){
 		case "dashboard" 		: $page_link = 'pages/dashboard/index.php'; break;
 		case "temporaryDocu" 	: $page_link = 'pages/masterlist_temporary/index.php'; break;

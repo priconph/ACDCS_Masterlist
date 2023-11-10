@@ -12,47 +12,50 @@
 	/* Array of database columns which should be read and sent back to DataTables. Use a space where
 	 * you want to insert a non-database field (for example a counter or static image)
 	 */
+	/* Model */
+	$database_config = '../db_config/config_acdcs.php';
+	$active_document_class = '../model/active_document.php';
+	$common_function_handler = '../handler/common_function_handler.php';
+
+
+	use Handler\DocuReviewDisposition;
+	use Model\ActiveDocument;
+
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
-    // echo 'true';
-    // return;
-
-	// $aColumns = array( 
-    //             'id',
-    //             'fkid_document',
-	// 			'document_status',
-    //             'is_expiration_date_exist',
-	// 			'deleted_at',
-	// 			'created_at',
-	// 			'updated_at',
-	// 			// "(SELECT `vw_role`.`role` FROM `vw_user_roles` `vw_role` WHERE `vw_role`.`user` = '".$_GET['username']."' AND `vw_role`.`module` = 'Special Acceptance' AND `vw_role`.`subsystem_code` = 'QFR' AND `vw_role`.`logdel` = '0') as role",
-	// 			);
+    
 	$aColumns = array( 
-                'id',
-                'fkid_document',
-				'document_status',
-                'is_expiration_date_exist',
-                'originator_code',
-				'deleted_at',
-				'created_at',
-				'updated_at',
-				// "(SELECT `vw_role`.`role` FROM `vw_user_roles` `vw_role` WHERE `vw_role`.`user` = '".$_GET['username']."' AND `vw_role`.`module` = 'Special Acceptance' AND `vw_role`.`subsystem_code` = 'QFR' AND `vw_role`.`logdel` = '0') as role",
-				);
-
-	
+		'masterlist.id',
+		'masterlist.fkid_document',
+		'masterlist.document_status',
+		'masterlist.is_expiration_date_exist',
+		'masterlist.deleted_at',
+		'active.date_received',
+		'active.model',
+		'active.doc_title',
+		'active.doc_no',
+		'active.rev_no',
+		'masterlist.originator_code',
+	);
 	/* used this field for searching data typed in the search box */
-	// $array_search = array('empno', 'LastName',
-							// 'date', 'date_out');
-	// $array_search = array('empno', 'LastName');
+
+	$array_search = array(
+		'active.date_received',
+		'active.model',
+	 	'active.doc_title',
+	 	'active.doc_no',
+	 	'active.rev_no',
+	 	'masterlist.originator_code',
+	);
 							
 	/* Indexed column (used for fast and accurate table cardinality) */
-	$sIndexColumn = "id";
+	$sIndexColumn = "masterlist.id";
 	
 	/* DB table to use */
-	$sTable = "tbl_doc_review_masterlist";
+	$sTable = "tbl_doc_review_masterlist masterlist";
+	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	
-	$database_config = '../db_config/config_acdcs.php';
-	$common_function_handler = '../handler/common_function_handler.php';
+
 
 	if(file_exists($database_config)){
 		require_once($database_config);
@@ -67,6 +70,14 @@
 		echo "common_function_handler file does not exist!";
 		exit;
 	}
+
+	if(file_exists($active_document_class)){
+		require_once($active_document_class);
+	} else {
+		echo "common_function_handler file does not exist!";
+		exit;
+	}
+
 	/* Database connection information */
 	$gaSql['user']       = $username;
 	$gaSql['password']   = $password;
@@ -101,7 +112,7 @@
     
 
 /*
-	Ordering
+	Ordering/Sorting
     aColumns is array of column a DB
 */
     $sOrder = '';
@@ -122,10 +133,8 @@
 			$sOrder = "";
 		}
 	}
-    // echo $sOrder;
-	// return;
 	if($sOrder == ""){
-		$sOrder = " ORDER BY id DESC";
+		$sOrder = "ORDER BY masterlist.id DESC";
 	}
 
 	/* 
@@ -139,28 +148,12 @@
 	$sWhere = "";
 	if ( $_GET['sSearch'] != "" )
 	{
-		//  $sWhere = "WHERE (";
-		// for ( $i=0 ; $i<count($aColumns) ; $i++ )
-		// {
-		// 	if( in_array($aColumns[$i],$array_search) ){
-		// 	$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
-		// 	}
-		// }
-		// $sWhere = substr_replace( $sWhere, "", -3 );
-
-		$sWhere .= ')'; 
+		// $sWhere .= ')'; 
 		$sWhere = "WHERE (";
 		for ( $i=0 ; $i<count($aColumns) ; $i++ )
 		{
-			if( strpos($aColumns[$i]," as ") !== false ){
-				$modified_search = explode(" ",$aColumns[$i]);
-				$modified_search_reduced = array();
-				for($x=0;$x< (count($modified_search) -2); $x++){
-					$modified_search_reduced[] = $modified_search[$x];
-				}
-				$sWhere .= implode(" ",$modified_search_reduced)." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
-			}else{
-				$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
+			if( in_array($aColumns[$i],$array_search) ){
+			$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
 			}
 		}
 		$sWhere = substr_replace( $sWhere, "", -3 );
@@ -174,8 +167,9 @@
     */
 
 	/* Individual column filtering */
-	for ( $i=0 ; $i<count($aColumns) ; $i++ )
+	for ( $i=0 ; $i<count($array_search) ; $i++ )
 	{
+		//NOTE: $_GET['bSearchable_'.$i] accept only 11  $array_search
 		if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
 		{
 			if ( $sWhere == "" )
@@ -186,35 +180,23 @@
 			{
 				$sWhere .= " AND ";
 			}
-			$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
+			$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
 		}
 	}
-    
+	
+
 
 	/* 
 		dito ka mag add ng where mo, una check mo kung may laman na yung $sWhere pag wala append mo yung where mo na meron
 		kasama where kapag naman may laman na AND na syempre diba :)
 	*/
-	
-	// if($sWhere == ""){
-		// $sWhere .= "WHERE  ";
-	// }else{
-		// $sWhere .= "AND ";
-	// }
 
-	// $sWhere  .= " (created_by = '$username' OR judged_by_approver = '$username') AND logdel='0'";
-	// $username 	= $_GET['username'];
-	// $sql_where 	= $_GET['wh'];
-	// if($sql_where != ""){
-	// 	$sWhere 	= $sql_where;
-	// }
-	
 	if($sWhere == ""){
 		$sWhere .= "WHERE  ";
 	}else{
 		$sWhere .= "AND ";
 	}
-	$sWhere .= " `deleted_at` IS NULL AND is_expiration_date_exist = 'true'"; //nmodify
+	$sWhere .= "active.view_status =1 AND active.`logdel` =0 AND masterlist.deleted_at IS NULL";
     
 	// $sWhere .= " `status` = 0 OR `status` = 2 OR `status` = 8 OR `status` = 'A' AND `logdel` = 0";
 	/*
@@ -224,6 +206,7 @@
 	$sQuery = "
 		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
 		FROM   $sTable
+		$sJoin
 		$sWhere
 		$sOrder
 		$sLimit
@@ -259,9 +242,9 @@
 	/*
 		Class Object
 	*/
-	use Handler\DocuReviewDisposition;
 	$request_doc_review_disposition = new DocuReviewDisposition;
-
+	$active_documents = new ActiveDocument;
+	
 	while ( $aRow = mysql_fetch_array( $rResult ) )
     {
 		$row = array();
@@ -272,7 +255,7 @@
 	/* 
 		Button
 	*/
-        $getActiveDocumentById = getActiveDocumentById($fkid_document);
+        $getActiveDocumentById = $active_documents->getActiveDocumentById($fkid_document);
 		if($getActiveDocumentById['document_status'] == 1){
 			$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-edit" type="button" style="background-color:yellow;color:black;"> Review</button></center>';
         }else if($getActiveDocumentById['document_status'] == 2){
@@ -308,90 +291,15 @@
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
 		$row[]= $getActiveDocumentById['date_received'];
-		$row[]= $getActiveDocumentById['model'];
-		$row[]= $getActiveDocumentById['doc_title'];
-		$row[]= $getActiveDocumentById['doc_no'];
-		$row[]= $getActiveDocumentById['rev_no'];
+		$row[]= $aRow['model'];
+		$row[]= $aRow['doc_title'];
+		$row[]= $aRow['doc_no'];
+		$row[]= $aRow['rev_no'];
 		$row[]= $aRow['originator_code'];
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
-
 	/* 
 		Functions 
 	*/
-    function getActiveDocumentById($fkid_document)
-    {
-        require_once('../class/oop_acdcs.php');
-        $return = $_POST;
-		$array_fields = array('	masterlist.id AS doc_review_masterlist_id,masterlist.document_status,
-								masterlist.created_at, active. *,docs.pkid AS doc_pkid,docs.section'
-		);
-		$table 	   	= 'tbl_active_docs active';
-		$joins 	   	= 'LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document';
-		$joins 	   	.=' RIGHT JOIN tbl_doc_review_masterlist masterlist ON masterlist.fkid_document = docs.pkid';
-		$sql_where 	=  'WHERE active.view_status = 1';
-		$sql_where 	.= ' AND active.logdel = 0';
-		$sql_where 	.= ' AND masterlist.fkid_document = '.$fkid_document.'';
-		$sql_where 	.= ' AND masterlist.deleted_at IS NULL';
-		$sql_order 	= 'ORDER BY active.doc_no DESC';
-		$sql_limit 	= '';
-		$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-		$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-        while($row = mysqli_fetch_array($query)){
-            $return['fkid_document'] = $row['fkid_document'];
-            $return['document_status'] = $row['document_status'];
-            $return['date_received'] = $row['date_received'];
-            $return['model'] = $row['model'];
-            $return['doc_title'] = $row['doc_title'];
-            $return['doc_no'] = $row['doc_no'];
-            $return['rev_no'] = $row['rev_no'];
-            // $return['originator_code'] = $row['originator_code'];
-            // $return['doc_type'] = $row['doc_type'];
-            // $return['effectivity_date'] = $row['effectivity_date'];
-            // $return['created_at'] = $row['created_at'];
-        }
-        return $return;
-    }
-
-/*
-====GROUP BY originator code===
-
-SELECT originator_code, COUNT( * )
-FROM `tbl_active_docs` active
-WHERE originator_code IS NOT NULL
-GROUP BY originator_code
-ORDER BY `active`.`originator_code` DESC
-LIMIT 0 , 100
-========================
-
-SELECT `masterlist`.id AS `doc_review_masterlist_id` , `masterlist`.document_status, `masterlist`.created_at, `active`. * , `docs`.`pkid` AS `doc_pkid` , `docs`.`section`
-FROM `tbl_active_docs` active
-LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document
-RIGHT JOIN `tbl_doc_review_masterlist` masterlist ON masterlist.fkid_document = docs.pkid
-WHERE active.view_status =1
-AND active.`logdel` =0
-AND docs.doc_status =1
-AND masterlist.deleted_at IS NULL
-ORDER BY `masterlist`.`created_at`
-LIMIT 0 , 10
-
-SELECT SQL_CALC_FOUND_ROWS  `masterlist`.id AS `doc_review_masterlist_id` , `masterlist`.document_status,
-`masterlist`.created_at, `active`. * , `docs`.`pkid` AS `doc_pkid` , `docs`.`section`
-FROM `tbl_active_docs` active LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document 
-RIGHT JOIN `tbl_doc_review_masterlist` masterlist ON masterlist.fkid_document = docs.pkid 
-WHERE active.view_status = 1 AND active.`logdel` = 0 AND masterlist.fkid_document = 142587 AND masterlist.deleted_at IS NULL
-ORDER BY `active`.`doc_no` DESC;
-
-SELECT `active`. * , `docs`.`pkid` AS `doc_pkid`, `docs`.`section`
-FROM `tbl_active_docs` active
-LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document
-RIGHT JOIN `tbl_doc_review_masterlist` masterlist ON masterlist.fkid_document = docs.pkid
-WHERE active.view_status =1
-AND active.`logdel` =0
-AND docs.doc_status =1
-ORDER BY `active`.`doc_no` DESC
-LIMIT 0 , 10
-    
-*/
 ?>

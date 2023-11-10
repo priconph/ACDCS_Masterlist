@@ -107,7 +107,6 @@
 		$('a').click(function (e) { 
 			e.preventDefault();
 			let linkId = $(this).attr('link-id');
-			alert(linkId)
 			fnGetPageLink(linkId)
 			// window.load.location('pages/masterlist_temporary/index.php');
 			// window.location.href = "index.php?page="+result['page'];
