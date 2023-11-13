@@ -23,9 +23,10 @@
 
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
-    
+
 	$aColumns = array( 
-		'masterlist.id',
+		'approval.id',
+		'approval.sec_heads_username',
 		'masterlist.fkid_document',
 		'masterlist.document_status',
 		'masterlist.is_expiration_date_exist',
@@ -37,6 +38,7 @@
 		'active.rev_no',
 		'masterlist.originator_code',
 	);
+
 	/* used this field for searching data typed in the search box */
 
 	$array_search = array(
@@ -49,11 +51,13 @@
 	);
 							
 	/* Indexed column (used for fast and accurate table cardinality) */
-	$sIndexColumn = "masterlist.id";
+	$sIndexColumn = "approval.id";
 	
 	/* DB table to use */
 	$sTable = "tbl_doc_review_masterlist masterlist";
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
+	$sJoin .= " RIGHT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
+	$sJoin .= " RIGHT JOIN tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id";
 	
 
 
@@ -134,7 +138,7 @@
 		}
 	}
 	if($sOrder == ""){
-		$sOrder = "ORDER BY masterlist.id DESC";
+		$sOrder = "ORDER BY approval.id DESC";
 	}
 
 	/* 
@@ -196,7 +200,11 @@
 	}else{
 		$sWhere .= "AND ";
 	}
-	$sWhere .= "active.view_status =1 AND active.`logdel` =0 AND masterlist.deleted_at IS NULL";
+	// $sWhere .= '(active.view_status =1 AND active.`logdel` =0) AND (masterlist.deleted_at IS NULL AND masterlist.document_status = 2) AND disposition.deleted_at IS NULL AND (approval.deleted_at IS NULL AND approval.sec_heads_username= "'.$_GET['username'].'") ';
+	$sWhere .= '(active.view_status =1 AND active.`logdel` =0)';
+	$sWhere .= ' AND (masterlist.deleted_at IS NULL AND masterlist.document_status = 2)';
+	$sWhere .= ' AND disposition.deleted_at IS NULL';
+	$sWhere .= ' AND (approval.deleted_at IS NULL AND approval.sec_heads_username= "'.$_GET['username'].'")';
     
 	// $sWhere .= " `status` = 0 OR `status` = 2 OR `status` = 8 OR `status` = 'A' AND `logdel` = 0";
 	/*
@@ -211,6 +219,7 @@
 		$sOrder
 		$sLimit
 	";
+	
 	$rResult = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
 	
 	/* Data set length after filtering */
@@ -225,6 +234,10 @@
 	$sQuery = "
 		SELECT COUNT(".$sIndexColumn.")
 		FROM   $sTable
+		$sJoin
+		$sWhere
+		$sOrder
+		$sLimit
 	";
 	$rResultTotal = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
 	$aResultTotal = mysql_fetch_array($rResultTotal);
@@ -286,11 +299,12 @@
 		}
 
 		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
-		$row[]= $button;
+		$row[]= $aRow['sec_heads_username'];
+		$row[]= $aRow['id'];
 		$row[]= $getActiveDocumentById['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
-		$row[]= $getActiveDocumentById['date_received'];
+		$row[]= $aRow['date_received'];
 		$row[]= $aRow['model'];
 		$row[]= $aRow['doc_title'];
 		$row[]= $aRow['doc_no'];

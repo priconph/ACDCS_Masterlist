@@ -211,6 +211,7 @@
 		$sOrder
 		$sLimit
 	";
+
 	$rResult = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
 	
 	/* Data set length after filtering */
@@ -290,7 +291,7 @@
 		$row[]= $getActiveDocumentById['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
-		$row[]= $getActiveDocumentById['date_received'];
+		$row[]= $aRow['date_received'];
 		$row[]= $aRow['model'];
 		$row[]= $aRow['doc_title'];
 		$row[]= $aRow['doc_no'];

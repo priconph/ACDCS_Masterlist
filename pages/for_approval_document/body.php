@@ -30,7 +30,8 @@
 											<thead>
 												<tr>
 													<th></th>
-													<th><span class="fa fa-cogs"></span></th>
+													<th>Approved by</th>
+													<th>Approval ID</th>
 													<th>Document ID</th>
 													<th>Document Status</th>
 													<th>Disposition</th>
@@ -271,10 +272,11 @@ $(document).ready(function () {
 	/* ***************************
 				Start
 	*************************** */
-	var arr_doc_review_masterlist_id = [];
-	var handler_ = 'handler_qfr';
-	var masterlist_temporary_handler = 'handler/masterlist_temporary_handler.php'
+	var arrApprovalId = [];
+	var handler_qfr = 'handler_qfr';
+	var masterlist_temporary_handler = "handler/masterlist_temporary_handler.php";
 	var $formReviewDocu = $('#formReviewDocu');
+
 	var dt_special_acceptance = $(tbl_masterlist_temporary).DataTable({
 		"aaSorting"	: [],
 		"bProcessing": true,
@@ -282,110 +284,28 @@ $(document).ready(function () {
 		"columnDefs":[
             {"orderable":false,"targets":[0,1,2,3,4]}
         ],
-		"sAjaxSource": "server_side_scripts/dt_masterlist_for_approval.php",
+		"sAjaxSource": "server_side_scripts/dt_masterlist_for_approval.php?username="+"<?php echo $_SESSION['username'];?>",
 		"drawCallback": function( settings ) {
 			$('#tbl_special_acceptance').attr('style','width:100%;')
 		}
 	});
 
-	function readTemporaryReviewDocu(dataId){
-		let data = {'action':'read_temporary_review_docu','temporary_document_id':dataId}
-		call_ajax(data, masterlist_temporary_handler,function(result){
-			console.log(result);
-		})
-	}
-
-	$(tbl_masterlist_temporary).on('click','#btnReviewDocu',function (e) { 
-		e.preventDefault()
-		$('#modalReviewDocu').modal()
-		$formReviewDocu.find('#doc_review_masterlist_id').val($(this).attr('data-id'))
-		re_initialize_select2_server_side('#modalReviewDocu #person_in_charge','#modalReviewDocu #formReviewDocu',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
-		re_initialize_select2_server_side('#modalReviewDocu #sec_heads_username','#modalReviewDocu #formReviewDocu',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
-
-	});
-
-	$(tbl_masterlist_temporary).on('click','#cBoxBatchSelect' ,function () {
-		let doc_review_masterlist_id = $(this).attr('data-id');
+	$(tbl_masterlist_temporary).on('click','#cBoxBatchSelect', function () {
+		approvalId = $(this).attr('data-id');
 		if ($(this).prop('checked')) {
 			$(this).each(function () {
-				arr_doc_review_masterlist_id.push(doc_review_masterlist_id);
-				console.log('Checked '+arr_doc_review_masterlist_id);
+				arrApprovalId.push(approvalId);
+				console.log('push_fkid_document',arrApprovalId);
 			});
 		}else{
 			$(this).each(function () {
-				let index = arr_doc_review_masterlist_id.indexOf(doc_review_masterlist_id);
-				arr_doc_review_masterlist_id.splice(index, 1);
-				console.log('Unchecked '+arr_doc_review_masterlist_id);
+				let indexApprovalId = arrApprovalId.indexOf(approvalId);
+
+				arrApprovalId.splice(indexApprovalId, 1);
+				console.log('splice_fkid_document',arrApprovalId);
 			});
 		}
 	});
-
-	$('#btnBatchApproval').click(function (e) { 
-		e.preventDefault();
-		const filtered_doc_review_masterlist_id = Array.from(new Set(arr_doc_review_masterlist_id));
-		console.log(filtered_doc_review_masterlist_id);
-		$('#modal_approver_decision').modal();
-
-	});
-	
-	$('#disposition').change(function (e) { 
-		e.preventDefault()
-		$formReviewDocu.find('#person_in_charge').empty()
-		$formReviewDocu.find('#due_date').val('')
-		$formReviewDocu.find('#extension_date').val('')
-		$formReviewDocu.find('#file_memo').val('')
-
-		if($(this).val() === '1'){
-			$('#isRevisionRow').show()
-			$('#isExtension').hide()
-			$formReviewDocu.find('#due_date').attr('required',true)
-			$formReviewDocu.find('#extension_date').removeAttr('required',true)
-		}
-		else if($(this).val() === '4'){
-			$('#isRevisionRow').hide()
-			$('#isExtension').show()
-			$formReviewDocu.find('#due_date').removeAttr('required',true)
-			$formReviewDocu.find('#extension_date').attr('required',true)
-		}
-		else{
-			$('#isRevisionRow').hide()
-			$('#isExtension').hide()
-			$formReviewDocu.find('#due_date').removeAttr('required',true)
-			$formReviewDocu.find('#extension_date').removeAttr('required',true)
-		}
-	});
-
-	
-	$formReviewDocu.submit(function (e) { 
-		e.preventDefault();
-		var form_data = new FormData(this);
-		form_data.append("action","create_disposition_details")
-		// form_data.append("pkid",$('#modal_sa_edit').data('id'));
-		// form_data.append("username",username);
-		call_ajax_attachment(form_data, masterlist_temporary_handler, function(response){
-			if(response['is_success'] === 'true'){
-				$('#modalReviewDocu').modal('hide')
-				notif_success('Save Successfully')
-				dt_special_acceptance.draw()
-			}else{
-				$('#modalReviewDocu').modal('hide');
-				$('#alert_message').text(response['result_msg'])
-				$('#modal_alert').modal()
-			}
-		});
-	});
-	
-	/* ***************************
-			Closing of Modal
-	*************************** */
-	$('#modalReviewDocu').on('hidden.bs.modal', function (e) {
-		$formReviewDocu[0].reset()
-		$('#sec_heads_username').empty()
-		$('#person_in_charge').empty()
-		$('#isRevisionRow').hide()
-		$('#isExtension').hide()
-	});
-	
 });
 </script>
 
