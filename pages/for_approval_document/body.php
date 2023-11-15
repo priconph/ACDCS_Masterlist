@@ -22,7 +22,7 @@
 										// 	echo '<button class="btn btn-success fa fa-plus pull-right" id="btn_sa"> New Special Acceptance</button>';
 										// }
 									?>
-									<button class="btn btn-success btn-lg fa pull-right" id="btnBatchApproval"> Approval <span id="count">(5)</span> </button>
+									<button class="btn btn-primary btn-lg fa pull-right" id="btnBatchApproval"> For Approval <span id="countApproval">(5)</span> </button>
 
 								</div> <br><br><br>
 									<div class="col-sm-12">
@@ -72,63 +72,60 @@
 <!---------------------
 	Modals - Start 
 ---------------------->
-<!-- Modal for system message -->
-<div class="modal fade" tabindex="-1" role="dialog" id="modal_remove_attachment_confirmation">
+<!-- Modal for Approval -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalForApproval">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title"><i class="fa fa-question-circle-o"></i> System Confirmation</h4>
       </div>
-	  <form id="form_remove_attachment_confirmation">
-		  <div class="modal-body">
-			<div class="row">
-				<div class="col-sm-12" id="">				
-					<div class="alert alert-danger" role="alert" id="">
-						<h4>Are you sure you want to delete the document? <br> *Document will permanently be deleted to server.</h4>
-					</div>
-				</div>
+		<div class="modal-body">
+		<!-- <div class="row" id="">
+			<div class="col-sm-12" id="">				
+				<label>Remarks: </label>
 			</div>
-			<div class="row" id="">
-				<div class="col-sm-12" id="">				
-					<label>If yes, please write the reason:</label>
-				</div>
-				<div class="col-sm-12">				
-					<textarea id="reason" name="reason" style="width:100%;" required></textarea>
-				</div>
+			<div class="col-sm-12">				
+				<textarea id="remarks" name="remarks" style="width:100%;" required></textarea>
 			</div>
-		  </div>
-		  <div class="modal-footer">
-			<button type="submit" class="btn btn-primary fa fa-trash" id="btn_yes_remove_attachment"> Yes</button>
-			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Close</button>
-		  </div>
-		</form>
+		</div> -->
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-success fa fa-thumbs-o-up " id="btnApproved"> Approved</button>
+			<button type="button" class="btn btn-danger fa fa-thumbs-o-down" id="btnDisapproved"> Disapproved</button>
+		</div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
 <!-- Modal for Approver Decision -->
-<div class="modal fade" tabindex="-1" role="dialog" id="modal_approver_decision">
+<div class="modal fade" tabindex="-1" role="dialog" id="modalApproverDecision">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title"><i class="fa fa-question-circle-o"></i> System Confirmation</h4>
       </div>
-	  <form id="form_remove_attachment_confirmation">
+	  <form id="formApproverDecision">
 		  <div class="modal-body">
+		  <div class="row">
+				<div class="col-sm-12" id="">				
+					<div class="alert" role="alert" id="alertOption">
+					</div>
+				</div>
+			</div>
 			<div class="row" id="">
 				<div class="col-sm-12" id="">				
-					<label>If yes, please write the reason:</label>
+					<label>Remarks: </label>
 				</div>
 				<div class="col-sm-12">				
-					<textarea id="reason" name="reason" style="width:100%;" required></textarea>
+					<textarea id="remarks" name="remarks" style="width:100%;" required></textarea>
 				</div>
 			</div>
 		  </div>
 		  <div class="modal-footer">
-			<button type="submit" class="btn btn-primary fa fa-trash" id="btn_yes_remove_attachment"> Yes</button>
-			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Disapproved</button>
+			<button type="submit" class="btn btn-primary fa fa-save" id="btn_yes_remove_attachment"> Yes</button>
+			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> No</button>
 		  </div>
 		</form>
     </div><!-- /.modal-content -->
@@ -159,130 +156,33 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!---------------------
-	Modals - Add Review 
----------------------->
-<div class="modal fade" tabindex="-1" role="dialog" id="modalReviewDocu">
-  <div class="modal-dialog modal-md" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"><i class="fa fa-plus"></i> Add Review</h4>
-      </div>
-	  <form id="formReviewDocu">
-		  <div class="modal-body">
-				<div class="row">
-					<div class="col-sm-12">		
-						<input type="text" name="doc_review_masterlist_id" id="doc_review_masterlist_id" class="form-control">
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-12">		
-						<label>Approved by:</label>
-					</div>
-					<div class="col-sm-12">		
-						<select class="form-control" id="sec_heads_username" name="sec_heads_username" style="width:100%;" required>
-						</select>
-					</div>
-					<div class="col-sm-12">		
-						<label>Disposition:</label>
-					</div>
-					<div class="col-sm-12">				
-						<select class="form-control" id="disposition" name="disposition" style="width:100%;" required>
-							<option value="" selected disabled>--Select--</option>
-							<option value="1">Revision</option>
-							<option value="2">Retain</option>
-							<option value="3">Obsolete</option>
-							<option value="4">Extended</option>
-						</select>
-					</div>
-				</div>
-				<div class="row" id="isRevisionRow" style="display:none;">
-					<div class="col-sm-12">				
-						<label>Person in charge</label>
-					</div>
-					<div class="col-sm-12">
-						<!-- <input type="text"> -->
-						<select class="form-control" id="person_in_charge" name="person_in_charge" style="width:100%;"></select>
-					</div>
-					<div class="col-sm-12">				
-						<label>Due Date</label>
-					</div>
-					<div class="col-sm-12">				
-						<input type="date" class="form-control" id="due_date" name="due_date" style="width:100%;" required>
-					</div>
-				</div>
-				<div class="row" id="isExtension" style="display:none;">
-					<div class="col-sm-12">				
-						<label>Extension Date</label>
-					</div>
-					<div class="col-sm-12">				
-						<input type="date" class="form-control" id="extension_date" name="extension_date" style="width:100%;" required>
-					</div>
-					<div class="col-sm-12">				
-						<input type="file" class="form-control" id="file_memo" name="file_memo" style="width:100%;">
-					</div>
-				</div>
-		  </div>
-		  <div class="modal-footer">
-			<button type="submit" class="btn btn-primary fa fa-save" id="btn_yes_remove_attachment"> Save</button>
-			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Close</button>
-		  </div>
-		</form>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-
 <script src="js/common_functions.js?23456"></script>
 <script>
 $(document).ready(function () {
-	/* Date Range Picker */
-	function date_time_picker(id) {
-		$('#'+id).daterangepicker(
-				{
-					ranges: {
-						'Today': [moment(), moment()],
-						'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
-						'Last 7 Days': [moment().subtract('days', 6), moment()],
-						'Last 30 Days': [moment().subtract('days', 29), moment()],
-						'This Month': [moment().startOf('month'), moment().endOf('month')],
-						'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
-					},
-					startDate: moment().subtract('days', 29),
-					endDate: moment()
-				},
-			function(start, end) {
-				$('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-				if(id == "date_created_search_group") {
-					load_all_control_number_per_date_created('control_number_search_list_group','control_number_search',$('#date_created_search_group').val());
-				}
-			}
-		);
-		return false;
-	}
 	
 	$('.modal').on('hidden.bs.modal', function (e) {
 		/* Allows the overlayed modal to be scrollable */
 		if($('.modal').hasClass('in')) {
 			$('body').addClass('modal-open');
-		}    
+		}   
+		
 	});
 
+	
 	/* ***************************
 				Start
 	*************************** */
 	var arrApprovalId = [];
 	var handler_qfr = 'handler_qfr';
 	var masterlist_temporary_handler = "handler/masterlist_temporary_handler.php";
-	var $formReviewDocu = $('#formReviewDocu');
-
+	var $formApproverDecision 	= $('#formApproverDecision');
+	
 	var dt_special_acceptance = $(tbl_masterlist_temporary).DataTable({
 		"aaSorting"	: [],
 		"bProcessing": true,
         "bServerSide": true,
 		"columnDefs":[
-            {"orderable":false,"targets":[0,1,2,3,4]}
+            {"orderable":false,"targets":[0,1,2,3,4,5]}
         ],
 		"sAjaxSource": "server_side_scripts/dt_masterlist_for_approval.php?username="+"<?php echo $_SESSION['username'];?>",
 		"drawCallback": function( settings ) {
@@ -306,6 +206,56 @@ $(document).ready(function () {
 			});
 		}
 	});
+
+	$('#btnBatchApproval').click(function (e) { 
+		e.preventDefault();
+        /* Filtered the duplicate number before submiting to BatchApproval */
+		const filteredArrApprovalId = Array.from(new Set(arrApprovalId));
+		// approverDecision (filteredArrApprovalId);
+		$('#modalForApproval').modal();
+	});
+	var alertSuccess = 'alert-success';
+	var alertDanger = 'alert-danger';
+	$('#btnApproved').click(function (e) { 
+		e.preventDefault();
+		// alert('btnApproved');
+		$formApproverDecision.find('#alertOption').addClass(alertSuccess);
+		$formApproverDecision.find('#alertOption').removeClass(alertDanger);
+		$formApproverDecision.find('#alertOption').html('Are you sure you want to approve the request?');
+		$('#modalApproverDecision').modal();
+	});
+	
+	$('#btnDisapproved').click(function (e) { 
+		e.preventDefault();
+		$formApproverDecision.find('#alertOption').addClass(alertDanger);
+		$formApproverDecision.find('#alertOption').removeClass(alertSuccess);
+		$formApproverDecision.find('#alertOption').html('Are you sure you want to disapprove the request?');
+		$('#modalApproverDecision').modal();
+	});
+
+	$formApproverDecision.submit(function (e) { 
+		e.preventDefault();
+		formApproverDecision.find('#alertOption')
+		approverDecision (filteredArrApprovalId);
+	});
+	/*
+		Function
+	*/
+	function approverDecision (filteredArrApprovalId){
+		let data = {'action':'save_approver_decision','filtered_arr_approval_id':filteredArrApprovalId}
+		call_ajax(data, masterlist_temporary_handler,function(result){
+			console.log(result);
+		})
+	}
+
+
+	/*
+	arrApprovalId = []; 
+	$('#cBoxBatchSelect').prop('checked',false);
+	
+	*/
+
+
 });
 </script>
 

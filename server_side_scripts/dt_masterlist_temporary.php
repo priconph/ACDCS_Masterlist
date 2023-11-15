@@ -196,9 +196,8 @@
 	}else{
 		$sWhere .= "AND ";
 	}
-	$sWhere .= "active.view_status =1 AND active.`logdel` =0 AND masterlist.deleted_at IS NULL";
+	$sWhere .= "(active.`view_status` = 1 AND active.`logdel` = 0) AND masterlist.`deleted_at` IS NULL";
     
-	// $sWhere .= " `status` = 0 OR `status` = 2 OR `status` = 8 OR `status` = 'A' AND `logdel` = 0";
 	/*
 	 * SQL queries
 	 * Get data to display

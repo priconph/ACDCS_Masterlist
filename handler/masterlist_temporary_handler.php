@@ -29,29 +29,6 @@ use Handler\DocuReviewDisposition;
 			return $request;
 		}
 
-		// public static function getDocReviewDispositionById($doc_review_masterlist_id) 
-		// {
-		// 	require_once('../class/oop_acdcs.php');
-		// 	$request = $_POST;
-		// 	$array_fields = array('*');
-		// 	$table 	   	= 'tbl_doc_review_disposition';
-		// 	$joins 	   	= '';
-		// 	$sql_where 	=  'WHERE id = '.$doc_review_masterlist_id.' AND deleted_at IS NULL';
-		// 	$sql_order 	= '';
-		// 	$sql_limit 	= '';
-		// 	$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-		// 	$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-		// 	if($query->num_rows > 0){
-		// 		while($row = mysqli_fetch_array($query)){
-		// 			$return['tbl_doc_review_masterlist_id'] = $row['tbl_doc_review_masterlist_id'];
-		// 		}
-		// 		$return['result'] = 1;
-		// 	}else{
-		// 		$return['result'] = 0; //no data
-		// 	}
-		// 	return $return;
-		// }
-
 		public static function folderPath($folder_name) 
 		{
 			// tbl_folder_path
@@ -174,7 +151,7 @@ use Handler\DocuReviewDisposition;
 			$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 			$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
 
-			return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+			// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 		}
 
 		public static function sendScheduledEmailToProcessOwner($docu_review_disposition_id,$sec_heads_username)
@@ -189,7 +166,7 @@ use Handler\DocuReviewDisposition;
 				$message = 'WEEKLY Testing Auto Emailer';
 				$date_start = date('Y-m-d');
 				$frequency = 3;
-				return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
+				// return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
 			} catch (\Throwable $th) {
 				throw $th;
 			}
@@ -203,7 +180,8 @@ use Handler\DocuReviewDisposition;
 			$action = $_POST["action"];
 			switch($action) {	
 				case "read_temporary_review_docu" 					: read_temporary_review_docu(); break; 
-				case "create_disposition_details" 				: create_disposition_details(); break; 
+				case "create_disposition_details" 					: create_disposition_details(); break; 
+				case "save_approver_decision" 						: save_approver_decision(); break; 
 			}	
 		}
 	}
@@ -235,6 +213,8 @@ use Handler\DocuReviewDisposition;
 		TODO: ACDCS Email format DCC to Process owner with table of data
 		TODO: Enable the Email to PO and Approvers 
 		TODO: change the folder path of memo
+		TODO: change the file name masterlist_temporary_handler.php
+
 		* nedit
 	*/
 	function create_disposition_details()
@@ -324,9 +304,10 @@ use Handler\DocuReviewDisposition;
 					
 					$response['is_success'] ='true';
 					$response['result_msg'] = 'Save successfully !';
-					echo json_encode($email);
+					echo json_encode($response);
 					return;
 				}
+
 				if($file_memo_tmp != ""){
 					$is_file_name_existed = $common_class->selectDispositionByFilename($file_memo_name);
 					if($is_file_name_existed['is_exist']=='true'){
@@ -357,6 +338,14 @@ use Handler\DocuReviewDisposition;
 				}
 			}
 		}catch(\Exception $e){
+			throw $th;
+		}
+	}
+
+	function save_approver_decision(){
+		try {
+			echo 'true';
+		} catch (\Throwable $th) {
 			throw $th;
 		}
 	}

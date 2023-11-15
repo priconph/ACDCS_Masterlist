@@ -25,6 +25,7 @@
 	ini_set('display_errors', 1);
 
 	$aColumns = array( 
+		'disposition.disposition',
 		'approval.id',
 		'approval.sec_heads_username',
 		'masterlist.fkid_document',
@@ -204,7 +205,7 @@
 	$sWhere .= '(active.view_status =1 AND active.`logdel` =0)';
 	$sWhere .= ' AND (masterlist.deleted_at IS NULL AND masterlist.document_status = 2)';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
-	$sWhere .= ' AND (approval.deleted_at IS NULL AND approval.sec_heads_username= "'.$_GET['username'].'")';
+	$sWhere .= ' AND (approval.deleted_at IS NULL AND approval.sec_heads_username= "'.$_GET['username'].'" AND approval.status = 0 )';
     
 	// $sWhere .= " `status` = 0 OR `status` = 2 OR `status` = 8 OR `status` = 'A' AND `logdel` = 0";
 	/*
@@ -285,14 +286,23 @@
 	/* 
 		Disposition
 	*/
-		$arr_doc_review_disposition = $request_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
-		if($arr_doc_review_disposition['disposition'] == 1){
+		// $arr_doc_review_disposition = $request_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
+		// switch ($variable) {
+		// 	case 'value':
+		// 		# code...
+		// 		break;
+			
+		// 	default:
+		// 		# code...
+		// 		break;
+		// }
+		if($aRow['disposition'] == 1){
 			$doc_review_disposition = 'Revision';
-		}else if($arr_doc_review_disposition['disposition'] == 2){
+		}else if($aRow['disposition'] == 2){
 			$doc_review_disposition = 'Retain';
-		}else if($arr_doc_review_disposition['disposition'] == 3){
+		}else if($aRow['disposition'] == 3){
 			$doc_review_disposition = '<span class="">Obsolete';
-		}else if($arr_doc_review_disposition['disposition'] == 4){
+		}else if($aRow['disposition'] == 4){
 			$doc_review_disposition = 'Extended';
 		}else{
 			$doc_review_disposition = '';
