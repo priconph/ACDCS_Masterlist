@@ -264,27 +264,44 @@
 	/* 
 		Document Status
 	*/
-        if($getActiveDocumentById['document_status'] == 1){
-            $status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
-        }else if($getActiveDocumentById['document_status'] == 2){
-            $status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
-        }
+		switch ($getActiveDocumentById['document_status']) {
+			case 1:
+				$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
+
+				break;
+			case 2:
+				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
+				break;
+			default:
+				# code...
+				$status = '<span class="badge highlight-color-red">Unknown Status</span>';
+				break;
+		}
+
 	/* 
 		Disposition
 	*/
 		$arr_doc_review_disposition = $request_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
-		if($arr_doc_review_disposition['disposition'] == 1){
-			$doc_review_disposition = 'Revision';
-		}else if($arr_doc_review_disposition['disposition'] == 2){
-			$doc_review_disposition = 'Retain';
-		}else if($arr_doc_review_disposition['disposition'] == 3){
-			$doc_review_disposition = '<span class="">Obsolete';
-		}else if($arr_doc_review_disposition['disposition'] == 4){
-			$doc_review_disposition = 'Extended';
-		}else{
-			$doc_review_disposition = '';
+		switch ($arr_doc_review_disposition['disposition']) {
+			case 1:
+				$doc_review_disposition = 'Revision';
+				break;
+			case 2:
+				$doc_review_disposition = 'Retain';
+				break;
+			case 3:
+				$doc_review_disposition = '<span class="">Obsolete';
+				break;
+			case 4:
+				$doc_review_disposition = 'Extended';
+				break;
+			default:
+				$doc_review_disposition = '';
+				break;
 		}
-
+		/**
+		 * TODO: check if dcc need to have checked box to approved then transfer to REVIEWED TABLE
+		*/
 		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
 		$row[]= $button;
 		$row[]= $getActiveDocumentById['fkid_document'];

@@ -344,12 +344,33 @@ use Handler\DocuReviewDisposition;
 
 	function save_approver_decision(){
 		try {
-			echo 'true';
+			require_once('../class/oop_acdcs.php');
+			$return = $_POST;
+			$status = ($return['is_approved'] == 'true') ? 1 : 2 ;
+			foreach ($return['filtered_arr_approval_id'] as $key => $arr_approval_id) {
+				$table = 'tbl_doc_review_disposition_approval_details';
+				$array_fields = array('status','remarks','updated_at');
+				$array_values = array($status, $return['approver_remarks'], date('Y-m-d H:i:s') );
+				$where = ' WHERE id = '.$arr_approval_id.' ';
+				// $query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+				if($status == 1){
+					// $change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
+					echo json_encode($arr_approval_id);
+				}else if($status == 2){
+					// $change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
+				}
+
+			}
+			return;
+			
+
+			$response['is_success'] = 'true';
+			$response['msg'] = 'Saved Successfully';
+			echo json_encode($response);
 		} catch (\Throwable $th) {
 			throw $th;
 		}
 	}
-	
 	
 	function Slug($string, $slug = '-', $extra = null)
 	{

@@ -286,34 +286,30 @@
 	/* 
 		Disposition
 	*/
-		// $arr_doc_review_disposition = $request_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
-		// switch ($variable) {
-		// 	case 'value':
-		// 		# code...
-		// 		break;
-			
-		// 	default:
-		// 		# code...
-		// 		break;
-		// }
-		if($aRow['disposition'] == 1){
-			$doc_review_disposition = 'Revision';
-		}else if($aRow['disposition'] == 2){
-			$doc_review_disposition = 'Retain';
-		}else if($aRow['disposition'] == 3){
-			$doc_review_disposition = '<span class="">Obsolete';
-		}else if($aRow['disposition'] == 4){
-			$doc_review_disposition = 'Extended';
-		}else{
-			$doc_review_disposition = '';
+		switch ($aRow['disposition']) {
+			case 1:
+				$doc_review_disposition = 'Revision';
+				break;
+			case 2:
+				$doc_review_disposition = 'Retain';
+				break;
+			case 3:
+				$doc_review_disposition = '<span class="">Obsolete';
+				break;
+			case 4:
+				$doc_review_disposition = 'Extended';
+				break;
+			default:
+				$doc_review_disposition = '';
+				break;
 		}
 
 		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
 		$row[]= $aRow['sec_heads_username'];
-		$row[]= $aRow['id'];
-		$row[]= $getActiveDocumentById['fkid_document'];
-		$row[]= '<center> '.$status.' </center>';
-		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
+		// $row[]= $aRow['id'];
+		// $row[]= $getActiveDocumentById['fkid_document'];
+		// $row[]= '<center> '.$status.' </center>';
+		$row[]= '<center> <span class="badge highlight-color-green">	' .$doc_review_disposition. '</span> </center>';
 		$row[]= $aRow['date_received'];
 		$row[]= $aRow['model'];
 		$row[]= $aRow['doc_title'];
