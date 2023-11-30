@@ -5,8 +5,10 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once('../model/send_email.php');
+require_once('../model/doc_review_disposition_approval_details.php');
 require_once('./common_function_handler.php');
 use Model\EmailDetail;
+use Model\DocReviewDispositionApprovalDetails;
 use Handler\DocuReviewDisposition;
 
 	class CommonClass{
@@ -80,7 +82,7 @@ use Handler\DocuReviewDisposition;
 			}
 		}
 
-		public static function changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status)
+		public static function changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status)
 		{
 			try {
 				$request = $_POST;
@@ -242,14 +244,15 @@ use Handler\DocuReviewDisposition;
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','created_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$datetime_today);
 				$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values); 
-				/* nedit Scheduled email to Process owner 
-					$scheduled_email[] = $common_class->sendScheduledEmailToProcessOwner($docu_review_disposition_id,$return['person_in_charge']);
+				/** 
+				 * TODO: edit Scheduled email to Process owner | FIND: function sendScheduledEmailToProcessOwner(
+				* $scheduled_email[] = $common_class->sendScheduledEmailToProcessOwner($docu_review_disposition_id,$return['person_in_charge']);
 				*/
-				/* Approval Details	and Send Email to Approvers */
+				/* Save Approval Details	and Send Email to Approvers */
 				$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 
 				/* Change status*/
-				$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
+				$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
 
 				$response['is_success'] = 'true';
 				$response['result_msg'] =  'Save Successfully';
@@ -264,7 +267,7 @@ use Handler\DocuReviewDisposition;
 				/* Approval Details	and Send Email to Approvers */
 				$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 				/* Change status*/
-				$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
+				$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
 
 				$response['is_success'] = 'true';
 				$response['result_msg'] =  'Save Successfully';
@@ -300,7 +303,7 @@ use Handler\DocuReviewDisposition;
 					/* Approval Details	and Send Email to Approvers	*/
 					$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 					/* Change status*/
-					$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
 					
 					$response['is_success'] ='true';
 					$response['result_msg'] = 'Save successfully !';
@@ -329,7 +332,7 @@ use Handler\DocuReviewDisposition;
 					/* Approval Details	and Send Email to Approvers	*/
 					$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 					/* Change status*/
-					$change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
 
 					$response['is_success'] = ($request_upload_docu == 1) ? 'true' : 'false';
 					$response['result_msg'] = ($response['is_success'] == 'true') ? 'File uploaded successfully !': 'Uploading Failed. Please Try Again!';
@@ -347,23 +350,21 @@ use Handler\DocuReviewDisposition;
 			require_once('../class/oop_acdcs.php');
 			$return = $_POST;
 			$status = ($return['is_approved'] == 'true') ? 1 : 2 ;
+			$common_class = new CommonClass;
+
 			foreach ($return['filtered_arr_approval_id'] as $key => $arr_approval_id) {
 				$table = 'tbl_doc_review_disposition_approval_details';
 				$array_fields = array('status','remarks','updated_at');
 				$array_values = array($status, $return['approver_remarks'], date('Y-m-d H:i:s') );
 				$where = ' WHERE id = '.$arr_approval_id.' ';
-				// $query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+				$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+				$doc_review_masterlist_id = DocReviewDispositionApprovalDetails::getDocReviewDispositionById($arr_approval_id);
 				if($status == 1){
-					// $change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
-					echo json_encode($arr_approval_id);
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],3);
 				}else if($status == 2){
-					// $change_status[]= $common_class->changeStatusByDocReviewMasterlistId($doc_review_masterlist_id,$new_status);
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],1);
 				}
-
 			}
-			return;
-			
-
 			$response['is_success'] = 'true';
 			$response['msg'] = 'Saved Successfully';
 			echo json_encode($response);
@@ -371,7 +372,8 @@ use Handler\DocuReviewDisposition;
 			throw $th;
 		}
 	}
-	
+	// getdispositionApprovalDetails
+
 	function Slug($string, $slug = '-', $extra = null)
 	{
 		return strtolower(trim(preg_replace('~[^0-9a-z' . preg_quote($extra, '~') . ']+~i', $slug, Unaccent($string)), $slug));

@@ -39,6 +39,7 @@
 													<th>Document No.</th>
 													<th>Rev No.</th>
 													<th>Orignator Code</th>
+													<th>Doc Type</th>
 													<!--<th>Document Type</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th> -->

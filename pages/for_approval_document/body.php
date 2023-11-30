@@ -31,8 +31,8 @@
 												<tr>
 													<th></th>
 													<th>Approved by</th>
-													<!-- <th>Approval ID</th>
-													<th>Document ID</th> -->
+													<th>Approval ID</th>
+													<!-- <th>Document ID</th> -->
 													<!-- <th>Document Status</th> -->
 													<th>Disposition</th>
 													<!-- <th>Number of Review</th> -->

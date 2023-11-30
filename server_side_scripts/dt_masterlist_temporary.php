@@ -24,7 +24,14 @@
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
     
-	$aColumns = array( 
+	$aColumns = array(
+		'obsolete.expiration_date AS obsolete_expiration_date',
+		'obsolete.date_received AS obsolete_date_received',
+		'obsolete.model AS obsolete_model',
+		'obsolete.doc_title AS obsolete_doc_title',
+		'obsolete.doc_no AS obsolete_doc_no',
+		'obsolete.rev_no AS obsolete_rev_no',
+		'active.expiration_date',
 		'masterlist.id',
 		'masterlist.fkid_document',
 		'masterlist.document_status',
@@ -40,6 +47,11 @@
 	/* used this field for searching data typed in the search box */
 
 	$array_search = array(
+		'obsolete.date_received',
+		'obsolete.model',
+		'obsolete.doc_title',
+		'obsolete.doc_no',
+		'obsolete.rev_no',
 		'active.date_received',
 		'active.model',
 	 	'active.doc_title',
@@ -54,6 +66,7 @@
 	/* DB table to use */
 	$sTable = "tbl_doc_review_masterlist masterlist";
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
+	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
 	
 
 
@@ -150,16 +163,14 @@
 	{
 		// $sWhere .= ')'; 
 		$sWhere = "WHERE (";
-		for ( $i=0 ; $i<count($aColumns) ; $i++ )
+		for ( $i=0 ; $i<count($array_search) ; $i++ )
 		{
-			if( in_array($aColumns[$i],$array_search) ){
-			$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
-			}
+			$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
 		}
 		$sWhere = substr_replace( $sWhere, "", -3 );
 		$sWhere .= ')';
 	}
-    
+
     /* The number of UI column is required to be equal to table column
         Ex. 5 db table column == 5 UI column. Uncomment the script below to show.
         echo json_encode($aColumns);
@@ -183,9 +194,6 @@
 			$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
 		}
 	}
-	
-
-
 	/* 
 		dito ka mag add ng where mo, una check mo kung may laman na yung $sWhere pag wala append mo yung where mo na meron
 		kasama where kapag naman may laman na AND na syempre diba :)
@@ -196,7 +204,11 @@
 	}else{
 		$sWhere .= "AND ";
 	}
-	$sWhere .= "(active.`view_status` = 1 AND active.`logdel` = 0) AND masterlist.`deleted_at` IS NULL";
+
+	/* NOTE: Cannot get nullable column so I add this mysql query 
+			 YEAR(active.expiration_date) BETWEEN 1970 AND '.date('Y').'
+	*/
+	$sWhere .= '( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
     
 	/*
 	 * SQL queries
@@ -210,7 +222,6 @@
 		$sOrder
 		$sLimit
 	";
-
 	$rResult = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
 	
 	/* Data set length after filtering */
@@ -252,29 +263,23 @@
 
 		$doc_review_masterlist_id = $aRow['id'];
 		$fkid_document = $aRow['fkid_document'];
-	/* 
-		Button
-	*/
-        $getActiveDocumentById = $active_documents->getActiveDocumentById($fkid_document);
-		if($getActiveDocumentById['document_status'] == 1){
-			$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-edit" type="button" style="background-color:yellow;color:black;"> Review</button></center>';
-        }else if($getActiveDocumentById['document_status'] == 2){
-            $button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDetails" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
-        }
+	
 	/* 
 		Document Status
 	*/
-		switch ($getActiveDocumentById['document_status']) {
+		switch ($aRow['document_status']) {
 			case 1:
+				$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-edit" type="button" style="background-color:yellow;color:black;"> Review</button></center>';
 				$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
-
 				break;
 			case 2:
+            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDetails" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
 				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
 				break;
 			default:
 				# code...
-				$status = '<span class="badge highlight-color-red">Unknown Status</span>';
+				$button = '';
+				$status = '<span class="badge highlight-color-blue">DCC CHECKING</span>';
 				break;
 		}
 
@@ -304,15 +309,16 @@
 		*/
 		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
 		$row[]= $button;
-		$row[]= $getActiveDocumentById['fkid_document'];
+		$row[]= $aRow['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
-		$row[]= $aRow['date_received'];
-		$row[]= $aRow['model'];
-		$row[]= $aRow['doc_title'];
-		$row[]= $aRow['doc_no'];
-		$row[]= $aRow['rev_no'];
-		$row[]= $aRow['originator_code'];
+		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
+		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
+		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
+		$row[]= ( $aRow['doc_no'] != NULL ) ? $aRow['doc_no'] : $aRow['obsolete_doc_no'];
+		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
+		$row[]= ( $aRow['originator_code'] != NULL ) ? $aRow['originator_code'] : $aRow['obsolete_originator_code'];
+		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );

@@ -8,14 +8,6 @@ class email {
 		$mail = new PHPMailer();
 		$mail->IsSMTP();
 		$mail->SMTPDebug = 1;
-		/* old email
-		$mail->Host 		= '192.168.3.254';
-		$mail->SMTPAuth 	= true;
-		$mail->SMTPSecure 	= 'none';
-		$mail->Username 	= 'issinfoservice';
-		$mail->Password 	= 'pmi1234';
-		$mail->Port 		= '25';
-		*/
 		$mail->Host 		= 'mail3.pricon.ph';
 		$mail->SMTPAuth 	= true;
 		$mail->SMTPSecure 	= 'ssl';
@@ -45,16 +37,16 @@ class email {
 		// $body .= "TO: ".$to."<br>";
 		// $body .= "FROM: ".$from."<br>";
 		// $body .= "CC: ".$cc."<br>";
-		// $mail->AddAddress('rdfernandez@pricon.ph');	//change novs 2019-07-27
-		// $mail->AddCC('rdfernandez@pricon.ph');		//change novs 2019-07-27
-		$mail->AddAddress('dbretusto@pricon.ph');	//change novs 2019-07-27
-		$mail->AddCC('dbretusto@pricon.ph');		//change novs 2019-07-27
+		// $mail->AddAddress('rdfernandez@pricon.ph');
+		// $mail->AddCC('rdfernandez@pricon.ph');
+		$mail->AddAddress('dbretusto@pricon.ph');
+		$mail->AddCC('dbretusto@pricon.ph');
 		
 		$mail->From = $from;
 		$mail->FromName = $from;
 		// $mail->FromName = "Total Quality Tracking System";
-		$mail->AddBCC("dbretusto@pricon.ph");
-		$mail->AddBCC("dbretusto@pricon.ph");
+		$mail->AddBCC("");
+		$mail->AddBCC("");
 		$mail->Subject = $subject;
 		$mail->Body= $body;
 		

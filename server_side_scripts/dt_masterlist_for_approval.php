@@ -306,7 +306,7 @@
 
 		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
 		$row[]= $aRow['sec_heads_username'];
-		// $row[]= $aRow['id'];
+		$row[]= $aRow['id'];
 		// $row[]= $getActiveDocumentById['fkid_document'];
 		// $row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> <span class="badge highlight-color-green">	' .$doc_review_disposition. '</span> </center>';
