@@ -6,9 +6,11 @@ error_reporting(E_ALL);
 
 require_once('../model/send_email.php');
 require_once('../model/doc_review_disposition_approval_details.php');
+require_once('../model/doc_review_disposition.php');
 require_once('./common_function_handler.php');
 use Model\EmailDetail;
 use Model\DocReviewDispositionApprovalDetails;
+use Model\DocReviewDisposition;
 use Handler\DocuReviewDisposition;
 
 	class CommonClass{
@@ -184,6 +186,7 @@ use Handler\DocuReviewDisposition;
 				case "read_temporary_review_docu" 					: read_temporary_review_docu(); break; 
 				case "create_disposition_details" 					: create_disposition_details(); break; 
 				case "save_approver_decision" 						: save_approver_decision(); break; 
+				case "read_doc_review_masterlist" 					: read_doc_review_masterlist(); break; 
 			}	
 		}
 	}
@@ -345,7 +348,8 @@ use Handler\DocuReviewDisposition;
 		}
 	}
 
-	function save_approver_decision(){
+	function save_approver_decision()
+	{
 		try {
 			require_once('../class/oop_acdcs.php');
 			$return = $_POST;
@@ -368,6 +372,17 @@ use Handler\DocuReviewDisposition;
 			$response['is_success'] = 'true';
 			$response['msg'] = 'Saved Successfully';
 			echo json_encode($response);
+		} catch (\Throwable $th) {
+			throw $th;
+		}
+	}
+	
+	function read_doc_review_masterlist()
+	{
+		try {
+			$return = $_POST; 
+			$get_doc_review_disposition_by_id = DocReviewDisposition::getDocReviewDispositionApprovalDetailsById($return['doc_review_masterlist_id']);
+			echo json_encode($get_doc_review_disposition_by_id);
 		} catch (\Throwable $th) {
 			throw $th;
 		}

@@ -28,6 +28,7 @@ class DocuReviewDisposition{
 		}
 		return $return;
     }
+	
 	public static function activeDocs($fkid_document) 
 	{
 		require_once('../class/oop_acdcs.php');

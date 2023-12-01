@@ -1,0 +1,40 @@
+<?php
+namespace Model;
+use ACDCS;
+class DocReviewDisposition{
+
+    public function getDocReviewDispositionApprovalDetailsById($doc_review_masterlist_id)
+    {
+        require_once('../class/oop_acdcs.php');
+        $request = $_POST;
+        $array_fields = array('disposition.*,approval.sec_heads_username,approval.tbl_doc_review_disposition_id');
+        $table 	   	= 'tbl_doc_review_disposition disposition';
+        $joins 	   	= 'LEFT JOIN tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id';
+        $sql_where 	=  'WHERE disposition.tbl_doc_review_masterlist_id = '.$doc_review_masterlist_id.' AND disposition.deleted_at IS NULL';
+        $sql_where 	.=  ' AND approval.deleted_at IS NULL';
+        $sql_order 	= '';
+        $sql_limit 	= '';
+        $script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+        $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+        if($query->num_rows > 0){
+            while($row = mysqli_fetch_array($query)){
+                $return['id'] = $row['id'];
+                $return['disposition'] = $row['disposition'];
+                $return['due_date'] = date($row['due_date']);
+                
+                $return['person_in_charge'] = $row['person_in_charge'];
+
+                $return['sec_heads_username'][] = $row['sec_heads_username'];
+            }
+            foreach ($return['sec_heads_username'] as $key => $value) {
+                $array_data_app 				= array();
+                $array_data_app['id'] 			= $value;
+                // $array_data_app['text'] 		= get_emp_name_by_username_systemone($value);
+                $return['arr_sec_heads_username'][]	= $array_data_app;
+            }
+        }else{
+            $return['disposition'] = 0; //no disposition
+        }
+        return $return;
+    }
+}

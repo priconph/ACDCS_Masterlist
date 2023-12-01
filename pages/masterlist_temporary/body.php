@@ -43,7 +43,6 @@
 													<!--<th>Document Type</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th> -->
-
 													<!-- <th>Reviewed by</th>
 													<th>Date of review</th>
 													<th>Person in charge</th>
@@ -212,6 +211,80 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<!---------------------
+	Modals - Add Review 
+---------------------->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalDocReviewDisposition">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><i class="fa fa-plus"></i> Edit Review</h4>
+      </div>
+	  <form id="formDocReviewDisposition">
+		  <div class="modal-body">
+				<div class="row">
+					<div class="col-sm-12">		
+						<input type="text" name="doc_review_masterlist_id" id="doc_review_masterlist_id" class="form-control">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">		
+						<label>Approved by:</label>
+					</div>
+					<div class="col-sm-12">		
+						<select class="form-control" id="sec_heads_username" name="sec_heads_username" style="width:100%;" required>
+						</select>
+					</div>
+					<div class="col-sm-12">		
+						<label>Disposition:</label>
+					</div>
+					<div class="col-sm-12">				
+						<select class="form-control" id="disposition" name="disposition" style="width:100%;" required>
+							<option value="" selected disabled>--Select--</option>
+							<option value="1">Revision</option>
+							<option value="2">Retain</option>
+							<option value="3">Obsolete</option>
+							<option value="4">Extended</option>
+						</select>
+					</div>
+				</div>
+				<div class="row" id="isRevisionRow" style="display:none;">
+					<div class="col-sm-12">				
+						<label>Person in charge</label>
+					</div>
+					<div class="col-sm-12">
+						<!-- <input type="text"> -->
+						<select class="form-control" id="person_in_charge" name="person_in_charge" style="width:100%;"></select>
+					</div>
+					<div class="col-sm-12">				
+						<label>Due Date</label>
+					</div>
+					<div class="col-sm-12">				
+						<input type="date" class="form-control" id="due_date" name="due_date" style="width:100%;" required>
+					</div>
+				</div>
+				<div class="row" id="isExtension" style="display:none;">
+					<div class="col-sm-12">				
+						<label>Extension Date</label>
+					</div>
+					<div class="col-sm-12">				
+						<input type="date" class="form-control" id="extension_date" name="extension_date" style="width:100%;" required>
+					</div>
+					<div class="col-sm-12">				
+						<input type="file" class="form-control" id="file_memo" name="file_memo" style="width:100%;">
+					</div>
+				</div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="submit" class="btn btn-primary fa fa-save" id="btn_yes_remove_attachment"> Save</button>
+			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Close</button>
+		  </div>
+		</form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 
 <script src="js/common_functions.js?23456"></script>
 <script>
@@ -255,6 +328,7 @@ $(document).ready(function () {
 	var handler_ = 'handler_qfr';
 	var masterlist_temporary_handler = 'handler/masterlist_temporary_handler.php'
 	var $formReviewDocu = $('#formReviewDocu');
+	var $formDocReviewDisposition = $('#formDocReviewDisposition');
 	var dt_special_acceptance = $(tbl_masterlist_temporary).DataTable({
 		"aaSorting"	: [],
 		"bProcessing": true,
@@ -267,8 +341,10 @@ $(document).ready(function () {
 
 	function readTemporaryReviewDocu(dataId){
 		let data = {'action':'read_temporary_review_docu','temporary_document_id':dataId}
+
 		call_ajax(data, masterlist_temporary_handler,function(result){
 			console.log(result);
+			$('#modalDocReviewDisposition').modal();
 		})
 	}
 
@@ -283,6 +359,7 @@ $(document).ready(function () {
 
 	$(tbl_masterlist_temporary).on('click','#cBoxBatchSelect' ,function () {
 		let doc_review_masterlist_id = $(this).attr('data-id');
+
 		if ($(this).prop('checked')) {
 			$(this).each(function () {
 				arr_doc_review_masterlist_id.push(doc_review_masterlist_id);
@@ -297,6 +374,35 @@ $(document).ready(function () {
 		}
 	});
 
+	$(tbl_masterlist_temporary).on('click','#btnViewDocReviewDisposition' ,function () {
+		let doc_review_masterlist_id = $(this).attr('data-id');
+		console.log('doc_review_masterlist_id',doc_review_masterlist_id);
+		let data = {
+			'action' : 'read_doc_review_masterlist',
+			'doc_review_masterlist_id' : doc_review_masterlist_id,
+		}
+		call_ajax(data, masterlist_temporary_handler,function(result){
+			console.log('disposition',result['disposition']);
+			let disposition = result['disposition'];
+			
+			$('#modalDocReviewDisposition').modal();
+			$formDocReviewDisposition.find('#disposition').val(disposition);
+			
+			// assign_value_select2(combo_id,data_value);
+			if(disposition === '1'){
+				// $formDocReviewDisposition.find('#extension_date').val(disposition);
+				$formDocReviewDisposition.find('#due_date').val(result['due_date']);
+			}else if(disposition === '4'){
+				// $formDocReviewDisposition.find('#extension_date').val(disposition);
+			}
+
+			re_initialize_select2_server_side('#modalDocReviewDisposition #person_in_charge','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
+			re_initialize_select2_server_side('#modalDocReviewDisposition #sec_heads_username','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
+			dispositionStatus($formDocReviewDisposition,disposition);
+
+		});
+	});
+	
 	$('#btnBatchApproval').click(function (e) { 
 		e.preventDefault();
 		const filtered_doc_review_masterlist_id = Array.from(new Set(arr_doc_review_masterlist_id));
@@ -305,34 +411,44 @@ $(document).ready(function () {
 
 	});
 	
-	$('#disposition').change(function (e) { 
+	$formReviewDocu.find('#disposition').change(function (e) { 
 		e.preventDefault()
-		$formReviewDocu.find('#person_in_charge').empty()
-		$formReviewDocu.find('#due_date').val('')
-		$formReviewDocu.find('#extension_date').val('')
-		$formReviewDocu.find('#file_memo').val('')
-
-		if($(this).val() === '1'){
-			$('#isRevisionRow').show()
-			$('#isExtension').hide()
-			$formReviewDocu.find('#due_date').attr('required',true)
-			$formReviewDocu.find('#extension_date').removeAttr('required',true)
-		}
-		else if($(this).val() === '4'){
-			$('#isRevisionRow').hide()
-			$('#isExtension').show()
-			$formReviewDocu.find('#due_date').removeAttr('required',true)
-			$formReviewDocu.find('#extension_date').attr('required',true)
-		}
-		else{
-			$('#isRevisionRow').hide()
-			$('#isExtension').hide()
-			$formReviewDocu.find('#due_date').removeAttr('required',true)
-			$formReviewDocu.find('#extension_date').removeAttr('required',true)
-		}
+		changeEventDisposition($formReviewDocu,$(this).val());
 	});
 
-	
+	$formDocReviewDisposition.find('#disposition').change(function (e) { 
+		e.preventDefault();
+		console.log($formDocReviewDisposition);
+		changeEventDisposition($formDocReviewDisposition,$(this).val());
+	});
+
+	function changeEventDisposition($formId,disposition){
+		$formId.find('#person_in_charge').empty()
+		$formId.find('#due_date').val('')
+		$formId.find('#extension_date').val('')
+		$formId.find('#file_memo').val('')
+		dispositionStatus($formId,disposition);
+	}
+
+	function dispositionStatus($formId,disposition){
+		if(disposition === '1'){
+			$formId.find('#isRevisionRow').show()
+			$formId.find('#isExtension').hide()
+			$formId.find('#due_date').attr('required',true)
+			$formId.find('#extension_date').removeAttr('required',true)
+		}else if(disposition === '4'){
+			$formId.find('#isRevisionRow').hide()
+			$formId.find('#isExtension').show()
+			$formId.find('#due_date').removeAttr('required',true)
+			$formId.find('#extension_date').attr('required',true)
+		}else{
+			$formId.find('#isRevisionRow').hide()
+			$formId.find('#isExtension').hide()
+			$formId.find('#due_date').removeAttr('required',true)
+			$formId.find('#extension_date').removeAttr('required',true)
+		}
+	}
+
 	$formReviewDocu.submit(function (e) { 
 		e.preventDefault();
 		var form_data = new FormData(this);

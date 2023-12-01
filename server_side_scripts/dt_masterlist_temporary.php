@@ -273,7 +273,7 @@
 				$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
 				break;
 			case 2:
-            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDetails" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
+            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
 				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
 				break;
 			default:
