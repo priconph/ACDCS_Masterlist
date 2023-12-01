@@ -219,7 +219,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"><i class="fa fa-plus"></i> Edit Review</h4>
+        <h4 class="modal-title"><i class="fa fa-edit"></i> View Details</h4>
       </div>
 	  <form id="formDocReviewDisposition">
 		  <div class="modal-body">
@@ -386,16 +386,15 @@ $(document).ready(function () {
 			let disposition = result['disposition'];
 			
 			$('#modalDocReviewDisposition').modal();
+			$formDocReviewDisposition.find('#doc_review_masterlist_id').val(doc_review_masterlist_id);
 			$formDocReviewDisposition.find('#disposition').val(disposition);
-			
-			// assign_value_select2(combo_id,data_value);
+			assign_value_select2('#formDocReviewDisposition #sec_heads_username',result['sec_heads_username']);
 			if(disposition === '1'){
-				// $formDocReviewDisposition.find('#extension_date').val(disposition);
 				$formDocReviewDisposition.find('#due_date').val(result['due_date']);
+				assign_value_select2('#formDocReviewDisposition #person_in_charge',result['person_in_charge']);
 			}else if(disposition === '4'){
-				// $formDocReviewDisposition.find('#extension_date').val(disposition);
+				$formDocReviewDisposition.find('#extension_date').val(result['extension_date']);
 			}
-
 			re_initialize_select2_server_side('#modalDocReviewDisposition #person_in_charge','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
 			re_initialize_select2_server_side('#modalDocReviewDisposition #sec_heads_username','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
 			dispositionStatus($formDocReviewDisposition,disposition);

@@ -1,6 +1,8 @@
 <?php
 
 namespace Model;
+use SYSTEMONE;
+use RAPID;
 class Hris {
     function get_emp_name_by_username_systemone($username) {
 		if(file_exists('../class/oop_acdcs.php')) {

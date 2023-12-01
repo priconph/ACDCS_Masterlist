@@ -269,7 +269,7 @@
 	*/
 		switch ($aRow['document_status']) {
 			case 1:
-				$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-edit" type="button" style="background-color:yellow;color:black;"> Review</button></center>';
+				$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-plus" type="button" style="background-color:yellow;color:black;"> Add Review</button></center>';
 				$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
 				break;
 			case 2:
@@ -282,7 +282,6 @@
 				$status = '<span class="badge highlight-color-blue">DCC CHECKING</span>';
 				break;
 		}
-
 	/* 
 		Disposition
 	*/

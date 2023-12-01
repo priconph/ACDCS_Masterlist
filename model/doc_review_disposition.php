@@ -1,5 +1,8 @@
 <?php
 namespace Model;
+require_once('../model/systemone.php');
+
+use Model\Hris;
 use ACDCS;
 class DocReviewDisposition{
 
@@ -20,17 +23,22 @@ class DocReviewDisposition{
             while($row = mysqli_fetch_array($query)){
                 $return['id'] = $row['id'];
                 $return['disposition'] = $row['disposition'];
-                $return['due_date'] = date($row['due_date']);
-                
-                $return['person_in_charge'] = $row['person_in_charge'];
-
-                $return['sec_heads_username'][] = $row['sec_heads_username'];
+                $return['due_date'] = $row['due_date'];
+                $return['extension_date'] = $row['extension_date'];
+                $person_in_charge[] = $row['person_in_charge'];
+                $sec_heads_username[] = $row['sec_heads_username'];
             }
-            foreach ($return['sec_heads_username'] as $key => $value) {
+            foreach ($person_in_charge as $key => $value) {
                 $array_data_app 				= array();
                 $array_data_app['id'] 			= $value;
-                // $array_data_app['text'] 		= get_emp_name_by_username_systemone($value);
-                $return['arr_sec_heads_username'][]	= $array_data_app;
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
+                $return['person_in_charge'][]	= $array_data_app;
+            }
+            foreach ($sec_heads_username as $key => $value) {
+                $array_data_app 				= array();
+                $array_data_app['id'] 			= $value;
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
+                $return['sec_heads_username'][]	= $array_data_app;
             }
         }else{
             $return['disposition'] = 0; //no disposition
