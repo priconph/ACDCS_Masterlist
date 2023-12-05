@@ -12,58 +12,109 @@
 							<?php //include('main_menu.php'); omodify ?>
 						</div>
 				   	</div>
+					<!-- Nav tabs -->
 					<div class="col-sm-12">
-						<div class="panel panel-info" style="overflow:scroll;">
-							<div class="panel-heading"><i class="fa fa-file fa-lg"> For Review</i></div>
-							<div class="panel-body">
-								<div class="col-sm-12">
-									<?php
-										// if($sa_user_access){
-										// 	echo '<button class="btn btn-success fa fa-plus pull-right" id="btn_sa"> New Special Acceptance</button>';
-										// }
-									?>
-								</div> <br><br><br>
-									<div class="col-sm-12">
-										<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary">
-											<thead>
-												<tr>
-													<th></th>
-													<th><span class="fa fa-cogs"></span></th>
-													<th>Document ID</th>
-													<th>Document Status</th>
-													<th>Disposition</th>
-													<!-- <th>Number of Review</th> -->
-													<th>Date Received</th>
-													 <th>Model</th>
-													<th>Title</th>
-													<th>Document No.</th>
-													<th>Rev No.</th>
-													<th>Orignator Code</th>
-													<th>Doc Type</th>
-													<!--<th>Document Type</th>
-													<th>Effectivity Date</th>
-													<th>Expiration Date</th> -->
-													<!-- <th>Reviewed by</th>
-													<th>Date of review</th>
-													<th>Person in charge</th>
-													<th>Due Date</th>
-													<th>Recommitment Date</th>
-													<th>Date of DCC Email</th>
-													<th>Process Owner Remarks</th>
-													<th>DCC Remarks</th> -->
-												</tr>
-											</thead>
-										</table>
-									</div>
-								</div>
-							</div>
+						<div class="">
+							<ul class="nav nav-tabs" role="tablist">
+							<?php 
+								// echo '
+								// 	<li class="nav-item active">
+								// 		<a class="nav-link" data-toggle="tab" href="#menu1">Pending</a>
+								// 	</li>
+								// 	<li class="nav-item">
+								// 		<a class="nav-link " data-toggle="tab" href="#menu3">For Review</a>
+								// 	</li>
+								// 	';
+
+								echo '
+									<li class="nav-item active">
+											<a class="nav-link" data-toggle="tab" href="#menu1">Pending</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#menu2">Production - Active Document</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link " data-toggle="tab" href="#menu3">For Review</a>
+									</li>
+									';
+							?>
+							</ul>
 						</div>
 					</div>
-					<!--  -->
+					<!-- Tab content -->
+					<div class="tab-content">
+						<div role="tabpanel" id="menu1" class="tab-pane active"><br>
+							<div class="col-sm-12">
+							<div class="panel panel-info" style="overflow:scroll;">
+								<div class="panel-heading"><i class="fa fa-file fa-lg"> Pending</i></div>
+									<div class="panel-body">
+											<iframe src="../../ACDCS/dcc_home.php?page=./search_masterlist_temporary.php" width="100%" height="100%" style="border:none;" title="Pending">
+											</iframe>
+									</div>
+								</div>
+							</div> <!--end div panel info -->
+						</div> <!--end tabpanel-->
+						<div role="tabpanel" id="menu2" class="tab-pane"><br>
+							<div class="col-sm-12">
+							<div class="panel panel-info" style="overflow:scroll;">
+								<div class="panel-heading"><i class="fa fa-file fa-lg"> Production - Active Document</i></div>
+									<div class="panel-body">
+											<iframe src="../../ACDCS/prdn_home.php" width="100%" height="100%" style="border:none;" title="Pending">
+											</iframe>
+									</div>
+								</div>
+							</div> <!--end div panel info -->
+						</div> <!--end tabpanel-->
+						<div role="tabpanel" id="menu3" class="tab-pane"><br>
+							<div class="col-sm-12">
+							<div class="panel panel-info" style="overflow:scroll;">
+								<div class="panel-heading"><i class="fa fa-file fa-lg"> For Review</i></div>
+								<div class="panel-body">
+									<div class="col-sm-12">
+										<button class="btn btn-success fa fa-excel-o pull-right" id="btnExportDocReviewMasterlist"> Export </button>
+									</div> <br><br>
+										<div class="col-sm-12">
+											<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary">
+												<thead>
+													<tr>
+														<th></th>
+														<th><span class="fa fa-cogs"></span></th>
+														<th>Document ID</th>
+														<th>Document Status</th>
+														<th>Disposition</th>
+														<!-- <th>Number of Review</th> -->
+														<th>Date Received</th>
+														<th>Expiration Date</th>
+														<th>Model</th>
+														<th>Title</th>
+														<th>Document No.</th>
+														<th>Rev No.</th>
+														<th>Orignator Code</th>
+														<th>Doc Type</th>
+														<!--<th>Document Type</th>
+														<th>Effectivity Date</th>
+														<th>Expiration Date</th> -->
+														<!-- <th>Reviewed by</th>
+														<th>Date of review</th>
+														<th>Person in charge</th>
+														<th>Due Date</th>
+														<th>Recommitment Date</th>
+														<th>Date of DCC Email</th>
+														<th>Process Owner Remarks</th>
+														<th>DCC Remarks</th> -->
+													</tr>
+												</thead>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div> <!--end div panel info -->
+						</div> <!--end tabpanel-->
+					</div> <!--end tab-content--> 
 				</div>
 			</section>
 		</section>
-	</section>
+</section>
 	
 	<!-- <th><span class="fa fa-attachment"></span>File Attachment</th> -->
 <!---------------------
@@ -105,6 +156,34 @@
 </div><!-- /.modal -->
 
 <!-- Modal for Approver Decision -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modaAdvanceSearch">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><i class="fa fa-question-circle-o"></i> Export Data</h4>
+      </div>
+	   <form id="formAdvanceSearch">
+		  <div class="modal-body">
+			<div class="row" id="">
+				<div class="col-sm-4">	
+					<label>Expiration Date:</label>
+				</div>
+				<div class="col-sm-8">				
+					<input type="text" class="form-control" id="expiration_date_from_to" name="expiration_date_from_to" required></input>
+				</div>
+			</div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="submit" class="btn btn-success fa fa-export" id="btn_search"> Export</button>
+			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Close</button>
+		  </div>
+		</form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Modal for Approver Decision -->
 <div class="modal fade" tabindex="-1" role="dialog" id="modal_approver_decision">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
@@ -124,7 +203,7 @@
 			</div>
 		  </div>
 		  <div class="modal-footer">
-			<button type="submit" class="btn btn-primary fa fa-trash" id="btn_yes_remove_attachment"> Yes</button>
+			<button type="submit" class="btn btn-primary fa fa-check" id="btn_yes_remove_attachment"> Yes</button>
 			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Disapproved</button>
 		  </div>
 		</form>
@@ -212,7 +291,7 @@
 </div><!-- /.modal -->
 
 <!---------------------
-	Modals - Add Review 
+	Modals - View Review 
 ---------------------->
 <div class="modal fade" tabindex="-1" role="dialog" id="modalDocReviewDisposition">
   <div class="modal-dialog modal-md" role="document">
@@ -286,7 +365,7 @@
 </div><!-- /.modal -->
 
 
-<script src="js/common_functions.js?23456"></script>
+<script src="js/common_functions.js?4324"></script>
 <script>
 $(document).ready(function () {
 	/* Date Range Picker */
@@ -329,13 +408,14 @@ $(document).ready(function () {
 	var masterlist_temporary_handler = 'handler/masterlist_temporary_handler.php'
 	var $formReviewDocu = $('#formReviewDocu');
 	var $formDocReviewDisposition = $('#formDocReviewDisposition');
+	var $formAdvanceSearch = $('#formAdvanceSearch');
 	var dt_special_acceptance = $(tbl_masterlist_temporary).DataTable({
 		"aaSorting"	: [],
 		"bProcessing": true,
         "bServerSide": true,
-		"sAjaxSource": "server_side_scripts/dt_masterlist_temporary.php",
+		"sAjaxSource": "server_side_scripts/dt_masterlist_temporary.php?username="+"<?php echo $_SESSION['username'];?>",
 		"drawCallback": function( settings ) {
-			$('#tbl_special_acceptance').attr('style','width:100%;')
+			$(tbl_masterlist_temporary).attr('style','width:100%;')
 		}
 	});
 
@@ -346,6 +426,33 @@ $(document).ready(function () {
 			console.log(result);
 			$('#modalDocReviewDisposition').modal();
 		})
+	}
+
+	function changeEventDisposition($formId,disposition){
+		$formId.find('#person_in_charge').empty()
+		$formId.find('#due_date').val('')
+		$formId.find('#extension_date').val('')
+		$formId.find('#file_memo').val('')
+		dispositionStatus($formId,disposition);
+	}
+
+	function dispositionStatus($formId,disposition){
+		if(disposition === '1'){
+			$formId.find('#isRevisionRow').show()
+			$formId.find('#isExtension').hide()
+			$formId.find('#due_date').attr('required',true)
+			$formId.find('#extension_date').removeAttr('required',true)
+		}else if(disposition === '4'){
+			$formId.find('#isRevisionRow').hide()
+			$formId.find('#isExtension').show()
+			$formId.find('#due_date').removeAttr('required',true)
+			$formId.find('#extension_date').attr('required',true)
+		}else{
+			$formId.find('#isRevisionRow').hide()
+			$formId.find('#isExtension').hide()
+			$formId.find('#due_date').removeAttr('required',true)
+			$formId.find('#extension_date').removeAttr('required',true)
+		}
 	}
 
 	$(tbl_masterlist_temporary).on('click','#btnReviewDocu',function (e) { 
@@ -421,33 +528,6 @@ $(document).ready(function () {
 		changeEventDisposition($formDocReviewDisposition,$(this).val());
 	});
 
-	function changeEventDisposition($formId,disposition){
-		$formId.find('#person_in_charge').empty()
-		$formId.find('#due_date').val('')
-		$formId.find('#extension_date').val('')
-		$formId.find('#file_memo').val('')
-		dispositionStatus($formId,disposition);
-	}
-
-	function dispositionStatus($formId,disposition){
-		if(disposition === '1'){
-			$formId.find('#isRevisionRow').show()
-			$formId.find('#isExtension').hide()
-			$formId.find('#due_date').attr('required',true)
-			$formId.find('#extension_date').removeAttr('required',true)
-		}else if(disposition === '4'){
-			$formId.find('#isRevisionRow').hide()
-			$formId.find('#isExtension').show()
-			$formId.find('#due_date').removeAttr('required',true)
-			$formId.find('#extension_date').attr('required',true)
-		}else{
-			$formId.find('#isRevisionRow').hide()
-			$formId.find('#isExtension').hide()
-			$formId.find('#due_date').removeAttr('required',true)
-			$formId.find('#extension_date').removeAttr('required',true)
-		}
-	}
-
 	$formReviewDocu.submit(function (e) { 
 		e.preventDefault();
 		var form_data = new FormData(this);
@@ -467,8 +547,24 @@ $(document).ready(function () {
 		});
 	});
 	
+	$('#btnExportDocReviewMasterlist').click(function (e) { 
+		e.preventDefault();
+		$('#modaAdvanceSearch').modal();
+		date_time_picker('expiration_date_from_to');
+	});
+	$formAdvanceSearch.submit(function (e) { 
+		e.preventDefault();
+		let data = {
+			'action' : 'advanced_search',
+		}
+		call_ajax_serialize(data, $(this).serialize() , masterlist_temporary_handler, function(result){
+			// window.location.href = " ?query="+result['script'];
+			window.location.href = "reports/temporary_document/excel_iqc_visual_inspection.php?query="+result['script'];
+		});
+	});
+	//
 	/* ***************************
-			Closing of Modal
+		Closing of Modal
 	*************************** */
 	$('#modalReviewDocu').on('hidden.bs.modal', function (e) {
 		$formReviewDocu[0].reset()
@@ -477,7 +573,6 @@ $(document).ready(function () {
 		$('#isRevisionRow').hide()
 		$('#isExtension').hide()
 	});
-	
 });
 </script>
 

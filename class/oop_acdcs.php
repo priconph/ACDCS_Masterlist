@@ -60,7 +60,7 @@ class ACDCS extends mysqli
 	}
     
     public function select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit){
-		$query = "<br>SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $array_fields) . " FROM {$table} {$joins} {$sql_where} {$sql_order} {$sql_limit};<br>";
+		$query = "SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $array_fields) . " FROM {$table} {$joins} {$sql_where} {$sql_order} {$sql_limit};";
 		return $query;
 	}
     
@@ -200,6 +200,41 @@ class ACDCS extends mysqli
 	public function get_table_fields($table){
 		$result = $this->query("SHOW COLUMNS FROM $table");
 		return $result;
+	}
+
+	/* Customized Query */
+	public function export_advance_search_result_script($query){
+		return $query;
+	}
+	public function export_advance_search_result($query){
+		// return $script = "$query";
+		// return 'true';
+		// $script = "SELECT `date_received` FROM tbl_active_docs LIMIT 0,1";
+// 		$script = "SELECT SQL_CALC_FOUND_ROWS disposition.disposition, masterlist.id, masterlist.fkid_document,masterlist.document_status,masterlist.is_expiration_date_exist, masterlist.deleted_at,active.date_received, active.model, active.doc_title,active.doc_no, active.rev_no,masterlist.originator_code,obsolete.doc_no AS obsolete_doc_no,obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model,obsolete.doc_title AS obsolete_doc_title,obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no,active.expiration_date AS active_expiration_date,obsolete.expiration_date AS obsolete_expiration_date FROM tbl_doc_review_masterlist masterlist
+// LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document
+// LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document
+// LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id
+// WHERE (masterlist.`deleted_at` IS NULL AND masterlist.document_status >= 3)
+// AND (disposition.disposition IS NOT NULL AND disposition.deleted_at IS NULL)
+// AND (disposition.disposition IS NOT NULL AND disposition.deleted_at IS NULL)
+// AND (
+// ( active.`view_status` =1 AND active.`logdel` =0 )
+// AND ((active.`expiration_date` BETWEEN '2023-11-01' AND '2023-11-30') OR (active.`expiration_date1` BETWEEN '2023-11-01' AND '2023-11-30') OR (active.`expiration_date2` BETWEEN '2023-11-01' AND '2023-11-30') OR (active.`expiration_date3` BETWEEN '2023-11-01' AND '2023-11-30'))
+// )
+// ORDER BY masterlist.id DESC ;";
+		// $script = "SELECT SQL_CALC_FOUND_ROWS disposition.disposition, masterlist.id, masterlist.fkid_document,masterlist.document_status,masterlist.is_expiration_date_exist, masterlist.deleted_at,active.date_received, active.model, active.doc_title,active.doc_no, active.rev_no,masterlist.originator_code,obsolete.doc_no AS obsolete_doc_no,obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model,obsolete.doc_title AS obsolete_doc_title,obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no,active.expiration_date AS active_expiration_date,obsolete.expiration_date AS obsolete_expiration_date FROM tbl_doc_review_masterlist masterlist
+		// LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document
+		// LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document
+		// LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id
+		// WHERE (masterlist.`deleted_at` IS NULL AND masterlist.document_status >= 3)
+		// AND (disposition.disposition IS NOT NULL AND disposition.deleted_at IS NULL)
+		// AND (
+		// ( active.`view_status` =1 AND active.`logdel` =0 )
+		// AND ((active.`expiration_date` BETWEEN '2023-11-01' AND '2023-11-30') OR (active.`expiration_date1` BETWEEN '2023-11-01' AND '2023-11-30') OR (active.`expiration_date2` BETWEEN '2023-11-01' AND '2023-11-30') OR (active.`expiration_date3` BETWEEN '2023-11-01' AND '2023-11-30'))
+		// )
+		// ORDER BY masterlist.id DESC ;";
+		return $this->query($query);
+		// return $this->query($query);
 	}
 }
 

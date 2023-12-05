@@ -18,23 +18,6 @@ class DocReviewDispositionApprovalDetails{
 		}
 		return $request;
     }
-
-    // public function DocReviewDispositionApprovalDetailsById($doc_review_disposition_id){
-    //     require_once('../class/oop_acdcs.php');
-	// 	$request = $_POST;
-	// 	$array_fields = array('*');
-	// 	$table 	   	= 'tbl_doc_review_disposition_approval_details';
-	// 	$joins 	   	= '';
-	// 	$sql_where 	= 'WHERE tbl_doc_review_disposition_id = '.$doc_review_disposition_id.' AND deleted_at IS NULL';
-	// 	$sql_order 	= '';
-	// 	$sql_limit 	= '';
-	// 	$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-	// 	$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-	// 	while($row = mysqli_fetch_array($query)){
-	// 		$request['tbl_doc_review_masterlist_id'] 	= $row['tbl_doc_review_masterlist_id'];
-	// 	}
-	// 	return $request;
-    // }
 }
 
 

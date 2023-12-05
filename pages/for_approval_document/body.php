@@ -1,5 +1,5 @@
 <section class="main">		
-		<section class="tab-content" id="tab-content">
+	<section class="tab-content" id="tab-content">
 		   <section class="tab-pane active fade in content" id="iqc">
 				<div class="row">
 				   	<div class="col-xs-12">
@@ -26,7 +26,7 @@
 
 								</div> <br><br><br>
 									<div class="col-sm-12">
-										<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary">
+										<table class="table table-condensed table-bordered table-responsive" id="tbl_for_approval_document">
 											<thead>
 												<tr>
 													<th></th>
@@ -65,8 +65,8 @@
 					<!--  -->
 				</div>
 			</section>
-		</section>
 	</section>
+</section>
 	
 	<!-- <th><span class="fa fa-attachment"></span>File Attachment</th> -->
 <!---------------------
@@ -157,24 +157,25 @@ $(document).ready(function () {
 	var handler_qfr = 'handler_qfr';
 	var masterlist_temporary_handler = "handler/masterlist_temporary_handler.php";
 	var $formApproverDecision 	= $('#formApproverDecision');
+	var tbl_for_approval_document 	= 'tbl_for_approval_document';
 	
-	var dt_special_acceptance = $(tbl_masterlist_temporary).DataTable({
+	var dt_for_approval_document = $('#'+tbl_for_approval_document).DataTable({
 		"aaSorting"	: [],
 		"bProcessing": true,
         "bServerSide": true,
 		"columnDefs":[
-            {"orderable":false,"targets":[0,1,2,3,4,5]}
+            {"orderable":false,"targets":[0,1,2]}
         ],
 		"sAjaxSource": "server_side_scripts/dt_masterlist_for_approval.php?username="+"<?php echo $_SESSION['username'];?>",
 		"drawCallback": function( settings ) {
-			$('#tbl_special_acceptance').attr('style','width:100%;')
+			$('#'+tbl_for_approval_document).attr('style','width:100%;')
 		}
 	});
 
 	/* 
 		Batch Approval Event
 	*/
-	$(tbl_masterlist_temporary).on('click','#cBoxBatchSelect', function () {
+	$('#'+tbl_for_approval_document).on('click','#cBoxBatchSelect', function () {
 		const approvalId = $(this).attr('data-id');
 		if ($(this).prop('checked')) {
 			$(this).each(function () {
@@ -242,7 +243,7 @@ $(document).ready(function () {
 	$('#modalForApproval').on('hidden.bs.modal', function (e) {
 		arrApprovalId = [];
 		removeAttrCheckedApproval(arrApprovalId)
-		.then(dt_special_acceptance.draw());
+		.then(dt_for_approval_document.draw());
 		
 	});
 

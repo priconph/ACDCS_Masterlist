@@ -40,6 +40,7 @@ class DocReviewDisposition{
                 $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
                 $return['sec_heads_username'][]	= $array_data_app;
             }
+
         }else{
             $return['disposition'] = 0; //no disposition
         }

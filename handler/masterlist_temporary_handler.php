@@ -187,6 +187,7 @@ use Handler\DocuReviewDisposition;
 				case "create_disposition_details" 					: create_disposition_details(); break; 
 				case "save_approver_decision" 						: save_approver_decision(); break; 
 				case "read_doc_review_masterlist" 					: read_doc_review_masterlist(); break; 
+				case "advanced_search" 								: advanced_search(); break; 
 			}	
 		}
 	}
@@ -194,26 +195,6 @@ use Handler\DocuReviewDisposition;
 	function is_ajax() {
 		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
-
-	/* 
-		function read_temporary_review_docu() {
-			require_once('../class/oop_acdcs.php');
-			$return = $_POST;
-			$array_fields = array('*');
-			$table 	   	= '`tbl_doc_review_masterlist`';
-			$joins 	   	= '';
-			$sql_where 	=  'WHERE active.view_status = 1';
-			$sql_order 	= 'ORDER BY `active`.`doc_no` DESC';
-			$sql_limit 	= '';
-			$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-			$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-			while($row = mysqli_fetch_array($query)){
-				
-			}
-			echo json_encode($return);
-
-		}
-	*/
 	/*
 		TODO: ACDCS Email format DCC to Process owner with table of data
 		TODO: Enable the Email to PO and Approvers 
@@ -380,14 +361,60 @@ use Handler\DocuReviewDisposition;
 	function read_doc_review_masterlist()
 	{
 		try {
-			$return = $_POST; 
-			$get_doc_review_disposition_by_id = DocReviewDisposition::getDocReviewDispositionApprovalDetailsById($return['doc_review_masterlist_id']);
+			$get_doc_review_disposition_by_id = DocReviewDisposition::getDocReviewDispositionApprovalDetailsById($_POST['doc_review_masterlist_id']);
 			echo json_encode($get_doc_review_disposition_by_id);
 		} catch (\Throwable $th) {
 			throw $th;
 		}
 	}
-	// getdispositionApprovalDetails
+
+	function advanced_search(){
+		try {
+			$return = $_POST;
+				require_once('../class/oop_acdcs.php');
+				$request = $_POST;
+				$array_fields = array('disposition.created_at,disposition.reviewed_by,disposition.disposition,masterlist.originator_code, masterlist.id, masterlist.fkid_document,masterlist.document_status,masterlist.is_expiration_date_exist, masterlist.deleted_at,active.date_received, active.model, active.doc_title,active.doc_no, active.rev_no , obsolete.doc_no AS obsolete_doc_no,obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model,obsolete.doc_title AS obsolete_doc_title,obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no,active.expiration_date,obsolete.expiration_date AS obsolete_expiration_date');
+				$table 	   	 = 'tbl_doc_review_masterlist  masterlist';
+				$joins 	   	 = ' ' . 'LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document';
+				$joins 	   	.= ' ' . 'LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document';
+				$joins 	   	.= ' ' . 'LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id';
+				/* SQL WHERE */
+				$sql_where 	 = ' ' . 'WHERE (masterlist.`deleted_at` IS NULL AND masterlist.document_status >= 3)';
+				$sql_where 	.= ' ' . 'AND (disposition.disposition IS NOT NULL AND disposition.deleted_at IS NULL)';
+				$sql_where 	.= ' ' . 'AND (disposition.disposition IS NOT NULL AND disposition.deleted_at IS NULL)';
+				$sql_where 	.= ' ' . 'AND (';
+				$sql_where 	.= ' ' . '( active.`view_status` =1 AND active.`logdel` =0 )';
+				if($return['expiration_date_from_to'] != ''){
+					$arr_expiration_date_from_to = explode('-',$return['expiration_date_from_to']);
+					$arr_sql_where = "AND ((active.`expiration_date` BETWEEN '".date('Y-m-d', strtotime($arr_expiration_date_from_to[0]))."' AND '".date('Y-m-d', strtotime($arr_expiration_date_from_to[1]))."') OR (active.`expiration_date1` BETWEEN '".date('Y-m-d', strtotime($arr_expiration_date_from_to[0]))."' AND '".date('Y-m-d', strtotime($arr_expiration_date_from_to[1]))."') OR (active.`expiration_date2` BETWEEN '".date('Y-m-d', strtotime($arr_expiration_date_from_to[0]))."' AND '".date('Y-m-d', strtotime($arr_expiration_date_from_to[1]))."') OR (active.`expiration_date3` BETWEEN '".date('Y-m-d', strtotime($arr_expiration_date_from_to[0]))."' AND '".date('Y-m-d', strtotime($arr_expiration_date_from_to[1]))."'))";
+				}
+				/**
+				 * TODO: If the there is additional query for advance search  
+					*	if($date_received != "") {
+					*	$date_received = explode(' - ',$date_received);
+					*	$query .= " AND (active.`date_received` BETWEEN '".date('Y-m-d',strtotime($date_received[0]))."' AND '".date('Y-m-d', strtotime($date_received[1]))."')";
+					*	}
+				*/
+				$sql_where 	.= ' ' . ' '.$arr_sql_where.' ';
+				$sql_where 	.= ' ' .')';
+				$sql_order 	 = ' ' . 'ORDER BY masterlist.id DESC';
+				$sql_limit 	 = '';
+				$request['script'] = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+				echo json_encode($request);
+				return;
+				/**
+				 * TODO: For Query Review data before Exporting the data
+					* $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+					* while($row = mysqli_fetch_array($query)){
+					*	$request['tbl_doc_review_masterlist_id'] 	= $row['tbl_doc_review_masterlist_id'];
+					* }
+				 */
+				
+			// return $request;
+		} catch (\Throwable $th) {
+			throw $th;
+		}
+	}
 
 	function Slug($string, $slug = '-', $extra = null)
 	{
