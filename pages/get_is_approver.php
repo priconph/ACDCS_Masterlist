@@ -25,8 +25,8 @@ $database 	= mysqli_select_db($conn,$db_name) or die("cannot connect database");
 
 
 /* Query Here  */
-$username = $_SESSION['username'];
-$sql  = 'SELECT COUNT(*) as approver_count FROM tbl_doc_review_disposition_approval_details WHERE sec_heads_username = "'.$username.'"';
+// $username = $_SESSION['username'];
+$sql  = 'SELECT COUNT(*) as approver_count FROM tbl_doc_review_disposition_approval_details WHERE sec_heads_username = "'.$_SESSION['username'].'"';
 $result = mysqli_query($conn,$sql);
 while($data = mysqli_fetch_assoc($result)){
     return $data['approver_count'];

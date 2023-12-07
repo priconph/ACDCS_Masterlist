@@ -1,3 +1,9 @@
+<?php
+use Pages\GetUserRoles\Rapid;
+$is_dcc_staff = Rapid::getIsDccStaff();
+$is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR $is_dcc_staff['section'][0] == "EMO/QMS" OR $is_dcc_staff['division'][0] =="Quality Assurance Di" ) ? 'true': 'false';
+?>
+
 <section class="main">		
 		<section class="tab-content" id="tab-content">
 		   <section class="tab-pane active fade in content" id="iqc">
@@ -17,33 +23,38 @@
 						<div class="">
 							<ul class="nav nav-tabs" role="tablist">
 							<?php 
-								// echo '
-								// 	<li class="nav-item active">
-								// 		<a class="nav-link" data-toggle="tab" href="#menu1">Pending</a>
-								// 	</li>
-								// 	<li class="nav-item">
-								// 		<a class="nav-link " data-toggle="tab" href="#menu3">For Review</a>
-								// 	</li>
-								// 	';
-
-								echo '
-									<li class="nav-item active">
-											<a class="nav-link" data-toggle="tab" href="#menu1">Pending</a>
-									</li>
-									<li class="nav-item">
-										<a class="nav-link" data-toggle="tab" href="#menu2">Production - Active Document</a>
-									</li>
-									<li class="nav-item">
-										<a class="nav-link " data-toggle="tab" href="#menu3">For Review</a>
-									</li>
+								if($is_dcc_access == 'true'){
+									echo '
+										<li class="nav-item active">
+												<a class="nav-link" data-toggle="tab" href="#menu1">Pending</a>
+										</li>
+									
+										<li class="nav-item">
+											<a class="nav-link" data-toggle="tab" href="#menu3">For Review</a>
+										</li>
 									';
+									$dcc_active = 'active';
+									$process_owner_active = '';
+								}else{
+									echo '
+										<li class="nav-item active">
+											<a class="nav-link" data-toggle="tab" href="#menu2">Production - Active Document</a>
+										</li>
+										<li class="nav-item">
+											<a class="nav-link " data-toggle="tab" href="#menu3">For Review</a>
+										</li>
+									';
+									$dcc_active = '';
+									$process_owner_active = 'active';
+								}
+								
 							?>
 							</ul>
 						</div>
 					</div>
 					<!-- Tab content -->
 					<div class="tab-content">
-						<div role="tabpanel" id="menu1" class="tab-pane active"><br>
+						<div role="tabpanel" id="menu1" class="tab-pane <?php echo $dcc_active?>"><br>
 							<div class="col-sm-12">
 							<div class="panel panel-info" style="overflow:scroll;">
 								<div class="panel-heading"><i class="fa fa-file fa-lg"> Pending</i></div>
@@ -54,13 +65,13 @@
 								</div>
 							</div> <!--end div panel info -->
 						</div> <!--end tabpanel-->
-						<div role="tabpanel" id="menu2" class="tab-pane"><br>
+						<div role="tabpanel" id="menu2" class="tab-pane <?php echo $process_owner_active?>"><br>
 							<div class="col-sm-12">
 							<div class="panel panel-info" style="overflow:scroll;">
 								<div class="panel-heading"><i class="fa fa-file fa-lg"> Production - Active Document</i></div>
 									<div class="panel-body">
-											<iframe src="../../ACDCS/prdn_home.php" width="100%" height="100%" style="border:none;" title="Pending">
-											</iframe>
+										<iframe src="../../ACDCS/prdn_home.php" width="100%" height="100%" style="border:none;" title="Pending">
+										</iframe>
 									</div>
 								</div>
 							</div> <!--end div panel info -->
@@ -71,7 +82,7 @@
 								<div class="panel-heading"><i class="fa fa-file fa-lg"> For Review</i></div>
 								<div class="panel-body">
 									<div class="col-sm-12">
-										<button class="btn btn-success fa fa-excel-o pull-right" id="btnExportDocReviewMasterlist"> Export </button>
+										<!-- <button class="btn btn-success fa fa-excel-o pull-right" id="btnExportDocReviewMasterlist"> Export </button> -->
 									</div> <br><br>
 										<div class="col-sm-12">
 											<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary">
@@ -156,7 +167,7 @@
 </div><!-- /.modal -->
 
 <!-- Modal for Approver Decision -->
-<div class="modal fade" tabindex="-1" role="dialog" id="modaAdvanceSearch">
+<div class="modal fade" tabindex="-1" role="dialog" id="modalAdvanceSearch">
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -409,7 +420,7 @@ $(document).ready(function () {
 	var $formReviewDocu = $('#formReviewDocu');
 	var $formDocReviewDisposition = $('#formDocReviewDisposition');
 	var $formAdvanceSearch = $('#formAdvanceSearch');
-	var dt_special_acceptance = $(tbl_masterlist_temporary).DataTable({
+	var dt_masterlist_temporary = $(tbl_masterlist_temporary).DataTable({
 		"aaSorting"	: [],
 		"bProcessing": true,
         "bServerSide": true,
@@ -508,13 +519,24 @@ $(document).ready(function () {
 
 		});
 	});
-	
+
 	$('#btnBatchApproval').click(function (e) { 
 		e.preventDefault();
 		const filtered_doc_review_masterlist_id = Array.from(new Set(arr_doc_review_masterlist_id));
 		console.log(filtered_doc_review_masterlist_id);
 		$('#modal_approver_decision').modal();
 
+	});
+
+	$('#btnExportDocReviewMasterlist').click(function (e) { 
+		e.preventDefault();
+		$('#modalAdvanceSearch').modal();
+		date_time_picker('expiration_date_from_to');
+	});
+
+
+	$('a').click(function (e) { 
+		($(this).attr('href') === '#menu3')? dt_masterlist_temporary.draw() : '';
 	});
 	
 	$formReviewDocu.find('#disposition').change(function (e) { 
@@ -538,7 +560,7 @@ $(document).ready(function () {
 			if(response['is_success'] === 'true'){
 				$('#modalReviewDocu').modal('hide')
 				notif_success('Save Successfully')
-				dt_special_acceptance.draw()
+				dt_masterlist_temporary.draw()
 			}else{
 				$('#modalReviewDocu').modal('hide');
 				$('#alert_message').text(response['result_msg'])
@@ -547,11 +569,7 @@ $(document).ready(function () {
 		});
 	});
 	
-	$('#btnExportDocReviewMasterlist').click(function (e) { 
-		e.preventDefault();
-		$('#modaAdvanceSearch').modal();
-		date_time_picker('expiration_date_from_to');
-	});
+	
 	$formAdvanceSearch.submit(function (e) { 
 		e.preventDefault();
 		let data = {
@@ -560,6 +578,8 @@ $(document).ready(function () {
 		call_ajax_serialize(data, $(this).serialize() , masterlist_temporary_handler, function(result){
 			// window.location.href = " ?query="+result['script'];
 			window.location.href = "reports/temporary_document/excel_iqc_visual_inspection.php?query="+result['script'];
+			$('#expiration_date_from_to').val('');
+			$('#modalAdvanceSearch').modal('hide');
 		});
 	});
 	//
@@ -572,6 +592,9 @@ $(document).ready(function () {
 		$('#person_in_charge').empty()
 		$('#isRevisionRow').hide()
 		$('#isExtension').hide()
+	});
+	$('#modalAdvanceSearch').on('hidden.bs.modal', function (e) {
+		$('#expiration_date_from_to').val('');
 	});
 });
 </script>

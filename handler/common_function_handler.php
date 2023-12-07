@@ -32,7 +32,7 @@ class DocuReviewDisposition{
 	public static function activeDocs($fkid_document) 
 	{
 		require_once('../class/oop_acdcs.php');
-		$request = $_POST;
+		$request = array();
 		$array_fields = array('*');
 		$table 	   	= 'tbl_active_docs';
 		$joins 	   	= '';

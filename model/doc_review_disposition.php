@@ -6,6 +6,24 @@ use Model\Hris;
 use ACDCS;
 class DocReviewDisposition{
 
+    public function getDocReviewDisposition($doc_review_disposition_id)
+    {
+        require_once('../class/oop_acdcs.php');
+		$request = array();
+		$array_fields = array('tbl_doc_review_masterlist_id');
+		$table 	   	= 'tbl_doc_review_disposition';
+		$joins 	   	= '';
+		$sql_where 	= ' WHERE id = '.$doc_review_disposition_id.' ';
+		$sql_order 	= '';
+		$sql_limit 	= '';
+		$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		while($row = mysqli_fetch_array($query)){
+			$request['tbl_doc_review_masterlist_id'] 	= $row['tbl_doc_review_masterlist_id'];
+		}
+		return $request;
+    }
+
     public function getDocReviewDispositionApprovalDetailsById($doc_review_masterlist_id)
     {
         require_once('../class/oop_acdcs.php');
@@ -46,4 +64,8 @@ class DocReviewDisposition{
         }
         return $return;
     }
+
+    
+
+
 }

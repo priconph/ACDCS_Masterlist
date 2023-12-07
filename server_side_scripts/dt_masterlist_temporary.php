@@ -67,8 +67,6 @@
 	$sTable = "tbl_doc_review_masterlist masterlist";
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
-	
-
 
 	if(file_exists($database_config)){
 		require_once($database_config);
@@ -208,7 +206,8 @@
 	/* NOTE: Cannot get nullable column so I add this mysql query 
 			 YEAR(active.expiration_date) BETWEEN 1970 AND '.date('Y').'
 	*/
-	$sWhere .= '( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
+	$sWhere .= 'masterlist.deleted_at IS NULL';
+	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
     
 	/*
 	 * SQL queries
@@ -273,6 +272,7 @@
 				$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
 				break;
 			case 2:
+            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm btn-default fa fa-edit" type="button"> Edit Review</button></center>';
             	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
 				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
 				break;

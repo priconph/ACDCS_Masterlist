@@ -3,7 +3,11 @@ namespace Model;
 require_once('../class/oop_mailer.php');
 
 use MAILER as Mailer;
-class RapidEmailer{
+use RAPID;
+use SYSTEMONE;
+
+class RapidEmailer
+{
 	function get_fields_values($passed_param,$excluded_value)
 	{
 		$array_fields = array();
@@ -80,16 +84,60 @@ class RapidEmailer{
 		$script = MAILER::getInstance()->insert_query_script($table,$array_fields,$array_values);
 		return $script;
 	}
+
+	function get_user_email_add_by_username($username) {
+		require_once('../class/oop_acdcs.php');
+		/* Check first if employee has email address to Rapid database. If none, get the email address to SystemOne. Else, display empty. */
+		$result = "";
+		$array_fields = array('email_add','emp_type');
+		$table 	   	= 'db_rapid.tbl_useraccounts';
+		$joins 	   	= '';
+		$sql_where 	= 'WHERE username="'.$username.'"';
+		$sql_order 	= '';
+		$sql_limit 	= 'LIMIT 0,1';
+		$result = RAPID::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		if($result->num_rows != 0) {
+			if($row = mysqli_fetch_array($result)){
+				$email_add = $row['email_add'];
+				$emp_type  = $row['emp_type'];
+				if($emp_type == 'Pricon Employee' && $email_add == '') {
+					/* Get the email address to SystemOne and update the record to Rapid database */
+					$array_fields2 = array('email_add');
+					$table2 	   	= 'db_acl.tbl_useraccnt';
+					$joins2 	   	= '';
+					$sql_where2 	= 'WHERE username="'.$username.'"';
+					$sql_order2 	= '';
+					$sql_limit2 	= 'LIMIT 0,1';
+					$result2 = SYSTEMONE::getInstance()->select_query($array_fields2,$table2,$joins2,$sql_where2,$sql_order2,$sql_limit2);
+					if($row2=mysqli_fetch_array($result2)) {
+						$email_add = $row2['email_add'];
+					} else {
+						$email_add = 'NONE';
+					}
+				} else if($emp_type == 'Pricon Employee' && $email_add != '') {
+					$email_add = $row['email_add'];
+				} else if($emp_type == 'Subcon Hired' && $email_add == '') {
+					$email_add = 'NONE';
+				} else {
+					$email_add = $row['email_add'];
+				}
+			}
+		} else {
+			$email_add = 'NONE';
+		}
+		return $email_add;
+	}
 }
 
-class EmailDetail extends RapidEmailer {
+class EmailDetail extends RapidEmailer 
+{
 	public static function send_email($to, $from, $cc, $subject, $message) 
 	{
 		// return $subject;
 		$return 	= array();
 		$mail_data  = array();
 		$message .= "<br><br>
-					 For more info, please log-in to your Rapid account. Go to http://rapid/ and ACDCS Document Review Process
+					 For more info, please log-in to your Rapid account. Go to http://rapid/ and click http://rapid/ACDCS_Masterlist/index.php ACDCS Document Review Process
 					 <br><br>Notice of Disclaimer:<br>
                      This message (including any attachments) contains confidential information intended for a specific individual and purpose, and is protected by law. If you are not the intended recipient, you should delete this message. Any disclosure,copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.";
 		$mail_data  = array(
@@ -136,7 +184,7 @@ class EmailDetail extends RapidEmailer {
 		$return 	= array();
 		$mail_data  = array();
 		$message .= "<br><br>
-					 For more info, please log-in to your Rapid account. Go to http://rapid/ and ACDCS Document Review Process
+					 For more info, please log-in to your Rapid account. Go to http://rapid/ and click http://rapid/ACDCS_Masterlist/index.php ACDCS Document Review Process
 					 <br><br>Notice of Disclaimer:<br>
                      This message (including any attachments) contains confidential information intended for a specific individual and purpose, and is protected by law. If you are not the intended recipient, you should delete this message. Any disclosure,copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.";
 		$mail_data  = array(
@@ -173,7 +221,7 @@ class EmailDetail extends RapidEmailer {
 		$return 	= array();
 		$mail_data  = array();
 		$message .= "<br><br>
-					 For more info, please log-in to your Rapid account. Go to http://rapid/ and ACDCS Document Review Process
+					 For more info, please log-in to your Rapid account. Go to http://rapid/ and click http://rapid/ACDCS_Masterlist/index.php ACDCS Document Review Process
 					 <br><br>Notice of Disclaimer:<br>
                     This message (including any attachments) contains confidential information intended for a specific individual and purpose, and is protected by law. If you are not the intended recipient, you should delete this message. Any disclosure,copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.";
 		$mail_data  = array(
@@ -199,7 +247,7 @@ class EmailDetail extends RapidEmailer {
 		$return 	= array();
 		$mail_data  = array();
 		$message .= "<br><br>
-					 For more info, please log-in to your Rapid account. Go to http://rapid/ and ACDCS Document Review Process
+					 For more info, please log-in to your Rapid account. Go to http://rapid/ and click http://rapid/ACDCS_Masterlist/index.php ACDCS Document Review Process
 					 <br><br>Notice of Disclaimer:<br>
                     This message (including any attachments) contains confidential information intended for a specific individual and purpose, and is protected by law. If you are not the intended recipient, you should delete this message. Any disclosure,copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.";
 		$mail_data  = array(
@@ -235,7 +283,7 @@ class EmailDetail extends RapidEmailer {
 		$return 	= array();
 		$mail_data  = array();
 		$message .= "<br><br>
-					 For more info, please log-in to your Rapid account. Go to http://rapid/ and ACDCS Document Review Process
+					 For more info, please log-in to your Rapid account. Go to http://rapid/ and click http://rapid/ACDCS_Masterlist/index.php ACDCS Document Review Process
 					 <br><br>Notice of Disclaimer:<br>
                     This message (including any attachments) contains confidential information intended for a specific individual and purpose, and is protected by law. If you are not the intended recipient, you should delete this message. Any disclosure,copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.";
 		$mail_data  = array(

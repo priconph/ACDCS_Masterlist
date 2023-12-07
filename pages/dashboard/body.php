@@ -28,45 +28,12 @@
 										<?php 
 											/* Check if there is a read role on one IQC modules */
 											// echo $query;
-											
-											// $user_iqc_read_access = false;
-											// foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-											// 	if($subsystem_code == "IQC" && $user_role['read'][$key] == 1){ 
-											// 		$user_iqc_read_access = true;
-											// 	}
-											// }
-											$username_is_exist = isset($_SESSION['username'])? 'true':'false';
-											if($username_is_exist == 'true'){
+											use Pages\GetUserRoles\DocReviewDispositionApprovalDetails;
+											$is_approver = DocReviewDispositionApprovalDetails::getIsApprover();
+											$is_username_exist = isset($_SESSION['username']) ? 'true' : 'false';
+											if($is_username_exist == 'true'){
 												echo '<div class="col-xs-3">
-												<a href="#" id="router" link-id="temporaryDocu">
-													<div class="panel panel-success" style="padding:0px;">
-														<div class="panel-heading">
-														<div class="row">
-															<div class="col-xs-5">
-															<i class="fa fa-search fa-5x"></i>
-															</div>
-															<div class="col-xs-7 text-right">
-															<p class="announcement-heading"></p>
-															<p class="announcement-text fa-2x"> Temporary Documents</p>
-															</div>
-														</div>
-														</div>
-														<div class="panel-footer announcement-bottom">
-															<div class="row">
-															<div class="col-xs-6">
-																Open
-															</div>
-															<div class="col-xs-6 text-right">
-																<i class="fa fa-arrow-circle-right"></i>
-															</div>
-															</div>
-														</div>
-													</div>
-												</a>
-											</div>';
-												if( $data['approver_count'] > 0 ){
-													echo '<div class="col-xs-3">
-													<a href="#" id="router" link-id="forApproval">
+													<a href="#" id="router" link-id="temporaryDocu">
 														<div class="panel panel-success" style="padding:0px;">
 															<div class="panel-heading">
 															<div class="row">
@@ -75,7 +42,7 @@
 																</div>
 																<div class="col-xs-7 text-right">
 																<p class="announcement-heading"></p>
-																<p class="announcement-text fa-2x"> For Approval Documents</p>
+																<p class="announcement-text fa-2x"> Temporary Documents</p>
 																</div>
 															</div>
 															</div>
@@ -92,9 +59,36 @@
 														</div>
 													</a>
 												</div>';
+												if( $is_approver > 0 ){
+													echo '<div class="col-xs-3">
+														<a href="#" id="router" link-id="forApproval">
+															<div class="panel panel-success" style="padding:0px;">
+																<div class="panel-heading">
+																<div class="row">
+																	<div class="col-xs-5">
+																	<i class="fa fa-search fa-5x"></i>
+																	</div>
+																	<div class="col-xs-7 text-right">
+																	<p class="announcement-heading"></p>
+																	<p class="announcement-text fa-2x"> For Approval Documents</p>
+																	</div>
+																</div>
+																</div>
+																<div class="panel-footer announcement-bottom">
+																	<div class="row">
+																	<div class="col-xs-6">
+																		Open
+																	</div>
+																	<div class="col-xs-6 text-right">
+																		<i class="fa fa-arrow-circle-right"></i>
+																	</div>
+																	</div>
+																</div>
+															</div>
+														</a>
+													</div>';
 												}
 											}
-											
 										?>
 									</div>
 								</div>

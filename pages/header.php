@@ -6,10 +6,10 @@
 <?php 
 
 require_once('libraries/includes.php'); 
-// require_once('get_user_roles.php');
-require_once('get_is_approver.php');
-
+// require_once('get_is_approver.php');
+require_once('get_user_roles.php');
 echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
+
 ?>
 <?php 
 /* used for standalone testing purposed only - remove on live or do not patch this page */
@@ -34,7 +34,7 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 		<div class="">
 			<div class="navbar-header">
 				<a href="#" class="navbar-brand">
-					<span class="hidden-xs">ACDCS <?php echo $username = isset($_SESSION['username'])? 'true':'false'; ?></span>
+					<span class="hidden-xs">ACDCS</span>
 				</a>
 				<p class="navbar-text">
 				</p>
