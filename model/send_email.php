@@ -53,7 +53,7 @@ class RapidEmailer
 		$array_fields[]		 = 'date_created'; $array_values[] = date('Y-m-d H:i:s');
 		$result = Mailer::getInstance()->insert_query($table,$array_fields,$array_values);
 		$script = Mailer::getInstance()->insert_query_script($table,$array_fields,$array_values);
-		return $script;
+		return $result;
 	}
 	
 	/*Save E-mail in tbl_mailer */
@@ -82,7 +82,7 @@ class RapidEmailer
 		$array_fields[]		 = 'created_by'; $array_values[] = $mail_data['username'];
 		$result = MAILER::getInstance()->insert_query($table,$array_fields,$array_values);
 		$script = MAILER::getInstance()->insert_query_script($table,$array_fields,$array_values);
-		return $script;
+		return $result;
 	}
 
 	function get_user_email_add_by_username($username) {

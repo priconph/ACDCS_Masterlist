@@ -31,7 +31,7 @@
 												<tr>
 													<th></th>
 													<th>Approved by</th>
-													<th>Approval ID</th>
+													<!-- <th>Approval ID</th> -->
 													<!-- <th>Document ID</th> -->
 													<!-- <th>Document Status</th> -->
 													<th>Disposition</th>
@@ -45,7 +45,6 @@
 													<!--<th>Document Type</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th> -->
-
 													<!-- <th>Reviewed by</th>
 													<th>Date of review</th>
 													<th>Person in charge</th>
@@ -147,9 +146,6 @@ $(document).ready(function () {
 			$('body').addClass('modal-open');
 		}   
 	});
-
-
-	
 	/* ***************************
 				Start
 	*************************** */
@@ -202,7 +198,12 @@ $(document).ready(function () {
 		}
 		$('#countApproval').text(`(${arrApprovalId.length})`);
 	});
-	
+
+	$('#'+tbl_for_approval_document).on('click','#btnSearchDocNum', function () {
+		let doc_no = $(this).attr('doc_no');
+		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist?doc_no="+doc_no)
+	});
+
 	$('#btnBatchApproval').click(function (e) { 
 		e.preventDefault();
         /* Filtered the duplicate number before submiting to BatchApproval */
@@ -242,9 +243,7 @@ $(document).ready(function () {
 
 	$('#modalForApproval').on('hidden.bs.modal', function (e) {
 		arrApprovalId = [];
-		removeAttrCheckedApproval(arrApprovalId)
-		.then(dt_for_approval_document.draw());
-		
+		removeAttrCheckedApproval(arrApprovalId).then(dt_for_approval_document.draw());
 	});
 
 	/* Function */
@@ -285,15 +284,6 @@ $(document).ready(function () {
 			}, 100);
 		})
 	}
-
-
-	/*
-	arrApprovalId = []; 
-	$('#cBoxBatchSelect').prop('checked',false);
-	
-	*/
-
-
 });
 </script>
 

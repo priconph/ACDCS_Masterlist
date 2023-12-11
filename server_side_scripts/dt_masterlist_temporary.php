@@ -12,13 +12,14 @@
 	/* Array of database columns which should be read and sent back to DataTables. Use a space where
 	 * you want to insert a non-database field (for example a counter or static image)
 	 */
+
 	/* Model */
 	$database_config = '../db_config/config_acdcs.php';
 	$active_document_class = '../model/active_document.php';
-	$common_function_handler = '../handler/common_function_handler.php';
+	$doc_review_disposition_class = '../model/doc_review_disposition.php';
 
 
-	use Handler\DocuReviewDisposition;
+	use Model\DocReviewDisposition;
 	use Model\ActiveDocument;
 
 	error_reporting(E_ALL);
@@ -75,17 +76,17 @@
 		exit;
 	}
 
-	if(file_exists($common_function_handler)){
-		require_once($common_function_handler);
-	} else {
-		echo "common_function_handler file does not exist!";
-		exit;
-	}
-
 	if(file_exists($active_document_class)){
 		require_once($active_document_class);
 	} else {
-		echo "common_function_handler file does not exist!";
+		echo "active_document_class file does not exist!";
+		exit;
+	}
+
+	if(file_exists($doc_review_disposition_class)){
+		require_once($doc_review_disposition_class);
+	} else {
+		echo "doc_review_disposition_class file does not exist!";
 		exit;
 	}
 
@@ -206,7 +207,7 @@
 	/* NOTE: Cannot get nullable column so I add this mysql query 
 			 YEAR(active.expiration_date) BETWEEN 1970 AND '.date('Y').'
 	*/
-	$sWhere .= 'masterlist.deleted_at IS NULL';
+	$sWhere .= 'masterlist.deleted_at IS NULL'; //
 	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
     
 	/*
@@ -252,7 +253,7 @@
 	/*
 		Class Object
 	*/
-	$request_doc_review_disposition = new DocuReviewDisposition;
+	$request_doc_review_disposition = new DocReviewDisposition;
 	$active_documents = new ActiveDocument;
 	
 	while ( $aRow = mysql_fetch_array( $rResult ) )
@@ -272,15 +273,24 @@
 				$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
 				break;
 			case 2:
-            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm btn-default fa fa-edit" type="button"> Edit Review</button></center>';
-            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
+            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button">View</button></center>';
 				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
 				break;
-			default:
-				# code...
-				$button = '';
-				$status = '<span class="badge highlight-color-blue">DCC CHECKING</span>';
+			case 3:
+            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button">View</button></center>';
+				$status = '<span class="badge highlight-color-blue">DCC CONFORMANCE</span>';
 				break;
+			case 4:
+				$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm btn-primary fa fa-edit" type="button">Edit Review</button></center>';
+				$status = '<span class="badge highlight-color-red">REVISED DISPOSITION</span>';
+				break;
+			default:
+				$button = '';
+				$status = '<span class="badge highlight-color-gray">Unknown Status</span>';
+				break;
+
+            // $button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm btn-primary fa fa-edit" type="button"> Edit Review</button></center> <br>';
+				
 		}
 	/* 
 		Disposition
@@ -308,16 +318,21 @@
 		*/
 		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
 		$row[]= $button;
-		$row[]= $aRow['fkid_document'];
+		// $row[]= $aRow['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
 		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
 		$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];
 		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
 		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
-		$row[]= ( $aRow['doc_no'] != NULL ) ? $aRow['doc_no'] : $aRow['obsolete_doc_no'];
+		// $row[]= ( $aRow['doc_no'] != NULL ) ? $aRow['doc_no'] : $aRow['obsolete_doc_no'];
+		$row[]= ( $aRow['doc_no'] != NULL ) ? 
+					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc_no="' .$aRow['doc_no']. '">'.' '.$aRow['doc_no'].'</a>'  :
+					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc_no="' .$aRow['obsolete_doc_no']. '">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
 		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
-		$row[]= ( $aRow['originator_code'] != NULL ) ? $aRow['originator_code'] : $aRow['obsolete_originator_code'];
+		$row[]= ( $aRow['originator_code'] != NULL ) ? 
+					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
+					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
 		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
 		array_push($output['aaData'],$row);
 	}

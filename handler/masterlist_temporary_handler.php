@@ -165,7 +165,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
-				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 			} catch (\Throwable $th) {
 				throw $th;
 			}

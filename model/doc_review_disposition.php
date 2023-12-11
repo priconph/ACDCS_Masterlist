@@ -8,20 +8,46 @@ class DocReviewDisposition{
 
     public function getDocReviewDisposition($doc_review_disposition_id)
     {
+        try {
+            require_once('../class/oop_acdcs.php');
+            $request = array();
+            $array_fields = array('tbl_doc_review_masterlist_id');
+            $table 	   	= 'tbl_doc_review_disposition';
+            $joins 	   	= '';
+            $sql_where 	= ' WHERE id = '.$doc_review_disposition_id.' ';
+            $sql_order 	= '';
+            $sql_limit 	= '';
+            $script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+            $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+            while($row = mysqli_fetch_array($query)){
+                $request['tbl_doc_review_masterlist_id'] 	= $row['tbl_doc_review_masterlist_id'];
+            }
+            return $request;
+        }catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
+    public static function getDocReviewDispositionById($doc_review_masterlist_id)
+    {
         require_once('../class/oop_acdcs.php');
-		$request = array();
-		$array_fields = array('tbl_doc_review_masterlist_id');
+        $request = $_POST;
+		$array_fields = array('disposition');
 		$table 	   	= 'tbl_doc_review_disposition';
 		$joins 	   	= '';
-		$sql_where 	= ' WHERE id = '.$doc_review_disposition_id.' ';
+		$sql_where 	=  'WHERE tbl_doc_review_masterlist_id = '.$doc_review_masterlist_id.' AND deleted_at IS NULL';
 		$sql_order 	= '';
 		$sql_limit 	= '';
 		$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 		$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-		while($row = mysqli_fetch_array($query)){
-			$request['tbl_doc_review_masterlist_id'] 	= $row['tbl_doc_review_masterlist_id'];
+        if($query->num_rows > 0){
+			while($row = mysqli_fetch_array($query)){
+				$return['disposition'] = $row['disposition'];
+			}
+		}else{
+			$return['disposition'] = 0; //no disposition
 		}
-		return $request;
+		return $return;
     }
 
     public function getDocReviewDispositionApprovalDetailsById($doc_review_masterlist_id)

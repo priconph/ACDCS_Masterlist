@@ -14,12 +14,10 @@
 	 */
 	/* Model */
 	$database_config = '../db_config/config_acdcs.php';
-	$active_document_class = '../model/active_document.php';
-	$common_function_handler = '../handler/common_function_handler.php';
+	$system_one_class = '../model/systemone.php';
 
 
-	use Handler\DocuReviewDisposition;
-	use Model\ActiveDocument;
+	use Model\Hris;
 
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
@@ -69,17 +67,10 @@
 		exit;
 	}
 
-	if(file_exists($common_function_handler)){
-		require_once($common_function_handler);
+	if(file_exists($system_one_class)){
+		require_once($system_one_class);
 	} else {
-		echo "common_function_handler file does not exist!";
-		exit;
-	}
-
-	if(file_exists($active_document_class)){
-		require_once($active_document_class);
-	} else {
-		echo "common_function_handler file does not exist!";
+		echo "system_one_class file does not exist!";
 		exit;
 	}
 
@@ -253,11 +244,6 @@
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
 	);
-	/*
-		Class Object
-	*/
-	$request_doc_review_disposition = new DocuReviewDisposition;
-	$active_documents = new ActiveDocument;
 	
 	while ( $aRow = mysql_fetch_array( $rResult ) )
     {
@@ -266,54 +252,38 @@
 
 		$doc_review_masterlist_id = $aRow['id'];
 		$fkid_document = $aRow['fkid_document'];
-	/* 
-		Button
-	*/
-        $getActiveDocumentById = $active_documents->getActiveDocumentById($fkid_document);
-		if($getActiveDocumentById['document_status'] == 1){
-			$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-edit" type="button" style="background-color:yellow;color:black;"> Review</button></center>';
-        }else if($getActiveDocumentById['document_status'] == 2){
-            $button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDetails" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
-        }
-	/* 
-		Document Status
-	*/
-        if($getActiveDocumentById['document_status'] == 1){
-            $status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
-        }else if($getActiveDocumentById['document_status'] == 2){
-            $status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
-        }
+
 	/* 
 		Disposition
 	*/
 		switch ($aRow['disposition']) {
 			case 1:
-				$doc_review_disposition = 'Revision';
+				$disposition = 'Revision';
 				break;
 			case 2:
-				$doc_review_disposition = 'Retain';
+				$disposition = 'Retain';
 				break;
 			case 3:
-				$doc_review_disposition = '<span class="">Obsolete';
+				$disposition = '<span class="">Obsolete';
 				break;
 			case 4:
-				$doc_review_disposition = 'Extended';
+				$disposition = 'Extended';
 				break;
 			default:
-				$doc_review_disposition = '';
+				$disposition = '';
 				break;
 		}
 
 		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
-		$row[]= $aRow['sec_heads_username'];
-		$row[]= $aRow['id'];
+		$row[]= Hris::get_emp_name_by_username_systemone($aRow['sec_heads_username']);
+		// $row[]= $aRow['id'];
 		// $row[]= $getActiveDocumentById['fkid_document'];
 		// $row[]= '<center> '.$status.' </center>';
-		$row[]= '<center> <span class="badge highlight-color-green">	' .$doc_review_disposition. '</span> </center>';
+		$row[]= '<center> <span class="badge highlight-color-green">' .$disposition. '</span> </center>';
 		$row[]= $aRow['date_received'];
 		$row[]= $aRow['model'];
 		$row[]= $aRow['doc_title'];
-		$row[]= $aRow['doc_no'];
+		$row[]= '<a href="#" id="btnSearchDocNum" doc_no="' .$aRow['doc_no']. '">'.' '.$aRow['doc_no'].'</a>';
 		$row[]= $aRow['rev_no'];
 		$row[]= $aRow['originator_code'];
 		array_push($output['aaData'],$row);

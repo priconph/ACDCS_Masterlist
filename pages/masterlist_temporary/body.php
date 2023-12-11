@@ -37,10 +37,10 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 									$process_owner_active = '';
 								}else{
 									echo '
-										<li class="nav-item active">
+										<li class="nav-item">
 											<a class="nav-link" data-toggle="tab" href="#menu2">Production - Active Document</a>
 										</li>
-										<li class="nav-item">
+										<li class="nav-item  active">
 											<a class="nav-link " data-toggle="tab" href="#menu3">For Review</a>
 										</li>
 									';
@@ -65,7 +65,8 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 								</div>
 							</div> <!--end div panel info -->
 						</div> <!--end tabpanel-->
-						<div role="tabpanel" id="menu2" class="tab-pane <?php echo $process_owner_active?>"><br>
+						<!-- <div role="tabpanel" id="menu2" class="tab-pane <?php //echo $process_owner_active?>"><br> -->
+						<div role="tabpanel" id="menu2" class="tab-pane"><br>
 							<div class="col-sm-12">
 							<div class="panel panel-info" style="overflow:scroll;">
 								<div class="panel-heading"><i class="fa fa-file fa-lg"> Production - Active Document</i></div>
@@ -76,11 +77,30 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 								</div>
 							</div> <!--end div panel info -->
 						</div> <!--end tabpanel-->
-						<div role="tabpanel" id="menu3" class="tab-pane"><br>
+						<div role="tabpanel" id="menu3" class="tab-pane <?php echo $process_owner_active?>"><br>
 							<div class="col-sm-12">
 							<div class="panel panel-info" style="overflow:scroll;">
 								<div class="panel-heading"><i class="fa fa-file fa-lg"> For Review</i></div>
 								<div class="panel-body">
+									<div class="card" style="border-color: #D3D3D3;">
+										<div class="card-body">
+											<div class="row">
+
+												<div class="col-sm-4">
+												<span class="badge highlight-color-yellow">FOR REVIEW</span>
+												<label><b>- Process Owner</b></label>
+												</div>
+												<div class="col-sm-4">	
+												<span class="badge highlight-color-lime">FOR APPROVAL</span>
+												<label><b>- Section / Dept Head</b></label>
+												</div>
+												<div class="col-sm-4">	
+												<span class="badge highlight-color-blue">DCC CONFORMANCE</span>
+												<label><b>- DCC / QAS</b></label>
+												</div>
+											</div>
+										</div>
+									</div>
 									<div class="col-sm-12">
 										<!-- <button class="btn btn-success fa fa-excel-o pull-right" id="btnExportDocReviewMasterlist"> Export </button> -->
 									</div> <br><br>
@@ -90,7 +110,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 													<tr>
 														<th></th>
 														<th><span class="fa fa-cogs"></span></th>
-														<th>Document ID</th>
+														<!-- <th>Document ID</th> -->
 														<th>Document Status</th>
 														<th>Disposition</th>
 														<!-- <th>Number of Review</th> -->
@@ -131,40 +151,6 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 <!---------------------
 	Modals - Start 
 ---------------------->
-<!-- Modal for system message -->
-<div class="modal fade" tabindex="-1" role="dialog" id="modal_remove_attachment_confirmation">
-  <div class="modal-dialog modal-md" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"><i class="fa fa-question-circle-o"></i> System Confirmation</h4>
-      </div>
-	  <form id="form_remove_attachment_confirmation">
-		  <div class="modal-body">
-			<div class="row">
-				<div class="col-sm-12" id="">				
-					<div class="alert alert-danger" role="alert" id="">
-						<h4>Are you sure you want to delete the document? <br> *Document will permanently be deleted to server.</h4>
-					</div>
-				</div>
-			</div>
-			<div class="row" id="">
-				<div class="col-sm-12" id="">				
-					<label>If yes, please write the reason:</label>
-				</div>
-				<div class="col-sm-12">				
-					<textarea id="reason" name="reason" style="width:100%;" required></textarea>
-				</div>
-			</div>
-		  </div>
-		  <div class="modal-footer">
-			<button type="submit" class="btn btn-primary fa fa-trash" id="btn_yes_remove_attachment"> Yes</button>
-			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Close</button>
-		  </div>
-		</form>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
 
 <!-- Modal for Approver Decision -->
 <div class="modal fade" tabindex="-1" role="dialog" id="modalAdvanceSearch">
@@ -239,7 +225,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
       </div>
 	  <form id="formReviewDocu">
 		  <div class="modal-body">
-				<div class="row">
+				<div class="row" style="display:none;">
 					<div class="col-sm-12">		
 						<input type="text" name="doc_review_masterlist_id" id="doc_review_masterlist_id" class="form-control">
 					</div>
@@ -313,9 +299,18 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
       </div>
 	  <form id="formDocReviewDisposition">
 		  <div class="modal-body">
-				<div class="row">
-					<div class="col-sm-12">		
+				<div class="row" style="display:none;">
+					<div class="col-sm-3">		
+						<label>DocMasterList:</label>
+					</div>
+					<div class="col-sm-3">		
 						<input type="text" name="doc_review_masterlist_id" id="doc_review_masterlist_id" class="form-control">
+					</div>
+					<div class="col-sm-3">		
+						<label>DocDisposition:</label>
+					</div>
+					<div class="col-sm-3">		
+						<input type="text" name="doc_review_disposition_id" id="doc_review_disposition_id" class="form-control">
 					</div>
 				</div>
 				<div class="row">
@@ -367,7 +362,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 				</div>
 		  </div>
 		  <div class="modal-footer">
-			<button type="submit" class="btn btn-primary fa fa-save" id="btn_yes_remove_attachment"> Save</button>
+			<button type="submit" class="btn btn-primary fa fa-save" id="btnEditDispositionSave"> Save</button>
 			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Close</button>
 		  </div>
 		</form>
@@ -466,6 +461,37 @@ $(document).ready(function () {
 		}
 	}
 
+	function getDocReviewDisposition () {
+		( this.id === 'btnViewDocReviewDisposition' ) ? $('#btnEditDispositionSave').hide() : $('#btnEditDispositionSave').show()
+		let doc_review_masterlist_id = $(this).attr('data-id');
+		let data = {
+			'action' : 'read_doc_review_masterlist',
+			'doc_review_masterlist_id' : doc_review_masterlist_id,
+		}
+
+		call_ajax(data, masterlist_temporary_handler,function(result){
+			console.log('disposition',result['disposition']);
+			let disposition = result['disposition'];
+			let doc_review_disposition_id = result['id'];
+			
+			$('#modalDocReviewDisposition').modal();
+			$formDocReviewDisposition.find('#doc_review_masterlist_id').val(doc_review_masterlist_id);
+			$formDocReviewDisposition.find('#doc_review_disposition_id').val(doc_review_disposition_id);
+			$formDocReviewDisposition.find('#disposition').val(disposition);
+			assign_value_select2('#formDocReviewDisposition #sec_heads_username',result['sec_heads_username']);
+			if(disposition === '1'){
+				$formDocReviewDisposition.find('#due_date').val(result['due_date']);
+				assign_value_select2('#formDocReviewDisposition #person_in_charge',result['person_in_charge']);
+			}else if(disposition === '4'){
+				$formDocReviewDisposition.find('#extension_date').val(result['extension_date']);
+			}
+			re_initialize_select2_server_side('#modalDocReviewDisposition #person_in_charge','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
+			re_initialize_select2_server_side('#modalDocReviewDisposition #sec_heads_username','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
+			dispositionStatus($formDocReviewDisposition,disposition);
+
+		});
+	}
+
 	$(tbl_masterlist_temporary).on('click','#btnReviewDocu',function (e) { 
 		e.preventDefault()
 		$('#modalReviewDocu').modal()
@@ -492,34 +518,69 @@ $(document).ready(function () {
 		}
 	});
 
-	$(tbl_masterlist_temporary).on('click','#btnViewDocReviewDisposition' ,function () {
-		let doc_review_masterlist_id = $(this).attr('data-id');
-		console.log('doc_review_masterlist_id',doc_review_masterlist_id);
-		let data = {
-			'action' : 'read_doc_review_masterlist',
-			'doc_review_masterlist_id' : doc_review_masterlist_id,
-		}
-		call_ajax(data, masterlist_temporary_handler,function(result){
-			console.log('disposition',result['disposition']);
-			let disposition = result['disposition'];
-			
-			$('#modalDocReviewDisposition').modal();
-			$formDocReviewDisposition.find('#doc_review_masterlist_id').val(doc_review_masterlist_id);
-			$formDocReviewDisposition.find('#disposition').val(disposition);
-			assign_value_select2('#formDocReviewDisposition #sec_heads_username',result['sec_heads_username']);
-			if(disposition === '1'){
-				$formDocReviewDisposition.find('#due_date').val(result['due_date']);
-				assign_value_select2('#formDocReviewDisposition #person_in_charge',result['person_in_charge']);
-			}else if(disposition === '4'){
-				$formDocReviewDisposition.find('#extension_date').val(result['extension_date']);
+	/*
+		$(tbl_masterlist_temporary).on('click','#btnViewDocReviewDisposition' ,function () {
+			let doc_review_masterlist_id = $(this).attr('data-id');
+			console.log('doc_review_masterlist_id',doc_review_masterlist_id);
+			let data = {
+				'action' : 'read_doc_review_masterlist',
+				'doc_review_masterlist_id' : doc_review_masterlist_id,
 			}
-			re_initialize_select2_server_side('#modalDocReviewDisposition #person_in_charge','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
-			re_initialize_select2_server_side('#modalDocReviewDisposition #sec_heads_username','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
-			dispositionStatus($formDocReviewDisposition,disposition);
+			call_ajax(data, masterlist_temporary_handler,function(result){
+				console.log('disposition',result['disposition']);
+				let disposition = result['disposition'];
+				
+				$('#modalDocReviewDisposition').modal();
+				$formDocReviewDisposition.find('#doc_review_masterlist_id').val(doc_review_masterlist_id);
+				$formDocReviewDisposition.find('#disposition').val(disposition);
+				assign_value_select2('#formDocReviewDisposition #sec_heads_username',result['sec_heads_username']);
+				if(disposition === '1'){
+					$formDocReviewDisposition.find('#due_date').val(result['due_date']);
+					assign_value_select2('#formDocReviewDisposition #person_in_charge',result['person_in_charge']);
+				}else if(disposition === '4'){
+					$formDocReviewDisposition.find('#extension_date').val(result['extension_date']);
+				}
+				re_initialize_select2_server_side('#modalDocReviewDisposition #person_in_charge','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
+				re_initialize_select2_server_side('#modalDocReviewDisposition #sec_heads_username','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
+				dispositionStatus($formDocReviewDisposition,disposition);
 
+			});
 		});
-	});
+		$(tbl_masterlist_temporary).on('click','#btnEditDocReviewDisposition' ,function () {
+			let doc_review_masterlist_id = $(this).attr('data-id');
+			console.log('doc_review_masterlist_id',doc_review_masterlist_id);
+			let data = {
+				'action' : 'read_doc_review_masterlist',
+				'doc_review_masterlist_id' : doc_review_masterlist_id,
+			}
+			call_ajax(data, masterlist_temporary_handler,function(result){
+				console.log('disposition',result['disposition']);
+				let disposition = result['disposition'];
+				let doc_review_disposition_id = result['id'];
+				
+				$('#modalDocReviewDisposition').modal();
+				$formDocReviewDisposition.find('#doc_review_masterlist_id').val(doc_review_masterlist_id);
+				$formDocReviewDisposition.find('#doc_review_disposition_id').val(doc_review_disposition_id);
+				$formDocReviewDisposition.find('#disposition').val(disposition);
+				assign_value_select2('#formDocReviewDisposition #sec_heads_username',result['sec_heads_username']);
+				if(disposition === '1'){
+					$formDocReviewDisposition.find('#due_date').val(result['due_date']);
+					assign_value_select2('#formDocReviewDisposition #person_in_charge',result['person_in_charge']);
+				}else if(disposition === '4'){
+					$formDocReviewDisposition.find('#extension_date').val(result['extension_date']);
+				}
+				re_initialize_select2_server_side('#modalDocReviewDisposition #person_in_charge','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
+				re_initialize_select2_server_side('#modalDocReviewDisposition #sec_heads_username','#modalDocReviewDisposition #formDocReviewDisposition',[],"server_side_scripts/dropdown/common/dd_rapid_hris_and_subcon_list.php");
+				dispositionStatus($formDocReviewDisposition,disposition);
 
+			});
+		});
+	*/
+
+	$(tbl_masterlist_temporary).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
+	
+	$(tbl_masterlist_temporary).on('click','#btnEditDocReviewDisposition' ,getDocReviewDisposition);
+	
 	$('#btnBatchApproval').click(function (e) { 
 		e.preventDefault();
 		const filtered_doc_review_masterlist_id = Array.from(new Set(arr_doc_review_masterlist_id));
@@ -533,7 +594,6 @@ $(document).ready(function () {
 		$('#modalAdvanceSearch').modal();
 		date_time_picker('expiration_date_from_to');
 	});
-
 
 	$('a').click(function (e) { 
 		($(this).attr('href') === '#menu3')? dt_masterlist_temporary.draw() : '';
@@ -569,7 +629,6 @@ $(document).ready(function () {
 		});
 	});
 	
-	
 	$formAdvanceSearch.submit(function (e) { 
 		e.preventDefault();
 		let data = {
@@ -595,6 +654,10 @@ $(document).ready(function () {
 	});
 	$('#modalAdvanceSearch').on('hidden.bs.modal', function (e) {
 		$('#expiration_date_from_to').val('');
+	});
+	$(tbl_masterlist_temporary).on('click','#btnSearchDocNum', function () {
+		let doc_no = $(this).attr('doc_no');
+		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist?doc_no="+doc_no)
 	});
 });
 </script>

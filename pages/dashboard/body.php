@@ -33,55 +33,65 @@
 											$is_username_exist = isset($_SESSION['username']) ? 'true' : 'false';
 											if($is_username_exist == 'true'){
 												echo '<div class="col-xs-3">
-													<a href="#" id="router" link-id="temporaryDocu">
-														<div class="panel panel-success" style="padding:0px;">
-															<div class="panel-heading">
-															<div class="row">
-																<div class="col-xs-5">
-																<i class="fa fa-search fa-5x"></i>
+														<a href="#" id="router" link-id="temporaryDocu">
+															<div class="panel panel-success" style="padding:0px;">
+																<div class="panel-heading">
+																	<div class="row">
+																		<div class="col-xs-5">
+																		<i class="fa fa-search fa-5x"></i>
+																		</div>
+																		<div class="col-xs-7 text-right">
+																		<p class="announcement-heading"></p>
+																		<p class="announcement-text fa-2x"> Temporary Documents</p>
+																		</div>
+																	</div>
+																	<div class="row">
+																		<div class="col-xs-12">
+																			<p style="font-size: small;text-wrap: nowrap;">(Waiver, Change notice,Instruction ,Urgent Direction, GP)</p>
+																		</div>
+																	</div>
 																</div>
-																<div class="col-xs-7 text-right">
-																<p class="announcement-heading"></p>
-																<p class="announcement-text fa-2x"> Temporary Documents</p>
+																<div class="panel-footer announcement-bottom">
+																	<div class="row">
+																		<div class="col-xs-6">
+																			Open
+																		</div>
+																		<div class="col-xs-6 text-right">
+																			<i class="fa fa-arrow-circle-right"></i>
+																		</div>
+																	</div>
 																</div>
 															</div>
-															</div>
-															<div class="panel-footer announcement-bottom">
-																<div class="row">
-																<div class="col-xs-6">
-																	Open
-																</div>
-																<div class="col-xs-6 text-right">
-																	<i class="fa fa-arrow-circle-right"></i>
-																</div>
-																</div>
-															</div>
-														</div>
-													</a>
-												</div>';
+														</a>
+													</div>';
 												if( $is_approver > 0 ){
 													echo '<div class="col-xs-3">
 														<a href="#" id="router" link-id="forApproval">
-															<div class="panel panel-success" style="padding:0px;">
+															<div class="panel panel-info" style="padding:0px;">
 																<div class="panel-heading">
 																<div class="row">
 																	<div class="col-xs-5">
-																	<i class="fa fa-search fa-5x"></i>
+																	<i class="fa fa-check fa-5x"></i>
 																	</div>
 																	<div class="col-xs-7 text-right">
 																	<p class="announcement-heading"></p>
 																	<p class="announcement-text fa-2x"> For Approval Documents</p>
 																	</div>
 																</div>
+																<div class="row">
+																		<div class="col-xs-12">
+																			<p style="font-size: small;text-wrap: nowrap;">(Section Head / Dept Head)</p>
+																		</div>
+																</div>
 																</div>
 																<div class="panel-footer announcement-bottom">
 																	<div class="row">
-																	<div class="col-xs-6">
-																		Open
-																	</div>
-																	<div class="col-xs-6 text-right">
-																		<i class="fa fa-arrow-circle-right"></i>
-																	</div>
+																		<div class="col-xs-6">
+																			Open
+																		</div>
+																		<div class="col-xs-6 text-right">
+																			<i class="fa fa-arrow-circle-right"></i>
+																		</div>
 																	</div>
 																</div>
 															</div>
