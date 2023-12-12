@@ -11,7 +11,7 @@ class DocReviewDisposition{
         try {
             require_once('../class/oop_acdcs.php');
             $request = array();
-            $array_fields = array('tbl_doc_review_masterlist_id');
+            $array_fields = array('tbl_doc_review_masterlist_id','disposition');
             $table 	   	= 'tbl_doc_review_disposition';
             $joins 	   	= '';
             $sql_where 	= ' WHERE id = '.$doc_review_disposition_id.' ';
@@ -21,33 +21,38 @@ class DocReviewDisposition{
             $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
             while($row = mysqli_fetch_array($query)){
                 $request['tbl_doc_review_masterlist_id'] 	= $row['tbl_doc_review_masterlist_id'];
+                $request['disposition'] 	                = $row['disposition'];
             }
             return $request;
         }catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
     public static function getDocReviewDispositionById($doc_review_masterlist_id)
     {
-        require_once('../class/oop_acdcs.php');
-        $request = $_POST;
-		$array_fields = array('disposition');
-		$table 	   	= 'tbl_doc_review_disposition';
-		$joins 	   	= '';
-		$sql_where 	=  'WHERE tbl_doc_review_masterlist_id = '.$doc_review_masterlist_id.' AND deleted_at IS NULL';
-		$sql_order 	= '';
-		$sql_limit 	= '';
-		$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-		$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-        if($query->num_rows > 0){
-			while($row = mysqli_fetch_array($query)){
-				$return['disposition'] = $row['disposition'];
-			}
-		}else{
-			$return['disposition'] = 0; //no disposition
-		}
-		return $return;
+        try {
+            require_once('../class/oop_acdcs.php');
+            $request = $_POST;
+            $array_fields = array('disposition');
+            $table 	   	= 'tbl_doc_review_disposition';
+            $joins 	   	= '';
+            $sql_where 	=  'WHERE tbl_doc_review_masterlist_id = '.$doc_review_masterlist_id.' AND deleted_at IS NULL';
+            $sql_order 	= '';
+            $sql_limit 	= '';
+            $script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+            $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+            if($query->num_rows > 0){
+                while($row = mysqli_fetch_array($query)){
+                    $return['disposition'] = $row['disposition'];
+                }
+            }else{
+                $return['disposition'] = 0; //no disposition
+            }
+            return $return;
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
 
     public function getDocReviewDispositionApprovalDetailsById($doc_review_masterlist_id)
@@ -91,7 +96,29 @@ class DocReviewDisposition{
         return $return;
     }
 
-    
+    public function getDispositionCode($disposition_code){
+        try {
+            switch ($disposition_code) {
+                case 1:
+                    return $doc_review_disposition = 'Revision';
+                    break;
+                case 2:
+                    return $doc_review_disposition = 'Retain';
+                    break;
+                case 3:
+                    return $doc_review_disposition = '<span class="">Obsolete';
+                    break;
+                case 4:
+                    return $doc_review_disposition = 'Extended';
+                    break;
+                default:
+                    return $doc_review_disposition = '';
+                    break;
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 
 
 }

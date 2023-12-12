@@ -117,6 +117,8 @@ use Handler\DocuReviewDisposition;
 				/* 	Select if the approver is already exist, the soft deleted the details by 
 						tbl_doc_review_disposition_id column deleted_at is NULL
 				*/
+				$send_email_to_approver[] = CommonClass::sendEmailToApprover($doc_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
+				return $send_email_to_approver;
 				$request = $_POST;
 				$array_fields = array('tbl_doc_review_disposition_id');
 				$table = 'tbl_doc_review_disposition_approval_details';
@@ -149,6 +151,9 @@ use Handler\DocuReviewDisposition;
 			try {
 				$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($doc_review_masterlist_id);
 				$active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']);
+				$get_doc_review_disposition_by_id = DocReviewDisposition::getDocReviewDisposition($doc_review_disposition_id);
+				$get_disposition_code = DocReviewDisposition::getDispositionCode($get_doc_review_disposition_by_id['disposition']);
+				
 				// $from = 'cbretusto@pricon.ph';
 				// $to = 'mclegaspi@pricon.ph'; 
 				// $cc = '';
@@ -158,6 +163,7 @@ use Handler\DocuReviewDisposition;
 				$subject = 'FOR APPROVAL: ACDCS Document Review'.' | Doc No. : '.$active_docs['doc_no'].' ';
 				$message = 'Please be informed that you have ACDCS Document Review for approval <br><br>';
 				$message .= 'Request Details	: <br>';
+				$message .= 'Disposition		: '.$get_disposition_code.' '.'<br>';
 				$message .= 'Date Received		: '.$active_docs['date_received'].'<br>';
 				$message .= 'Model				: '.$active_docs['model'].' <br>';
 				$message .= 'Originator			: '.$active_docs['originator_code'].'<br>';
@@ -165,7 +171,9 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
-				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				// print_r($message);
+				// exit;
 			} catch (\Throwable $th) {
 				throw $th;
 			}
@@ -197,7 +205,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
 				$date_start = $email_due_date;
 				$frequency = 2;
-				return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
+				// return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
 			} catch (\Throwable $th) {
 				throw $th;
 			}
@@ -222,8 +230,8 @@ use Handler\DocuReviewDisposition;
 		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
 	/*
-		TODO: Enabel ACDCS Email format DCC to Process owner with table of data
-		TODO: Enable the Email to PO and Approvers 
+		TODO: Enable ACDCS Email format DCC to Process owner with table of data 
+		TODO: Enable the Email to PO and Approvers | FIND: EmailDetail::
 		* nedit
 	*/
 	function create_disposition_details()
@@ -267,6 +275,9 @@ use Handler\DocuReviewDisposition;
 				return;
 			}
 			if($disposition == 2 || $disposition == 3 ){ //Retain & Obsolete
+				$email[] = $common_class->createApprovalDetails(2,$sec_heads_username,$doc_review_masterlist_id);
+				// echo json_encode($email);
+				return;
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','created_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$datetime_today);
 				$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values); 

@@ -256,23 +256,25 @@
 	/* 
 		Disposition
 	*/
-		switch ($aRow['disposition']) {
-			case 1:
-				$disposition = 'Revision';
-				break;
-			case 2:
-				$disposition = 'Retain';
-				break;
-			case 3:
-				$disposition = '<span class="">Obsolete';
-				break;
-			case 4:
-				$disposition = 'Extended';
-				break;
-			default:
-				$disposition = '';
-				break;
-		}
+		$disposition = $request_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
+		
+		// switch ($aRow['disposition']) {
+		// 	case 1:
+		// 		$disposition = 'Revision';
+		// 		break;
+		// 	case 2:
+		// 		$disposition = 'Retain';
+		// 		break;
+		// 	case 3:
+		// 		$disposition = '<span class="">Obsolete';
+		// 		break;
+		// 	case 4:
+		// 		$disposition = 'Extended';
+		// 		break;
+		// 	default:
+		// 		$disposition = '';
+		// 		break;
+		// }
 
 		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
 		$row[]= Hris::get_emp_name_by_username_systemone($aRow['sec_heads_username']);

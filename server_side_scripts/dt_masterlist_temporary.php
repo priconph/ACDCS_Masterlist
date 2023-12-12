@@ -296,23 +296,9 @@
 		Disposition
 	*/
 		$arr_doc_review_disposition = $request_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
-		switch ($arr_doc_review_disposition['disposition']) {
-			case 1:
-				$doc_review_disposition = 'Revision';
-				break;
-			case 2:
-				$doc_review_disposition = 'Retain';
-				break;
-			case 3:
-				$doc_review_disposition = '<span class="">Obsolete';
-				break;
-			case 4:
-				$doc_review_disposition = 'Extended';
-				break;
-			default:
-				$doc_review_disposition = '';
-				break;
-		}
+
+		$doc_review_disposition = $request_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
+
 		/**
 		 * TODO: check if dcc need to have checked box to approved then transfer to REVIEWED TABLE
 		*/
