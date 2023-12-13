@@ -268,21 +268,22 @@
 		Document Status
 	*/
 		switch ($aRow['document_status']) {
+			case 0:
+				$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center>';
+				$status = '<span class="badge highlight-color-red">DISAPPROVED</span>';
+				break;
 			case 1:
 				$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-plus" type="button" style="background-color:yellow;color:black;"> Add Review</button></center>';
 				$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
 				break;
 			case 2:
-            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button">View</button></center>';
+            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button">View</button></center> <br>';
+				$button .= '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center>';
 				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
 				break;
 			case 3:
             	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button">View</button></center>';
 				$status = '<span class="badge highlight-color-blue">DCC CONFORMANCE</span>';
-				break;
-			case 4:
-				$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm btn-primary fa fa-edit" type="button">Edit Review</button></center>';
-				$status = '<span class="badge highlight-color-red">REVISED DISPOSITION</span>';
 				break;
 			default:
 				$button = '';

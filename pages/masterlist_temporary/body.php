@@ -299,18 +299,18 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
       </div>
 	  <form id="formDocReviewDisposition">
 		  <div class="modal-body">
-				<div class="row" style="display:none;">
+				<div class="row" style="display:block;">
 					<div class="col-sm-3">		
-						<label>DocMasterList:</label>
+						<label>DocMasterListId:</label>
 					</div>
 					<div class="col-sm-3">		
 						<input type="text" name="doc_review_masterlist_id" id="doc_review_masterlist_id" class="form-control">
 					</div>
 					<div class="col-sm-3">		
-						<label>DocDisposition:</label>
+						<label>DocDispositionId:</label>
 					</div>
 					<div class="col-sm-3">		
-						<input type="text" name="doc_review_disposition_id" id="doc_review_disposition_id" class="form-control">
+						<input type="text" name="docu_review_disposition_id" id="docu_review_disposition_id" class="form-control">
 					</div>
 				</div>
 				<div class="row">
@@ -476,7 +476,7 @@ $(document).ready(function () {
 			
 			$('#modalDocReviewDisposition').modal();
 			$formDocReviewDisposition.find('#doc_review_masterlist_id').val(doc_review_masterlist_id);
-			$formDocReviewDisposition.find('#doc_review_disposition_id').val(doc_review_disposition_id);
+			$formDocReviewDisposition.find('#docu_review_disposition_id').val(doc_review_disposition_id);
 			$formDocReviewDisposition.find('#disposition').val(disposition);
 			assign_value_select2('#formDocReviewDisposition #sec_heads_username',result['sec_heads_username']);
 			if(disposition === '1'){
@@ -516,6 +516,11 @@ $(document).ready(function () {
 				console.log('Unchecked '+arr_doc_review_masterlist_id);
 			});
 		}
+	});
+
+	$(tbl_masterlist_temporary).on('click','#btnSearchDocNum', function () {
+		let doc_no = $(this).attr('doc_no');
+		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist?doc_no="+doc_no)
 	});
 
 	/*
@@ -610,6 +615,26 @@ $(document).ready(function () {
 		changeEventDisposition($formDocReviewDisposition,$(this).val());
 	});
 
+	$formDocReviewDisposition.submit(function (e) { 
+		e.preventDefault();
+		var form_data = new FormData(this);
+		form_data.append("action","edit_disposition_details")
+		// form_data.append("pkid",$('#modal_sa_edit').data('id'));
+		// form_data.append("username",username);
+		call_ajax_attachment(form_data, masterlist_temporary_handler, function(response){
+			console.log('asdsa');
+			if(response['is_success'] === 'true'){
+				$('#modalDocReviewDisposition').modal('hide')
+				notif_success('Save Successfully')
+				dt_masterlist_temporary.draw()
+			}else{
+				$('#modalDocReviewDisposition').modal('hide');
+				$('#alert_message').text(response['result_msg'])
+				$('#modal_alert').modal()
+			}
+		});
+	});
+
 	$formReviewDocu.submit(function (e) { 
 		e.preventDefault();
 		var form_data = new FormData(this);
@@ -655,10 +680,7 @@ $(document).ready(function () {
 	$('#modalAdvanceSearch').on('hidden.bs.modal', function (e) {
 		$('#expiration_date_from_to').val('');
 	});
-	$(tbl_masterlist_temporary).on('click','#btnSearchDocNum', function () {
-		let doc_no = $(this).attr('doc_no');
-		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist?doc_no="+doc_no)
-	});
+	
 });
 </script>
 

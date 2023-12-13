@@ -58,7 +58,7 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 			<li class="active" link-id="dashboard"><a href="#dashboard" data-toggle="tab"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
 			<?php 
 				/*omodify
-				 Check if there is a read role on one IQC modules
+				Check if there is a read role on one IQC modules
 				$user_iqc_read_access = false;
 				foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
 					if($subsystem_code == "IQC" && $user_role['read'][$key] == 1){

@@ -1,5 +1,8 @@
 <?php
 //Set Class name here, it's a good practice to Capitalize the first letter, I've just read it somewhere on the internet... so its up to you if will follow...
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 class ACDCS extends mysqli 
 {
 	private static $instance = null;
@@ -127,6 +130,12 @@ class ACDCS extends mysqli
 		$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) .$where;
 		$this->query($query);
 		return "Record has been updated";
+	}
+	public function update_query_id($table,$array_fields,$array_values,$where){
+		$update_array =  $this->create_update_param($array_fields,$array_values);
+		$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) .$where;
+		$this->query($query);
+		return $this->insert_id;
 	}
 
 	public function update_query_script($table,$array_fields,$array_values,$where){

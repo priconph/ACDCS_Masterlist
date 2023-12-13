@@ -18,8 +18,9 @@ use Handler\DocuReviewDisposition;
 
 	class CommonClass{
 
-		public static function docReviewMasterlist($doc_review_masterlist_id) 
+		public function docReviewMasterlist($doc_review_masterlist_id) 
 		{
+
 			try {
 				$request = array();
 				$array_fields = array('*');
@@ -117,8 +118,6 @@ use Handler\DocuReviewDisposition;
 				/* 	Select if the approver is already exist, the soft deleted the details by 
 						tbl_doc_review_disposition_id column deleted_at is NULL
 				*/
-				$send_email_to_approver[] = CommonClass::sendEmailToApprover($doc_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
-				return $send_email_to_approver;
 				$request = $_POST;
 				$array_fields = array('tbl_doc_review_disposition_id');
 				$table = 'tbl_doc_review_disposition_approval_details';
@@ -211,6 +210,15 @@ use Handler\DocuReviewDisposition;
 			}
 		}
 
+		public static function clearTblDocReviewDispositionColumn($docu_review_disposition_id){
+			$request = array();
+			$table = 'tbl_doc_review_disposition';
+			$array_fields = array('person_in_charge','due_date','memo_file_name','memo_file_filtered_name','extension_date','remarks');
+			$array_values = array(NULL,NULL,NULL,NULL,NULL,NULL);
+			$where = 'WHERE id = '.$docu_review_disposition_id.'';
+			$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where); 
+		}
+
 	}
 
 	if(is_ajax()) {
@@ -219,6 +227,7 @@ use Handler\DocuReviewDisposition;
 			switch($action) {	
 				case "read_temporary_review_docu" 					: read_temporary_review_docu(); break; 
 				case "create_disposition_details" 					: create_disposition_details(); break; 
+				case "edit_disposition_details" 					: edit_disposition_details(); break; 
 				case "save_approver_decision" 						: save_approver_decision(); break; 
 				case "read_doc_review_masterlist" 					: read_doc_review_masterlist(); break; 
 				case "advanced_search" 								: advanced_search(); break; 
@@ -386,6 +395,138 @@ use Handler\DocuReviewDisposition;
 		}
 	}
 	
+	function edit_disposition_details(){
+		try {
+			require_once('../class/oop_acdcs.php');
+
+			$common_class = new CommonClass;
+			$return = $_POST ;
+			$response = array();
+			$username = $_SESSION['username'];
+			$disposition = $return['disposition'];
+			$sec_heads_username = $return['sec_heads_username'];
+			$datetime_today = date('Y-m-d H:i:s');
+			$doc_review_masterlist_id = $return['doc_review_masterlist_id'];
+			$docu_review_disposition_id = $return['docu_review_disposition_id'];
+			
+			$doc_review_masterlist = $common_class->docReviewMasterlist($doc_review_masterlist_id);
+			$dcc_emailed_at = $doc_review_masterlist['created_at'];
+			$new_status = 2;
+
+			$table = 'tbl_doc_review_disposition';
+			if($disposition == 1){ //Revision
+				
+				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','updated_at');
+				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$datetime_today);
+				$where = 'WHERE id = '.$docu_review_disposition_id.'';
+				//Before updating the disposition, clear the doc review disposition table then update the data by id
+				$clear_tbl_disposition[] = $common_class->clearTblDocReviewDispositionColumn($docu_review_disposition_id);
+				$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+				
+				/* Scheduled email to Process owner */
+				$scheduled_email[] = $common_class->sendScheduledEmailToProcessOwner($docu_review_disposition_id,$return['person_in_charge'],$return['due_date'],$username);
+				
+				/* Save Approval Details and Send Email to Approvers */
+				$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
+
+				/* Change status*/
+				// $change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
+
+				$response['is_success'] = 'true';
+				$response['result_msg'] =  'Save Successfully';
+				echo json_encode($response);
+				return;
+			}
+
+			if($disposition == 2 || $disposition == 3 ){ //Retain & Obsolete
+				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','created_at');
+				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$datetime_today);
+				$where = 'WHERE id = '.$docu_review_disposition_id.'';
+				//Before updating the disposition, clear the doc review disposition table.
+				$clear_tbl_disposition[] = $common_class->clearTblDocReviewDispositionColumn($docu_review_disposition_id);
+				$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+				/* Approval Details	and Send Email to Approvers */
+				$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
+				/* Change status*/
+				// $change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
+
+				$response['is_success'] = 'true';
+				$response['result_msg'] =  'Save Successfully';
+				echo json_encode($response);
+				return;
+			}
+			
+			if($disposition == 4){//Extended
+				$fkid_document =  $doc_review_masterlist['fkid_document'];
+				$active_docs = ActiveDocument::activeDocsByFkid($fkid_document);
+				$date_difference = date_diff(date_create($return['extension_date']),date_create($active_docs['effectivity_date'])); //check the difference between ext date & effectivity date
+				$month = $date_difference->format("%m"); //get the month only
+				$year = $date_difference->format("%y");//get the year if the month is >= 12
+
+ 				// NOTE: Make every special character into underscore ( _ ) to locate the filename prevent problem in downloading of file 			
+				$file_memo_tmp = $_FILES['file_memo']['tmp_name'];
+				$file_memo_name = $_FILES['file_memo']['name'];				//'/etc#hosts/@Álix Ãxel likes - beer?!.pdf';
+				$filtered_filename = '_'.Slug($file_memo_name, '_', '.');	 // _etc_hosts_alix_axel_likes_beer.pdf
+ 				
+				// NOTE: Check if the file uploaded, the process required to upload MEMO
+				//Before updating the disposition, clear the doc review disposition table then update the data by id
+				$clear_tbl_disposition[] = $common_class->clearTblDocReviewDispositionColumn($docu_review_disposition_id);
+				if($file_memo_tmp != ""){
+					$is_file_name_existed = $common_class->selectDispositionByFilename($file_memo_name);
+					if($is_file_name_existed['is_exist']=='true'){
+						$response['is_success'] ='false';
+						$response['result_msg'] = 'Filename is already existed!';
+						echo json_encode($response);
+						return;
+					}
+					/* saved extended disposition w/ memo file */
+					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_filtered_name','extension_date','reviewed_by','dcc_email');
+					$array_values = array($doc_review_masterlist_id,$disposition,$file_memo_name,$filtered_filename,$return['extension_date'],$username,$dcc_emailed_at);
+					$where = 'WHERE id = '.$docu_review_disposition_id.'';
+					$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+					/* Uploading of Data */
+					$tbl_folder_path = $common_class->folderPath('memo'); //change temporary_document to memo
+					$target_file = $tbl_folder_path['folder_path'].$docu_review_disposition_id.$filtered_filename;
+					$request_upload_docu = $common_class->uploadDocument($tbl_folder_path['folder_path'],$file_memo_tmp,$target_file);
+					/* Approval Details	and Send Email to Approvers	*/
+					$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
+					/* Change status*/
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
+
+					$response['is_success'] = ($request_upload_docu == 1) ? 'true' : 'false';
+					$response['result_msg'] = ($response['is_success'] == 'true') ? 'File uploaded successfully !': 'Uploading Failed. Please Try Again!';
+					echo json_encode($response);
+					return;
+				}
+
+				if($file_memo_tmp == ""){
+					if($month >= 9 || $year >= 1){
+						$response['is_success'] ='false';
+						$response['result_msg'] = 'Please submit the memo!';
+						echo json_encode($response);
+						return;
+					}
+					/* saved extended disposition w/o memo file */
+					$array_fields = array('tbl_doc_review_masterlist_id','disposition','extension_date','reviewed_by','dcc_email','created_at');
+					$array_values = array($doc_review_masterlist_id,$disposition,$return['extension_date'],$username,$dcc_emailed_at,$datetime_today);
+					$where = 'WHERE id = '.$docu_review_disposition_id.'';
+					$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+					/* Approval Details	and Send Email to Approvers	*/
+					$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
+					/* Change status*/
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
+					
+					$response['is_success'] ='true';
+					$response['result_msg'] = 'Save successfully !';
+					echo json_encode($response);
+					return;
+				}
+			}
+		} catch (\Throwable $th) {
+			//throw $th;
+		}
+	}
+
 	function read_doc_review_masterlist()
 	{
 		try {
