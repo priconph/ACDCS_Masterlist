@@ -275,9 +275,6 @@ use Handler\DocuReviewDisposition;
 				return;
 			}
 			if($disposition == 2 || $disposition == 3 ){ //Retain & Obsolete
-				$email[] = $common_class->createApprovalDetails(2,$sec_heads_username,$doc_review_masterlist_id);
-				// echo json_encode($email);
-				return;
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','created_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$datetime_today);
 				$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values); 
@@ -295,12 +292,13 @@ use Handler\DocuReviewDisposition;
 			if($disposition == 4){//Extended
 				$fkid_document =  $doc_review_masterlist['fkid_document'];
 				$active_docs = ActiveDocument::activeDocsByFkid($fkid_document);
-				$date_difference = date_diff(date_create($return['extension_date']),date_create($active_docs['expiration_date']));
+				$date_difference = date_diff(date_create($return['extension_date']),date_create($active_docs['effectivity_date'])); //check the difference between ext date & effectivity date
 				$month = $date_difference->format("%m"); //get the month only
-				$year = $date_difference->format("%y");//get only the year if the month is >= 12
+				$year = $date_difference->format("%y");//get the year if the month is >= 12
+
  				// NOTE: Make every special character into underscore ( _ ) to locate the filename prevent problem in downloading of file 			
 				$file_memo_tmp = $_FILES['file_memo']['tmp_name'];
-				$file_memo_name = $_FILES['file_memo']['name'];				//'/etc/hosts/@Álix Ãxel likes - beer?!.pdf';
+				$file_memo_name = $_FILES['file_memo']['name'];				//'/etc#hosts/@Álix Ãxel likes - beer?!.pdf';
 				$filtered_filename = '_'.Slug($file_memo_name, '_', '.');	 // _etc_hosts_alix_axel_likes_beer.pdf
  				
 				// NOTE: Check if the file uploaded, the process required to upload MEMO

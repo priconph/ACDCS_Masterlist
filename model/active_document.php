@@ -60,7 +60,9 @@ class ActiveDocument {
 			$request['doc_title'] 				= $row['doc_title'];
 			$request['doc_no'] 					= $row['doc_no'];
 			$request['rev_no'] 					= $row['rev_no'];
+			$request['page_no'] 		        = $row['page_no'];
 			$request['expiration_date'] 		= $row['expiration_date'];
+			$request['effectivity_date'] 		= $row['effectivity_date'];
 		}
 		return $request;
 	}
