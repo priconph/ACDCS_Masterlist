@@ -12,7 +12,7 @@
 	/* Array of database columns which should be read and sent back to DataTables. Use a space where
 	 * you want to insert a non-database field (for example a counter or static image)
 	 */
-
+	// echo 
 	/* Model */
 	$database_config = '../db_config/config_acdcs.php';
 	$active_document_class = '../model/active_document.php';
@@ -32,6 +32,7 @@
 		'obsolete.doc_title AS obsolete_doc_title',
 		'obsolete.doc_no AS obsolete_doc_no',
 		'obsolete.rev_no AS obsolete_rev_no',
+		'obsolete.effectivity_date AS obsolete_effectivity_date',
 		'active.expiration_date',
 		'masterlist.id',
 		'masterlist.fkid_document',
@@ -43,6 +44,7 @@
 		'active.doc_title',
 		'active.doc_no',
 		'active.rev_no',
+		'active.effectivity_date',
 		'masterlist.originator_code',
 	);
 	/* used this field for searching data typed in the search box */
@@ -53,11 +55,13 @@
 		'obsolete.doc_title',
 		'obsolete.doc_no',
 		'obsolete.rev_no',
+		'obsolete.effectivity_date',
 		'active.date_received',
 		'active.model',
 	 	'active.doc_title',
 	 	'active.doc_no',
 	 	'active.rev_no',
+	 	'active.effectivity_date',
 	 	'masterlist.originator_code',
 	);
 							
@@ -253,7 +257,7 @@
 	/*
 		Class Object
 	*/
-	$request_doc_review_disposition = new DocReviewDisposition;
+	$get_doc_review_disposition = new DocReviewDisposition;
 	$active_documents = new ActiveDocument;
 	
 	while ( $aRow = mysql_fetch_array( $rResult ) )
@@ -264,13 +268,12 @@
 		$doc_review_masterlist_id = $aRow['id'];
 		$fkid_document = $aRow['fkid_document'];
 	
-	/* 
-		Document Status
-	*/
+		/* Document Status */
 		switch ($aRow['document_status']) {
 			case 0:
 				$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center>';
 				$status = '<span class="badge highlight-color-red">DISAPPROVED</span>';
+				// $status = '<button type="button" class="btn btn-danger" style="">DISAPPROVED</button>';
 				break;
 			case 1:
 				$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-plus" type="button" style="background-color:yellow;color:black;"> Add Review</button></center>';
@@ -293,12 +296,10 @@
             // $button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm btn-primary fa fa-edit" type="button"> Edit Review</button></center> <br>';
 				
 		}
-	/* 
-		Disposition
-	*/
-		$arr_doc_review_disposition = $request_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
+		/* Disposition */
+		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
 
-		$doc_review_disposition = $request_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
+		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
 
 		/**
 		 * TODO: check if dcc need to have checked box to approved then transfer to REVIEWED TABLE
@@ -309,10 +310,8 @@
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
 		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
-		$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];
 		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
 		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
-		// $row[]= ( $aRow['doc_no'] != NULL ) ? $aRow['doc_no'] : $aRow['obsolete_doc_no'];
 		$row[]= ( $aRow['doc_no'] != NULL ) ? 
 					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc_no="' .$aRow['doc_no']. '">'.' '.$aRow['doc_no'].'</a>'  :
 					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc_no="' .$aRow['obsolete_doc_no']. '">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
@@ -320,6 +319,8 @@
 		$row[]= ( $aRow['originator_code'] != NULL ) ? 
 					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
 					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
+					$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
+					$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];
 		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
 		array_push($output['aaData'],$row);
 	}

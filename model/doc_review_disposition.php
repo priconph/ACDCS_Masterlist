@@ -59,7 +59,7 @@ class DocReviewDisposition{
     {
         require_once('../class/oop_acdcs.php');
         $request = $_POST;
-        $array_fields = array('disposition.*,approval.sec_heads_username,approval.tbl_doc_review_disposition_id');
+        $array_fields = array('disposition.*,approval.sec_heads_username,approval.tbl_doc_review_disposition_id,approval.remarks');
         $table 	   	= 'tbl_doc_review_disposition disposition';
         $joins 	   	= 'LEFT JOIN tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id';
         $sql_where 	=  'WHERE disposition.tbl_doc_review_masterlist_id = '.$doc_review_masterlist_id.' AND disposition.deleted_at IS NULL';
@@ -74,6 +74,7 @@ class DocReviewDisposition{
                 $return['disposition'] = $row['disposition'];
                 $return['due_date'] = $row['due_date'];
                 $return['extension_date'] = $row['extension_date'];
+                $return['remarks'] = $row['remarks'];
                 $person_in_charge[] = $row['person_in_charge'];
                 $sec_heads_username[] = $row['sec_heads_username'];
             }
@@ -91,6 +92,7 @@ class DocReviewDisposition{
             }
 
         }else{
+            $return['result'] = 'Data not found ';
             $return['disposition'] = 0; //no disposition
         }
         return $return;

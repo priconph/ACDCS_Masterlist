@@ -37,9 +37,6 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 									$process_owner_active = '';
 								}else{
 									echo '
-										<li class="nav-item">
-											<a class="nav-link" data-toggle="tab" href="#menu2">Production - Active Document</a>
-										</li>
 										<li class="nav-item  active">
 											<a class="nav-link " data-toggle="tab" href="#menu3">For Review</a>
 										</li>
@@ -102,7 +99,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 										</div>
 									</div>
 									<div class="col-sm-12">
-										<!-- <button class="btn btn-success fa fa-excel-o pull-right" id="btnExportDocReviewMasterlist"> Export </button> -->
+										<button class="btn btn-success fa fa-excel-o pull-right" id="btnExportDocReviewMasterlist"> Export </button>
 									</div> <br><br>
 										<div class="col-sm-12">
 											<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary">
@@ -110,20 +107,18 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 													<tr>
 														<th></th>
 														<th><span class="fa fa-cogs"></span></th>
-														<!-- <th>Document ID</th> -->
 														<th>Document Status</th>
 														<th>Disposition</th>
-														<!-- <th>Number of Review</th> -->
 														<th>Date Received</th>
-														<th>Expiration Date</th>
 														<th>Model</th>
 														<th>Title</th>
 														<th>Document No.</th>
 														<th>Rev No.</th>
 														<th>Orignator Code</th>
-														<th>Doc Type</th>
-														<!--<th>Document Type</th>
 														<th>Effectivity Date</th>
+														<th>Expiration Date</th>
+														<th>Active/Obsolete</th>
+														<!--<th>Document Type</th>
 														<th>Expiration Date</th> -->
 														<!-- <th>Reviewed by</th>
 														<th>Date of review</th>
@@ -134,6 +129,32 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 														<th>Process Owner Remarks</th>
 														<th>DCC Remarks</th> -->
 													</tr>
+												<!--<tr>
+													 <th></th>
+													<th>Approved by</th>
+													<th>Approval ID</th>
+													<th>Document ID</th>
+													<th>Document Status</th>
+													<th>Disposition</th>
+													<th>Date Received</th>
+													 <th>Model</th>
+													<th>Title</th>
+													<th>Document No.</th>
+													<th>Rev No.</th>
+													<th>Orignator Code</th>
+													<th>Document Type</th>
+													<th>Effectivity Date</th>
+													<th>Expiration Date</th>
+													<th>Number of Review</th>//
+													<th>Reviewed by</th>//
+													<th>Date of review</th>//
+													<th>Person in charge</th>//
+													<th>Due Date</th>//
+													<th>Recommitment Date</th>//
+													<th>Date of DCC Email</th>//
+													<th>Process Owner Remarks</th>//
+													<th>DCC Remarks</th> //
+												</tr>-->
 												</thead>
 											</table>
 										</div>
@@ -299,7 +320,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
       </div>
 	  <form id="formDocReviewDisposition">
 		  <div class="modal-body">
-				<div class="row" style="display:block;">
+				<div class="row" style="display:none;">
 					<div class="col-sm-3">		
 						<label>DocMasterListId:</label>
 					</div>
@@ -358,6 +379,14 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 					</div>
 					<div class="col-sm-12">				
 						<input type="file" class="form-control" id="file_memo" name="file_memo" style="width:100%;">
+					</div>
+				</div>
+				<div class="row" id="is_approver_remarks"  style="display:none;">
+					<div class="col-sm-3">				
+						<label>Approver Remarks:</label>
+					</div>
+					<div class="col-sm-2">	
+						<i><p id="approver_remarks"></p></i>
 					</div>
 				</div>
 		  </div>
@@ -470,11 +499,15 @@ $(document).ready(function () {
 		}
 
 		call_ajax(data, masterlist_temporary_handler,function(result){
-			console.log('disposition',result['disposition']);
+			// console.log('disposition',result['disposition']);
+			console.log(result['remarks']);
+			let approver_remarks = result['remarks'];
 			let disposition = result['disposition'];
 			let doc_review_disposition_id = result['id'];
 			
 			$('#modalDocReviewDisposition').modal();
+			(approver_remarks != null) ? $formDocReviewDisposition.find('#is_approver_remarks').show() : $formDocReviewDisposition.find('#is_approver_remarks').hide()
+			$formDocReviewDisposition.find('#approver_remarks').html(approver_remarks);
 			$formDocReviewDisposition.find('#doc_review_masterlist_id').val(doc_review_masterlist_id);
 			$formDocReviewDisposition.find('#docu_review_disposition_id').val(doc_review_disposition_id);
 			$formDocReviewDisposition.find('#disposition').val(disposition);
@@ -519,8 +552,10 @@ $(document).ready(function () {
 	});
 
 	$(tbl_masterlist_temporary).on('click','#btnSearchDocNum', function () {
-		let doc_no = $(this).attr('doc_no');
-		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist?doc_no="+doc_no)
+		// let doc_no = $(this).attr('doc_no');
+		let doc_no = 'G116873-001';
+		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no)
+		// window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_obsolete?doc_no="+"G116873-001")
 	});
 
 	/*

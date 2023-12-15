@@ -42,9 +42,9 @@
 													<th>Document No.</th>
 													<th>Rev No.</th>
 													<th>Orignator Code</th>
-													<!--<th>Document Type</th>
+													<th>Document Type</th>
 													<th>Effectivity Date</th>
-													<th>Expiration Date</th> -->
+													<th>Expiration Date</th>
 													<!-- <th>Reviewed by</th>
 													<th>Date of review</th>
 													<th>Person in charge</th>
@@ -54,6 +54,7 @@
 													<th>Process Owner Remarks</th>
 													<th>DCC Remarks</th> -->
 												</tr>
+												
 											</thead>
 										</table>
 									</div>
@@ -201,7 +202,7 @@ $(document).ready(function () {
 
 	$('#'+tbl_for_approval_document).on('click','#btnSearchDocNum', function () {
 		let doc_no = $(this).attr('doc_no');
-		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist?doc_no="+doc_no)
+		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no)
 	});
 
 	$('#btnBatchApproval').click(function (e) { 
@@ -245,6 +246,7 @@ $(document).ready(function () {
 		arrApprovalId = [];
 		removeAttrCheckedApproval(arrApprovalId).then(dt_for_approval_document.draw());
 	});
+//		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no)
 
 	/* Function */
 

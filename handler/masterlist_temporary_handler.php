@@ -148,6 +148,7 @@ use Handler\DocuReviewDisposition;
 		public static function sendEmailToApprover($doc_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id)
 		{
 			try {
+				
 				$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($doc_review_masterlist_id);
 				$active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']);
 				$get_doc_review_disposition_by_id = DocReviewDisposition::getDocReviewDisposition($doc_review_disposition_id);
@@ -366,35 +367,6 @@ use Handler\DocuReviewDisposition;
 		}
 	}
 
-	function save_approver_decision()
-	{
-		try {
-			require_once('../class/oop_acdcs.php');
-			$return = $_POST;
-			$status = ($return['is_approved'] == 'true') ? 1 : 2 ;
-			$common_class = new CommonClass;
-
-			foreach ($return['filtered_arr_approval_id'] as $key => $arr_approval_id) {
-				$table = 'tbl_doc_review_disposition_approval_details';
-				$array_fields = array('status','remarks','updated_at');
-				$array_values = array($status, $return['approver_remarks'], date('Y-m-d H:i:s') );
-				$where = ' WHERE id = '.$arr_approval_id.' ';
-				$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
-				$doc_review_masterlist_id = DocReviewDispositionApprovalDetails::getDocReviewDispositionById($arr_approval_id);
-				if($status == 1){
-					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],3);
-				}else if($status == 2){
-					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],1);
-				}
-			}
-			$response['is_success'] = 'true';
-			$response['msg'] = 'Saved Successfully';
-			echo json_encode($response);
-		} catch (\Throwable $th) {
-			throw $th;
-		}
-	}
-	
 	function edit_disposition_details(){
 		try {
 			require_once('../class/oop_acdcs.php');
@@ -430,7 +402,7 @@ use Handler\DocuReviewDisposition;
 				$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 
 				/* Change status*/
-				// $change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
+				$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
 
 				$response['is_success'] = 'true';
 				$response['result_msg'] =  'Save Successfully';
@@ -448,7 +420,7 @@ use Handler\DocuReviewDisposition;
 				/* Approval Details	and Send Email to Approvers */
 				$email[] = $common_class->createApprovalDetails($docu_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id);
 				/* Change status*/
-				// $change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
+				$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id,$new_status);
 
 				$response['is_success'] = 'true';
 				$response['result_msg'] =  'Save Successfully';
@@ -523,13 +495,43 @@ use Handler\DocuReviewDisposition;
 				}
 			}
 		} catch (\Throwable $th) {
-			//throw $th;
+			throw $th;
+		}
+	}
+
+	function save_approver_decision()
+	{
+		try {
+			require_once('../class/oop_acdcs.php');
+			$return = $_POST;
+			$status = ($return['is_approved'] == 'true') ? 1 : 2 ;
+			$common_class = new CommonClass;
+
+			foreach ($return['filtered_arr_approval_id'] as $key => $arr_approval_id) {
+				$table = 'tbl_doc_review_disposition_approval_details';
+				$array_fields = array('status','remarks','updated_at');
+				$array_values = array($status, $return['approver_remarks'], date('Y-m-d H:i:s') );
+				$where = ' WHERE id = '.$arr_approval_id.' ';
+				$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+				$doc_review_masterlist_id = DocReviewDispositionApprovalDetails::getDocReviewDispositionById($arr_approval_id);
+				if($status == 1){
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],3);
+				}else if($status == 2){
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],0);
+				}
+			}
+			$response['is_success'] = 'true';
+			$response['msg'] = 'Saved Successfully';
+			echo json_encode($response);
+		} catch (\Throwable $th) {
+			throw $th;
 		}
 	}
 
 	function read_doc_review_masterlist()
 	{
 		try {
+			
 			$get_doc_review_disposition_by_id = DocReviewDisposition::getDocReviewDispositionApprovalDetailsById($_POST['doc_review_masterlist_id']);
 			echo json_encode($get_doc_review_disposition_by_id);
 		} catch (\Throwable $th) {

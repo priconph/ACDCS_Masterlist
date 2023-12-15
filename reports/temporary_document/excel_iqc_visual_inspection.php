@@ -28,7 +28,7 @@ if(file_exists($excel_class)){
 */
 use Model\Hris;
 
-$query = $_GET['query'];
+$query = $_GET['query']; //query from 
 
 $excel = new EXCEL;
 /* set title */
@@ -44,18 +44,19 @@ $excel->set_active_sheet(0);
 // $excel->set_margin();
 // $excel->set_print_area();
 
-$width_allowance = .81;
+$width_allowance_custom = 28;
+$width_allowance_custom_1 = 15;
 
 /* set width */
-// $excel->set_width('A',$width_allowance+15.86);
-// $excel->set_width('B',$width_allowance+28.43);
-// $excel->set_width('C',$width_allowance+28.00);
-// $excel->set_width('D',$width_allowance+28.86);
-// $excel->set_width('E',$width_allowance+18.71);
-// $excel->set_width('F',$width_allowance+28.71);
-// $excel->set_width('G',$width_allowance+45.86);
-// $excel->set_width('H',$width_allowance+21.71);
-// $excel->set_width('I',$width_allowance+23.57);
+$excel->set_width('B',$width_allowance_custom_1);
+$excel->set_width('C',$width_allowance_custom_1);
+$excel->set_width('D',$width_allowance_custom_1);
+$excel->set_width('E',$width_allowance_custom);
+$excel->set_width('F',$width_allowance_custom_1);
+$excel->set_width('G',$width_allowance_custom_1);
+$excel->set_width('H',$width_allowance_custom_1);
+$excel->set_width('I',$width_allowance_custom_1);
+$excel->set_width('J',$width_allowance_custom);
 
 $excel->place_value('B1','Date Received','string');
 $excel->place_value('C1','Model','string');

@@ -15,8 +15,9 @@
 	/* Model */
 	$database_config = '../db_config/config_acdcs.php';
 	$system_one_class = '../model/systemone.php';
-
-
+	$doc_review_disposition_class = '../model/doc_review_disposition.php';
+	
+	use Model\DocReviewDisposition;
 	use Model\Hris;
 
 	error_reporting(E_ALL);
@@ -34,7 +35,10 @@
 		'active.model',
 		'active.doc_title',
 		'active.doc_no',
+		'active.doc_type',
 		'active.rev_no',
+		'active.effectivity_date',
+		'active.expiration_date',
 		'masterlist.originator_code',
 	);
 
@@ -46,6 +50,9 @@
 	 	'active.doc_title',
 	 	'active.doc_no',
 	 	'active.rev_no',
+	 	'active.doc_type',
+	 	'active.effectivity_date',
+	 	'active.expiration_date',
 	 	'masterlist.originator_code',
 	);
 							
@@ -71,6 +78,13 @@
 		require_once($system_one_class);
 	} else {
 		echo "system_one_class file does not exist!";
+		exit;
+	}
+
+	if(file_exists($doc_review_disposition_class)){
+		require_once($doc_review_disposition_class);
+	} else {
+		echo "doc_review_disposition_class file does not exist!";
 		exit;
 	}
 
@@ -244,6 +258,7 @@
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
 	);
+
 	
 	while ( $aRow = mysql_fetch_array( $rResult ) )
     {
@@ -256,7 +271,7 @@
 	/* 
 		Disposition
 	*/
-		$disposition = $request_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
+		$disposition = DocReviewDisposition::getDispositionCode($aRow['disposition']);
 		
 		// switch ($aRow['disposition']) {
 		// 	case 1:
@@ -285,9 +300,12 @@
 		$row[]= $aRow['date_received'];
 		$row[]= $aRow['model'];
 		$row[]= $aRow['doc_title'];
-		$row[]= '<a href="#" id="btnSearchDocNum" doc_no="' .$aRow['doc_no']. '">'.' '.$aRow['doc_no'].'</a>';
+		$row[]= '<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc_no="' .$aRow['doc_no']. '">'.' '.$aRow['doc_no'].'</a>';
 		$row[]= $aRow['rev_no'];
 		$row[]= $aRow['originator_code'];
+		$row[]= $aRow['doc_type'];
+		$row[]= $aRow['effectivity_date'];
+		$row[]= $aRow['expiration_date'];
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
