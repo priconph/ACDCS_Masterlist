@@ -9,6 +9,7 @@ require_once('../model/doc_review_disposition_approval_details.php');
 require_once('../model/doc_review_disposition.php');
 require_once('../model/active_document.php');
 require_once('./common_function_handler.php');
+
 use Model\EmailDetail;
 use Model\RapidEmailer;
 use Model\DocReviewDispositionApprovalDetails;
@@ -20,7 +21,6 @@ use Handler\DocuReviewDisposition;
 
 		public function docReviewMasterlist($doc_review_masterlist_id) 
 		{
-
 			try {
 				$request = array();
 				$array_fields = array('*');
@@ -148,7 +148,8 @@ use Handler\DocuReviewDisposition;
 		public static function sendEmailToApprover($doc_review_disposition_id,$sec_heads_username,$doc_review_masterlist_id)
 		{
 			try {
-				
+				require_once('../class/oop_acdcs.php');
+
 				$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($doc_review_masterlist_id);
 				$active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']);
 				$get_doc_review_disposition_by_id = DocReviewDisposition::getDocReviewDisposition($doc_review_disposition_id);
@@ -182,6 +183,8 @@ use Handler\DocuReviewDisposition;
 		public static function sendScheduledEmailToProcessOwner($docu_review_disposition_id,$person_in_charge,$due_date,$username)
 		{
 			try {
+				require_once('../class/oop_acdcs.php');
+
 				$getDocReviewDisposition =  DocReviewDisposition::getDocReviewDisposition($docu_review_disposition_id);
 				$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($getDocReviewDisposition['tbl_doc_review_masterlist_id']);
 				$active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']);
@@ -212,13 +215,45 @@ use Handler\DocuReviewDisposition;
 		}
 
 		public static function clearTblDocReviewDispositionColumn($docu_review_disposition_id){
-			$request = array();
-			$table = 'tbl_doc_review_disposition';
-			$array_fields = array('person_in_charge','due_date','memo_file_name','memo_file_filtered_name','extension_date','remarks');
-			$array_values = array(NULL,NULL,NULL,NULL,NULL,NULL);
-			$where = 'WHERE id = '.$docu_review_disposition_id.'';
-			$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where); 
+			try {
+				$request = array();
+				$table = 'tbl_doc_review_disposition';
+				$array_fields = array('person_in_charge','due_date','memo_file_name','memo_file_filtered_name','extension_date','remarks');
+				$array_values = array(NULL,NULL,NULL,NULL,NULL,NULL);
+				$where = 'WHERE id = '.$docu_review_disposition_id.'';
+				$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where); 
+			} catch (\Throwable $th) {
+				throw $th;
+			}
 		}
+
+		public function deactivateAutoEmailToProcessOwner($docu_review_disposition_id){
+			try {
+				require_once('../class/oop_mailer.php');
+				$table = 'tbl_auto_mailer';
+				$array_fields = array('logdel');
+				$array_values = array(1);
+				$where = 'WHERE fkid = '.$docu_review_disposition_id.' AND system_name = "ACDCS_DRM"';
+				$query = Mailer::getInstance()->update_query_script($table,$array_fields,$array_values,$where);
+				return $query = Mailer::getInstance()->update_query($table,$array_fields,$array_values,$where);
+			} catch (\Throwable $th) {
+				throw $th;
+			}
+		}
+		/*
+			// SELECT *
+			// FROM `tbl_auto_mailer`
+			// WHERE `fkid` =1
+			// AND `system_name` = 'ACDCS_DRM'
+			// LIMIT 0 , 30
+
+		$table = 'tbl_doc_review_disposition_approval_details';
+				$array_fields = array('status','remarks','updated_at');
+				$array_values = array($status, $return['approver_remarks'], date('Y-m-d H:i:s') );
+				$where = ' WHERE id = '.$arr_approval_id.' ';
+				$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+		
+		*/
 
 	}
 
@@ -457,7 +492,7 @@ use Handler\DocuReviewDisposition;
 					$where = 'WHERE id = '.$docu_review_disposition_id.'';
 					$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
 					/* Uploading of Data */
-					$tbl_folder_path = $common_class->folderPath('memo'); //change temporary_document to memo
+					$tbl_folder_path = $common_class->folderPath('memo'); //memo
 					$target_file = $tbl_folder_path['folder_path'].$docu_review_disposition_id.$filtered_filename;
 					$request_upload_docu = $common_class->uploadDocument($tbl_folder_path['folder_path'],$file_memo_tmp,$target_file);
 					/* Approval Details	and Send Email to Approvers	*/
@@ -502,12 +537,16 @@ use Handler\DocuReviewDisposition;
 	function save_approver_decision()
 	{
 		try {
+			// docu_review_disposition_id
 			require_once('../class/oop_acdcs.php');
 			$return = $_POST;
 			$status = ($return['is_approved'] == 'true') ? 1 : 2 ;
 			$common_class = new CommonClass;
 
 			foreach ($return['filtered_arr_approval_id'] as $key => $arr_approval_id) {
+				/* Deactivate the Auto Emailer For Process Owner */
+				$return = $common_class->deactivateAutoEmailToProcessOwner($arr_approval_id);
+
 				$table = 'tbl_doc_review_disposition_approval_details';
 				$array_fields = array('status','remarks','updated_at');
 				$array_values = array($status, $return['approver_remarks'], date('Y-m-d H:i:s') );

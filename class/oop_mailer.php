@@ -103,30 +103,14 @@ class Mailer extends mysqli
        	return $query;
 	}
 
-	public function update_query($table,$array_fields,$array_values,$pkid){
-		$update_array =  $this->create_update_param($array_fields,$array_values);
-		$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) ."WHERE pkid='{$pkid}';";
-		$this->query($query);
-		// $this->save_logs('2',$query);
-		return "Record has been updated";
-	}
-	
-	public function update_query_script($table,$array_fields,$array_values,$pkid){
-		$update_array =  $this->create_update_param($array_fields,$array_values);
-		$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) ."WHERE pkid='{$pkid}'; <br>";
-		return $query;
-	}
-
-	public function update_query_detailed($table,$array_fields,$array_values,$where){
+	public function update_query($table,$array_fields,$array_values,$where){
 		$update_array =  $this->create_update_param($array_fields,$array_values);
 		$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) .$where;
 		$this->query($query);
-		// $this->save_logs('2',$query);
 		return "Record has been updated";
-		// return $query;
 	}
 
-	public function update_query_detailed_script($table,$array_fields,$array_values,$where){
+	public function update_query_script($table,$array_fields,$array_values,$where){
 		$update_array =  $this->create_update_param($array_fields,$array_values);
 		$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) .$where.' <br>';
 		$this->query($query);

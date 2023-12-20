@@ -30,6 +30,7 @@
 											<thead>
 												<tr>
 													<th></th>
+													<th><span class="fa fa-cogs"></span></th>
 													<th>Approved by</th>
 													<!-- <th>Approval ID</th> -->
 													<!-- <th>Document ID</th> -->
@@ -98,6 +99,13 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<!---------------------
+	Modals - View Review  - #formDocReviewDisposition
+---------------------->
+<?php
+	include_once('pages/components/modal.php');
+?>
+
 <!-- Modal for Approver Decision -->
 <div class="modal fade" tabindex="-1" role="dialog" id="modalApproverDecision">
   <div class="modal-dialog modal-md" role="document">
@@ -137,156 +145,154 @@
 	include_once('pages/components/modal.php');
 ?>
 
-<script src="js/common_functions.js?23456"></script>
+<script src="js/common_functions.js?09876"></script>
+<script src="js/doc_review_masterlist.js?1234"></script>
 <script>
-$(document).ready(function () {
-	
-	$('.modal').on('hidden.bs.modal', function (e) {
-		/* Allows the overlayed modal to be scrollable */
-		if($('.modal').hasClass('in')) {
-			$('body').addClass('modal-open');
-		}   
-	});
-	/* ***************************
-				Start
-	*************************** */
-	var arrApprovalId = [];
-	var handler_qfr = 'handler_qfr';
-	var masterlist_temporary_handler = "handler/masterlist_temporary_handler.php";
-	var $formApproverDecision 	= $('#formApproverDecision');
-	var tbl_for_approval_document 	= 'tbl_for_approval_document';
-	
-	var dt_for_approval_document = $('#'+tbl_for_approval_document).DataTable({
-		"aaSorting"	: [],
-		"bProcessing": true,
-        "bServerSide": true,
-		"columnDefs":[
-            {"orderable":false,"targets":[0,1,2]}
-        ],
-		"sAjaxSource": "server_side_scripts/dt_masterlist_for_approval.php?username="+"<?php echo $_SESSION['username'];?>",
-		"drawCallback": function( settings ) {
-			$('#'+tbl_for_approval_document).attr('style','width:100%;')
-		}
-	});
+	$(document).ready(function () {
+		$('.modal').on('hidden.bs.modal', function (e) {
+			/* Allows the overlayed modal to be scrollable */
+			if($('.modal').hasClass('in')) {
+				$('body').addClass('modal-open');
+			}   
+		});
+		/* ***************************
+					Start
+		*************************** */
+		var arrApprovalId = [];
+		var $formApproverDecision 	= $('#formApproverDecision');
+		var tbl_for_approval_document 	= 'tbl_for_approval_document';
 
-	/* 
-		Batch Approval Event
-	*/
-	$('#'+tbl_for_approval_document).on('click','#cBoxBatchSelect', function () {
-		const approvalId = $(this).attr('data-id');
-		if ($(this).prop('checked')) {
-			$(this).each(function () {
-				arrApprovalId.push(approvalId);
-				console.log('push_fkid_document',arrApprovalId);
-			});
-		}else{
-			$(this).each(function () {
-				let indexApprovalId = arrApprovalId.indexOf(approvalId);
-
-				arrApprovalId.splice(indexApprovalId, 1);
-				console.log('splice_fkid_document',arrApprovalId);
-			});
-		}
-		if(arrApprovalId.length === 0){
-			$('#btnBatchApproval').prop('disabled',true);
-		}else if(arrApprovalId.length > 10 ){
-			$('#btnBatchApproval').prop('disabled',true);
-			$('#alert_message').text('WARNING: Please select 10 approval only!');
-			$('#modal_alert').modal();
-		}else{
-			console.log(arrApprovalId.length);
-			$('#btnBatchApproval').prop('disabled',false);
-		}
-		$('#countApproval').text(`(${arrApprovalId.length})`);
-	});
-
-	$('#'+tbl_for_approval_document).on('click','#btnSearchDocNum', function () {
-		let doc_no = $(this).attr('doc_no');
-		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no)
-	});
-
-	$('#btnBatchApproval').click(function (e) { 
-		e.preventDefault();
-        /* Filtered the duplicate number before submiting to BatchApproval */
-		$('#modalForApproval').modal();
-		$('#modalForApproval').modal();
-	});
-
-	var alertSuccess = 'alert-success';
-	var alertDanger = 'alert-danger';
-	var alertOption = $formApproverDecision.find('#alertOption');
-
-	$('#btnApproved').click(function (e) { 
-		e.preventDefault();
-		$('#modalApproverDecision').modal();
-		alertOption.addClass(alertSuccess);
-		alertOption.removeClass(alertDanger);
-		alertOption.html('Are you sure you want to approve the request?');
-		$formApproverDecision.find('#remarks').prop('required',false);
-	});
-	
-	$('#btnDisapproved').click(function (e) { 
-		e.preventDefault();
-		$('#modalApproverDecision').modal();
-		alertOption.addClass(alertDanger);
-		alertOption.removeClass(alertSuccess);
-		alertOption.html('Are you sure you want to disapprove the request?');
-		$formApproverDecision.find('#remarks').prop('required',true);
-	});
-
-	$formApproverDecision.submit(function (e) { 
-		e.preventDefault();
-		const filteredArrApprovalId = Array.from(new Set(arrApprovalId));
-		const isApproved = (alertOption.attr('class') === 'alert alert-success') ? 'true' : 'false';
-		const approverRemarks = $formApproverDecision.find('#remarks').val();
-		approverDecision (filteredArrApprovalId,isApproved,approverRemarks);
-	});
-
-	$('#modalForApproval').on('hidden.bs.modal', function (e) {
-		arrApprovalId = [];
-		removeAttrCheckedApproval(arrApprovalId).then(dt_for_approval_document.draw());
-	});
-//		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no)
-
-	/* Function */
-
-	/**
-	 * approverDecision
-	 * removeAttrCheckedApproval
-	 * 
-	 * @return void
-	*/	
-	function approverDecision (filteredArrApprovalId,isApproved,approverRemarks){
-		let data = {
-			'action':'save_approver_decision',
-			'filtered_arr_approval_id':filteredArrApprovalId,
-			'is_approved': isApproved,
-			'approver_remarks': approverRemarks
-		}
-		call_ajax(data, masterlist_temporary_handler,function(response){
-			if(response['is_success'] === 'true'){
-				notif_success(response['msg'])
-				$('#modalForApproval').modal('hide');
-				$('#modalApproverDecision').modal('hide');
+		var dt_for_approval_document = $('#'+tbl_for_approval_document).DataTable({
+			"aaSorting"	: [],
+			"bProcessing": true,
+			"bServerSide": true,
+			// "columnDefs":[
+			// 	{"orderable":false,"targets":[0,1,2]}
+			// ],
+			"ordering":false,
+			"sAjaxSource": "server_side_scripts/dt_masterlist_for_approval.php?username="+"<?php echo $_SESSION['username'];?>",
+			"drawCallback": function( settings ) {
+				$('#'+tbl_for_approval_document).attr('style','width:100%;')
 			}
-		})
-	}
+		});
+		// Batch Approval Event 
+		$('#'+tbl_for_approval_document).on('click','#cBoxBatchSelect', function () {
+			const approvalId = $(this).attr('data-id');
+			if ($(this).prop('checked')) {
+				$(this).each(function () {
+					arrApprovalId.push(approvalId);
+					console.log('push_fkid_document',arrApprovalId);
+				});
+			}else{
+				$(this).each(function () {
+					let indexApprovalId = arrApprovalId.indexOf(approvalId);
 
-	function removeAttrCheckedApproval(arrApprovalId){
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				$('#countApproval').text(`(${arrApprovalId.length})`);
-				if(arrApprovalId.length === 0){
-					$('#btnBatchApproval').prop('disabled',true);
-				}else{
-					console.log(arrApprovalId.length);
-					$('#btnBatchApproval').prop('disabled',false);
+					arrApprovalId.splice(indexApprovalId, 1);
+					console.log('splice_fkid_document',arrApprovalId);
+				});
+			}
+			if(arrApprovalId.length === 0){
+				$('#btnBatchApproval').prop('disabled',true);
+			}else if(arrApprovalId.length > 10 ){
+				$('#btnBatchApproval').prop('disabled',true);
+				$('#alert_message').text('WARNING: Please select 10 approval only!');
+				$('#modal_alert').modal();
+			}else{
+				console.log(arrApprovalId.length);
+				$('#btnBatchApproval').prop('disabled',false);
+			}
+			$('#countApproval').text(`(${arrApprovalId.length})`);
+		});
+
+		$('#'+tbl_for_approval_document).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
+
+		$('#'+tbl_for_approval_document).on('click','#btnSearchDocNum', function () {
+			let doc_no = $(this).attr('doc_no');
+			window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no)
+		});
+
+		$('#btnBatchApproval').click(function (e) { 
+			e.preventDefault();
+			/* Filtered the duplicate number before submiting to BatchApproval */
+			$('#modalForApproval').modal();
+			$('#modalForApproval').modal();
+		});
+
+		var alertSuccess = 'alert-success';
+		var alertDanger = 'alert-danger';
+		var alertOption = $formApproverDecision.find('#alertOption');
+
+		$('#btnApproved').click(function (e) { 
+			e.preventDefault();
+			$('#modalApproverDecision').modal();
+			alertOption.addClass(alertSuccess);
+			alertOption.removeClass(alertDanger);
+			alertOption.html('Are you sure you want to approve the request?');
+			$formApproverDecision.find('#remarks').prop('required',false);
+		});
+		
+		$('#btnDisapproved').click(function (e) { 
+			e.preventDefault();
+			$('#modalApproverDecision').modal();
+			alertOption.addClass(alertDanger);
+			alertOption.removeClass(alertSuccess);
+			alertOption.html('Are you sure you want to disapprove the request?');
+			$formApproverDecision.find('#remarks').prop('required',true);
+		});
+
+		$formApproverDecision.submit(function (e) { 
+			e.preventDefault();
+			const filteredArrApprovalId = Array.from(new Set(arrApprovalId));
+			const isApproved = (alertOption.attr('class') === 'alert alert-success') ? 'true' : 'false';
+			const approverRemarks = $formApproverDecision.find('#remarks').val();
+			approverDecision (filteredArrApprovalId,isApproved,approverRemarks);
+		});
+
+		$('#modalForApproval').on('hidden.bs.modal', function (e) {
+			arrApprovalId = [];
+			removeAttrCheckedApproval(arrApprovalId).then(dt_for_approval_document.draw());
+		});
+	//		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no)
+
+		/* Function */
+
+		/**
+		 * approverDecision
+		 * removeAttrCheckedApproval
+		 * 
+		 * @return void
+		*/	
+		function approverDecision (filteredArrApprovalId,isApproved,approverRemarks){
+			let data = {
+				'action':'save_approver_decision',
+				'filtered_arr_approval_id':filteredArrApprovalId,
+				'is_approved': isApproved,
+				'approver_remarks': approverRemarks
+			}
+			call_ajax(data, masterlist_temporary_handler,function(response){
+				if(response['is_success'] === 'true'){
+					notif_success(response['msg'])
+					$('#modalForApproval').modal('hide');
+					$('#modalApproverDecision').modal('hide');
 				}
-				resolve('Success')
-			}, 100);
-		})
-	}
-});
+			})
+		}
+
+		function removeAttrCheckedApproval(arrApprovalId){
+			return new Promise((resolve) => {
+				setTimeout(() => {
+					$('#countApproval').text(`(${arrApprovalId.length})`);
+					if(arrApprovalId.length === 0){
+						$('#btnBatchApproval').prop('disabled',true);
+					}else{
+						console.log(arrApprovalId.length);
+						$('#btnBatchApproval').prop('disabled',false);
+					}
+					resolve('Success')
+				}, 100);
+			})
+		}
+	});
 </script>
 
 

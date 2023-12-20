@@ -54,9 +54,9 @@ class ACDCS extends mysqli
 	}
 
 	
-/*---------------
-	PUBLIC FUNCTIONS STARTS HERE
----------------- */
+	/*---------------
+		PUBLIC FUNCTIONS STARTS HERE
+	---------------- */
 	public function select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit){
 		$query = "SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $array_fields) . " FROM {$table} {$joins} {$sql_where} {$sql_order} {$sql_limit};";
 		return $this->query($query);
@@ -106,24 +106,11 @@ class ACDCS extends mysqli
        	return $query;
 	}
 	
-	// public function update_query($table,$array_fields,$array_values,$pkid){
-	// 	$update_array =  $this->create_update_param($array_fields,$array_values);
-	// 	$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) ."WHERE pkid='{$pkid}';";
-	// 	$this->query($query);
-	// 	// $this->save_logs('2',$query);
-	// 	return "Record has been updated";
-	// }
-	// public function update_query_log($table,$array_fields,$array_values,$pkid,$column){ //NOTE: SET DEFAULT WEEK
-	// 	$update_arrays =  $this->create_update_param($array_fields,$array_values);
-	// 	$query 		  = "UPDATE {$table} SET ". implode(",", $update_arrays) ."WHERE `{$column}` ='{$pkid}';";
-	// 	$this->query($query);
-	// 	return $query;
-	// }
-	// public function update_query_script($table,$array_fields,$array_values,$pkid){
-	// 	$update_array =  $this->create_update_param($array_fields,$array_values);
-	// 	$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) ."WHERE pkid='{$pkid}'; <br>";
-	// 	return $query;
-	// }
+	public function update_query_script($table,$array_fields,$array_values,$where){
+		$update_array =  $this->create_update_param($array_fields,$array_values);
+		$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) .$where.' <br>';
+		return $query;
+	}
 
 	public function update_query($table,$array_fields,$array_values,$where){
 		$update_array =  $this->create_update_param($array_fields,$array_values);
@@ -131,6 +118,7 @@ class ACDCS extends mysqli
 		$this->query($query);
 		return "Record has been updated";
 	}
+
 	public function update_query_id($table,$array_fields,$array_values,$where){
 		$update_array =  $this->create_update_param($array_fields,$array_values);
 		$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) .$where;
@@ -138,12 +126,7 @@ class ACDCS extends mysqli
 		return $this->insert_id;
 	}
 
-	public function update_query_script($table,$array_fields,$array_values,$where){
-		$update_array =  $this->create_update_param($array_fields,$array_values);
-		$query 		  = "UPDATE {$table} SET ". implode(",", $update_array) .$where.' <br>';
-		return $query;
-	}
-
+	
 	public function delete_query($table,$pkid){
 		$query = "DELETE FROM {$table} WHERE `pkid` = '{$pkid}';";
 		$this->query($query);
@@ -219,6 +202,7 @@ class ACDCS extends mysqli
 		return $this->query($query);
 	}
 }
+
 
 //THIS CLASS CONNECTS INTO SYSTEMONE SERVER
 class SYSTEMONE extends mysqli 

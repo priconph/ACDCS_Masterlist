@@ -1,6 +1,6 @@
 <?php
 namespace Model;
-require_once('../model/systemone.php');
+// require_once('../model/systemone.php');
 
 use Model\Hris;
 use ACDCS;
@@ -9,9 +9,9 @@ class DocReviewDisposition{
     public function getDocReviewDisposition($doc_review_disposition_id)
     {
         try {
-            require_once('../class/oop_acdcs.php');
+            // require_once('../class/oop_acdcs.php'); //if error to email uncomment then look for excel_download
             $request = array();
-            $array_fields = array('tbl_doc_review_masterlist_id','disposition');
+            $array_fields = array('*');
             $table 	   	= 'tbl_doc_review_disposition';
             $joins 	   	= '';
             $sql_where 	= ' WHERE id = '.$doc_review_disposition_id.' ';
@@ -22,6 +22,8 @@ class DocReviewDisposition{
             while($row = mysqli_fetch_array($query)){
                 $request['tbl_doc_review_masterlist_id'] 	= $row['tbl_doc_review_masterlist_id'];
                 $request['disposition'] 	                = $row['disposition'];
+                $request['memo_file_name'] 	                = $row['memo_file_name'];
+                $request['memo_file_filtered_name'] 	    = $row['memo_file_filtered_name'];
             }
             return $request;
         }catch (\Throwable $th) {
@@ -34,7 +36,7 @@ class DocReviewDisposition{
         try {
             require_once('../class/oop_acdcs.php');
             $request = $_POST;
-            $array_fields = array('disposition');
+            $array_fields = array('*');
             $table 	   	= 'tbl_doc_review_disposition';
             $joins 	   	= '';
             $sql_where 	=  'WHERE tbl_doc_review_masterlist_id = '.$doc_review_masterlist_id.' AND deleted_at IS NULL';
@@ -44,6 +46,7 @@ class DocReviewDisposition{
             $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
             if($query->num_rows > 0){
                 while($row = mysqli_fetch_array($query)){
+                    $return['id'] = $row['id'];
                     $return['disposition'] = $row['disposition'];
                 }
             }else{
@@ -51,13 +54,15 @@ class DocReviewDisposition{
             }
             return $return;
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
     public function getDocReviewDispositionApprovalDetailsById($doc_review_masterlist_id)
     {
         require_once('../class/oop_acdcs.php');
+        require_once('../model/systemone.php');
+
         $request = $_POST;
         $array_fields = array('disposition.*,approval.sec_heads_username,approval.tbl_doc_review_disposition_id,approval.remarks');
         $table 	   	= 'tbl_doc_review_disposition disposition';
@@ -75,6 +80,7 @@ class DocReviewDisposition{
                 $return['due_date'] = $row['due_date'];
                 $return['extension_date'] = $row['extension_date'];
                 $return['remarks'] = $row['remarks'];
+                $reviewed_by[] = $row['reviewed_by'];
                 $person_in_charge[] = $row['person_in_charge'];
                 $sec_heads_username[] = $row['sec_heads_username'];
             }
@@ -89,6 +95,12 @@ class DocReviewDisposition{
                 $array_data_app['id'] 			= $value;
                 $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
                 $return['sec_heads_username'][]	= $array_data_app;
+            }
+            foreach ($reviewed_by as $key => $value) {
+                $array_data_app 				= array();
+                $array_data_app['id'] 			= $value;
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
+                $return['reviewed_by'][]	= $array_data_app;
             }
 
         }else{

@@ -56,12 +56,14 @@
 		'obsolete.doc_no',
 		'obsolete.rev_no',
 		'obsolete.effectivity_date',
+		'obsolete.expiration_date',
 		'active.date_received',
 		'active.model',
 	 	'active.doc_title',
 	 	'active.doc_no',
 	 	'active.rev_no',
 	 	'active.effectivity_date',
+	 	'active.expiration_date',
 	 	'masterlist.originator_code',
 	);
 							
@@ -181,22 +183,24 @@
     */
 
 	/* Individual column filtering */
-	for ( $i=0 ; $i<count($array_search) ; $i++ )
-	{
-		//NOTE: $_GET['bSearchable_'.$i] accept only 11  $array_search
-		if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
-		{
-			if ( $sWhere == "" )
-			{
-				$sWhere = "WHERE ";
-			}
-			else
-			{
-				$sWhere .= " AND ";
-			}
-			$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
-		}
-	}
+	// for ( $i=0 ; $i<count($array_search) ; $i++ )
+	// {
+	// 	//NOTE: $_GET['bSearchable_'.$i] accept only 11  $array_search
+	// 	if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
+	// 	{
+	// 		if ( $sWhere == "" )
+	// 		{
+	// 			$sWhere = "WHERE ";
+	// 		}
+	// 		else
+	// 		{
+	// 			$sWhere .= " AND ";
+	// 		}
+	// 		$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
+			
+	// 	}
+	// }
+	
 	/* 
 		dito ka mag add ng where mo, una check mo kung may laman na yung $sWhere pag wala append mo yung where mo na meron
 		kasama where kapag naman may laman na AND na syempre diba :)
@@ -207,13 +211,15 @@
 	}else{
 		$sWhere .= "AND ";
 	}
-
-	/* NOTE: Cannot get nullable column so I add this mysql query 
-			 YEAR(active.expiration_date) BETWEEN 1970 AND '.date('Y').'
-	*/
+	/* Default WHERE query without search inputs */
 	$sWhere .= 'masterlist.deleted_at IS NULL'; //
 	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
-    
+
+	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
+	if ( $_GET['sSearch'] == "" ){
+		// ilagay dito kung pwede based sa date, or customized advance search
+	}
+	
 	/*
 	 * SQL queries
 	 * Get data to display
@@ -271,21 +277,21 @@
 		/* Document Status */
 		switch ($aRow['document_status']) {
 			case 0:
-				$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center>';
+				$button = '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center>';
 				$status = '<span class="badge highlight-color-red">DISAPPROVED</span>';
 				// $status = '<button type="button" class="btn btn-danger" style="">DISAPPROVED</button>';
 				break;
 			case 1:
-				$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-plus" type="button" style="background-color:yellow;color:black;"> Add Review</button></center>';
+				$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-plus" type="button" style="background-color:yellow;color:black;"> Add Review</button></center>';
 				$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
 				break;
 			case 2:
-            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button">View</button></center> <br>';
-				$button .= '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center>';
+            	$button = '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center> <br>';
+				$button .= '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center>';
 				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
 				break;
 			case 3:
-            	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button">View</button></center>';
+            	$button = '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
 				$status = '<span class="badge highlight-color-blue">DCC CONFORMANCE</span>';
 				break;
 			default:
@@ -313,8 +319,8 @@
 		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
 		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
 		$row[]= ( $aRow['doc_no'] != NULL ) ? 
-					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc_no="' .$aRow['doc_no']. '">'.' '.$aRow['doc_no'].'</a>'  :
-					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc_no="' .$aRow['obsolete_doc_no']. '">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
+					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active">'.' '.$aRow['doc_no'].'</a>'  :
+					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
 		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
 		$row[]= ( $aRow['originator_code'] != NULL ) ? 
 					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
