@@ -310,7 +310,7 @@
 		/**
 		 * TODO: check if dcc need to have checked box to approved then transfer to REVIEWED TABLE
 		*/
-		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
+		// $row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
 		$row[]= $button;
 		// $row[]= $aRow['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';

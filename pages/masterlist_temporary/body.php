@@ -85,14 +85,16 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 											</div>
 										</div>
 									</div>
-									<div class="col-sm-12">
+									<br>
+									<div class="col-sm-12 mt-5">
 										<button class="btn btn-success fa fa-file-excel-o pull-right" id="btnExportDocReviewMasterlist"> Export </button>
-									</div> <br><br>
+										<button class="btn btn-info fa fa-file-pdf-o pull-left" id="btnUserManual"> User Manual </button>
+									</div> <br><br><br><br>
 										<div class="col-sm-12">
 											<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary">
 												<thead>
 													<tr>
-														<th></th>
+														<!-- <th></th> -->
 														<th><span class="fa fa-cogs"></span></th>
 														<th>Document Status</th>
 														<th>Disposition</th>
@@ -437,7 +439,12 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		$('#link_file_memo').click(function (e) { 
 			e.preventDefault();
 			let doc_review_disposition_id = $formDocReviewDisposition.find('#docu_review_disposition_id').val();
-			window.open("reports/excel_download/memo.php?doc_review_disposition_id="+doc_review_disposition_id); //-08022021
+			window.open("reports/pdf_download/memo.php?doc_review_disposition_id="+doc_review_disposition_id);
+		});
+
+		$('#btnUserManual').click(function (e) { 
+			e.preventDefault();
+			window.open("reports/pdf_download/user_manual.php");
 		});
 		
 		$formReviewDocu.find('#disposition').change(function (e) { 

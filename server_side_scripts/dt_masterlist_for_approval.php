@@ -274,7 +274,7 @@
 		Disposition
 	*/
 		$disposition = DocReviewDisposition::getDispositionCode($aRow['disposition']);
-		$row[]= '<center><input data-id="'.$doc_review_disposition_approval_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
+		$row[]= '<center><input data-id="'.$doc_review_disposition_approval_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"  style="width:130%;"> </center>';
 		$row[] = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button">View</button></center> <br>';
 		$row[]= Hris::get_emp_name_by_username_systemone($aRow['sec_heads_username']);
 		// $row[]= $aRow['id'];

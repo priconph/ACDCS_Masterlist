@@ -162,6 +162,10 @@
 		var $formApproverDecision 	= $('#formApproverDecision');
 		var tbl_for_approval_document 	= 'tbl_for_approval_document';
 
+		var alertSuccess = 'alert-success';
+		var alertDanger = 'alert-danger';
+		var alertOption = $formApproverDecision.find('#alertOption');
+
 		var dt_for_approval_document = $('#'+tbl_for_approval_document).DataTable({
 			"aaSorting"	: [],
 			"bProcessing": true,
@@ -191,11 +195,12 @@
 					console.log('splice_fkid_document',arrApprovalId);
 				});
 			}
+			
 			if(arrApprovalId.length === 0){
 				$('#btnBatchApproval').prop('disabled',true);
 			}else if(arrApprovalId.length > 10 ){
 				$('#btnBatchApproval').prop('disabled',true);
-				$('#alert_message').text('WARNING: Please select 10 approval only!');
+				$('#alert_message').text('WARNING: Please select 10 items only!');
 				$('#modal_alert').modal();
 			}else{
 				console.log(arrApprovalId.length);
@@ -217,10 +222,6 @@
 			$('#modalForApproval').modal();
 			$('#modalForApproval').modal();
 		});
-
-		var alertSuccess = 'alert-success';
-		var alertDanger = 'alert-danger';
-		var alertOption = $formApproverDecision.find('#alertOption');
 
 		$('#btnApproved').click(function (e) { 
 			e.preventDefault();
@@ -249,11 +250,12 @@
 		});
 
 		$('#modalForApproval').on('hidden.bs.modal', function (e) {
-			arrApprovalId = [];
-			removeAttrCheckedApproval(arrApprovalId).then(dt_for_approval_document.draw());
-		});
-	//		window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no)
+			removeAttrCheckedApproval();
 
+		});
+		$('#modal_alert').on('hidden.bs.modal', function (e) {
+			removeAttrCheckedApproval();
+		});
 		/* Function */
 
 		/**
@@ -278,19 +280,11 @@
 			})
 		}
 
-		function removeAttrCheckedApproval(arrApprovalId){
-			return new Promise((resolve) => {
-				setTimeout(() => {
-					$('#countApproval').text(`(${arrApprovalId.length})`);
-					if(arrApprovalId.length === 0){
-						$('#btnBatchApproval').prop('disabled',true);
-					}else{
-						console.log(arrApprovalId.length);
-						$('#btnBatchApproval').prop('disabled',false);
-					}
-					resolve('Success')
-				}, 100);
-			})
+		function removeAttrCheckedApproval(){
+			arrApprovalId = [];
+			$('#countApproval').text(`(${arrApprovalId.length})`);
+			$('#btnBatchApproval').prop('disabled',true);
+			dt_for_approval_document.draw();
 		}
 	});
 </script>
