@@ -1,5 +1,9 @@
 <?php
 namespace Model;
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require_once('../class/oop_mailer.php');
 
 use MAILER as Mailer;
@@ -162,18 +166,7 @@ class EmailDetail extends RapidEmailer
 
 	public static function send_email_with_attachment($to, $from, $cc, $subject, $message, $attachment_filename, $attachment) 
 	{
-		/* 
-			NOTE: PLEASE READ!!
-			Attachment should be delimited by comma
-			Example: 
-			TQTS_edited/uploaded_file/test_file.jpg,TQTS_edited/uploaded_file/test_file_2.jpg
-		*/
-		$common_function = '../handler/common_function.php';
-		if(file_exists($common_function)){
-			require_once($common_function);
-		}else{
-			return "Common function not found";
-		}
+		
 		
 		// if(trim($from) == 'delaman@pricon.ph') {
 			// $from_name = 'Dell Amandoron';
@@ -236,7 +229,8 @@ class EmailDetail extends RapidEmailer
 			"system_name"		=> 'ACDCS_DRM',
 			"username"			=> $username
 		);
-		$mail_result = send_with_mailer($mail_data);
+		$rapid_mailer = new RapidEmailer;
+		$mail_result = $rapid_mailer->send_with_auto_mailer($mail_data);
 		$return['mail_result'] 		= $mail_result;
 		$return['mail_data'] 		= $mail_data;
 		return $return;
@@ -272,43 +266,108 @@ class EmailDetail extends RapidEmailer
 		$return['mail_data'] 		= $mail_data;
 		return $return;
 	}
-	
-	public static function send_scheduled_email_with_attachment($tbl_name, $fkid, $to, $from, $cc, $subject, $message, $attachment_filename, $attachment, $date_start, $frequency) {
-		$common_function = '../handler/common_function.php';
-		if(file_exists($common_function)){
-			require_once($common_function);
-		}else{
-			return "Common function not found";
+	/*
+		public static function send_scheduled_email_with_attachment($tbl_name, $fkid, $to, $from, $cc, $subject, $message, $attachment_filename, $attachment, $date_start, $frequency) {
+			$common_function = '../handler/common_function.php';
+			if(file_exists($common_function)){
+				require_once($common_function);
+			}else{
+				return "Common function not found";
+			}
+			$return 	= array();
+			$mail_data  = array();
+			$message .= "<br><br>
+						For more info, please log-in to your Rapid account. Go to http://rapid/ and click http://rapid/ACDCS_Masterlist/index.php ACDCS Document Review Process
+						<br><br>Notice of Disclaimer:<br>
+						This message (including any attachments) contains confidential information intended for a specific individual and purpose, and is protected by law. If you are not the intended recipient, you should delete this message. Any disclosure,copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.";
+			$mail_data  = array(
+				"`table_name`"			=> $tbl_name,
+				"`fkid`"				=> $fkid,
+				"`to`"					=> $to,
+				"cc"					=> $cc,
+				"bcc"					=> 'mclegaspi@pricon.ph',
+				"`from`"				=> $from,
+				"from_name"				=> 'ACDCSystemNotification@pricon.ph',
+				"subject"				=> $subject,
+				"date_start"			=> $date_start,
+				"message"				=> $message,
+				"frequency"				=> $frequency,
+				"system_name"			=> 'ACDCS_DRM',
+				"attachment_filename" 	=> $attachment_filename, 
+				"attachment" 			=> $attachment, 
+				"created_by"			=> $from
+			);
+			$rapid_mailer = new RapidEmailer;
+			$mail_result = $rapid_mailer->send_with_mailer($mail_data);
+			$return['mail_result'] 		= $mail_result;
+			$return['mail_data'] 		= $mail_data;
+			return $return;
 		}
-		$return 	= array();
-		$mail_data  = array();
-		$message .= "<br><br>
-					 For more info, please log-in to your Rapid account. Go to http://rapid/ and click http://rapid/ACDCS_Masterlist/index.php ACDCS Document Review Process
-					 <br><br>Notice of Disclaimer:<br>
-                    This message (including any attachments) contains confidential information intended for a specific individual and purpose, and is protected by law. If you are not the intended recipient, you should delete this message. Any disclosure,copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.";
-		$mail_data  = array(
-			"`table_name`"			=> $tbl_name,
-			"`fkid`"				=> $fkid,
-			"`to`"					=> $to,
-			"cc"					=> $cc,
-			"bcc"					=> 'mclegaspi@pricon.ph',
-			"`from`"				=> $from,
-			"from_name"				=> 'ACDCSystemNotification@pricon.ph',
-			"subject"				=> $subject,
-			"date_start"			=> $date_start,
-			"message"				=> $message,
-			"frequency"				=> $frequency,
-			"system_name"			=> 'ACDCS_DRM',
-			"attachment_filename" 	=> $attachment_filename, 
-			"attachment" 			=> $attachment, 
-			"created_by"			=> $from
-		);
-		$mail_result = send_with_auto_mailer($mail_data);
-		$return['mail_result'] 		= $mail_result;
-		$return['mail_data'] 		= $mail_data;
-		return $return;
-	}
+ 	*/
+	function send_email_with_table($to, $from, $cc, $subject, $body) {
+		// print_r('dasd');
+		// return;
+		try {
+			$return 	= array();
+			$mail_data  = array();
+			$message = '';
+			// $message .= 'Dear All, <br> Good Day, <br>';
+			$message .= '<!DOCTYPE html>
+							<html lang="en">
+							<head>
+								<meta charset="UTF-8">
+								<meta name="viewport" content="width=device-width, initial-scale=1.0">
+								<title>Document</title>
+							</head>
+							<style>
+								table {
+									border-collapse: collapse;
+									table-layout: fixed;
+									width: 100%;
+								}
+								table td {
+									border: solid 1px #666;
+									width: 200px;
+									word-wrap: break-word;
+								}
+								table th {
+									backgroud: skyblue;
+									border: solid 1px #666;
+									width: 200px;
+									word-wrap: break-word;
+								}
+							</style>
+							<body>';
+			$message .= 		$body;
+			$message .= '	</body>';
+			$message .= '</html>';
+			$message .= "<br><br><i>For more info, please log-in to your Rapid account. Go to http://rapid/ and click http://rapid/ACDCS_Masterlist/index.php ACDCS Document Review Process <br>";
+			$message .= "This E-mail is automatically generated by Automation & Centralization of Documents Controlled System(ACDCS). <br>";
+			$message .= "<br><br>Notice of Disclaimer:<br>
+						This message (including any attachments) contains confidential information intended for a specific individual and purpose, and is protected by law. If you are not the intended recipient, you should delete this message. Any disclosure,copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.";
 
+			$mail_data  = array(
+				"`to`"				=> $to,
+				"cc"				=> $cc,
+				// "bcc"				=> 'group-iss-software@pricon.ph',
+				"bcc"				=> 'mclegaspi@pricon.ph',
+				"`from`"			=> $from,
+				"from_name"			=> 'ACDCSNotification@pricon.ph',
+				"subject"			=> $subject,
+				"message"			=> $message,
+				"send_date_time"	=> date('Y-m-d H:i:s'),
+				"system_name"		=> 'ACDCS',
+				"username"			=> $from
+			);
+			$rapid_mailer = new RapidEmailer;
+			$mail_result = $rapid_mailer->send_with_mailer($mail_data);
+			$return['mail_result'] 		= $mail_result;
+			$return['mail_data'] 		= $mail_data;
+			return $return;
+		} catch (\Throwable $th) {
+			throw $th;
+		}
+	}
 
 }
 

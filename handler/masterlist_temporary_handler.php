@@ -184,7 +184,6 @@ use Handler\DocuReviewDisposition;
 		{
 			try {
 				require_once('../class/oop_acdcs.php');
-
 				$getDocReviewDisposition =  DocReviewDisposition::getDocReviewDisposition($docu_review_disposition_id);
 				$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($getDocReviewDisposition['tbl_doc_review_masterlist_id']);
 				$active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']);
@@ -213,6 +212,93 @@ use Handler\DocuReviewDisposition;
 				throw $th;
 			}
 		}
+		public static function sendScheduledEmailApproverToProcessOwner($approval_id)
+		{
+			try {
+				require_once('../class/oop_acdcs.php');
+				$active_docs = DocReviewDispositionApprovalDetails::getActiveDocDetailsById($approval_id);
+				
+				$from = 'cbretusto@pricon.ph';
+				$to = 'mclegaspi@pricon.ph'; 
+				$cc = '';
+				
+				// $from 	 = RapidEmailer::get_user_email_add_by_username($_SESSION['username']);
+				// $to 	 = RapidEmailer::get_user_email_add_by_username($sec_heads_username); 
+				// $cc 	 = RapidEmailer::get_user_email_add_by_username($_SESSION['username']);;
+				$subject = 'DISAPPROVED: ACDCS Document Review'.' | Doc No. : '.$active_docs['doc_no'].' ';
+				$message = 'Please be informed that you have ACDCS Document Review for approval <br><br>';
+				$message .= 'Request Details	: <br>';
+				$message .= 'Disposition		: '.DocReviewDisposition::getDispositionCode($active_docs['disposition']).' '.'<br>';
+				$message .= 'Date Received		: '.$active_docs['date_received'].'<br>';
+				$message .= 'Model				: '.$active_docs['model'].' <br>';
+				$message .= 'Originator			: '.$active_docs['originator_code'].'<br>';
+				$message .= 'Title				: '.$active_docs['doc_title'].'<br>';
+				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
+				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
+				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
+				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				// print_r($message);
+				// exit;
+			} catch (\Throwable $th) {
+				throw $th;
+			}
+		}
+		public static function sendEmailToDcc($filtered_arr_approval_id)
+		{
+			try {
+				$document_details = '';
+				$document_details .= '<table class="table table-bordered">';
+				$document_details .= '	<thead>';
+				$document_details .= '		<tr>';
+				$document_details .= '			<th>Item</th>';
+				$document_details .= '			<th>Date Received</th>';
+				$document_details .= '			<th>Model</th>';
+				$document_details .= '			<th>Originator</th>';
+				$document_details .= '			<th>Title</th>';
+				$document_details .= '			<th>Document No.</th>';
+				$document_details .= '			<th>Rev No. </th>';
+				$document_details .= '			<th>Expiration</th>';
+				$document_details .= '			<th>Document Type</th>';
+				$document_details .= '			<th>Disposition</th>';
+				$document_details .= '		</tr>';
+				$document_details .= '	</thead>';
+				$document_details .= '	<tbody>';
+				$arr_active_docs = DocReviewDispositionApprovalDetails::getActiveDocById($filtered_arr_approval_id);
+				// print_r($arr_active_docs);
+				// exit;
+				foreach ($arr_active_docs['tbl_doc_review_masterlist_id'] as $key => $active_fkid_document) {	
+					$document_details .= '	<tr>';
+					$document_details .= '		<td> '.($key+1).' </td>';
+					$document_details .= '		<td>'.$arr_active_docs['date_received'][$key].'</td>';
+					$document_details .= '		<td>'.$arr_active_docs['model'][$key].'</td>';
+					$document_details .= '		<td>'.$arr_active_docs['originator_code'][$key].'</td>';
+					$document_details .= '		<td>'.$arr_active_docs['doc_title'][$key].'</td>';
+					$document_details .= '		<td>'.$arr_active_docs['doc_no'][$key].'</td>';
+					$document_details .= '		<td>'.$arr_active_docs['rev_no'][$key].'</td>';
+					$document_details .= '		<td>'.$arr_active_docs['expiration_date'][$key].'</td>';
+					$document_details .= '		<td>'.$arr_active_docs['doc_type'][$key].'</td>';
+					$document_details .= '		<td> <i style="background:yellow;"> '.DocReviewDisposition::getDispositionCode($arr_active_docs['disposition'][$key]).' </i> </td>';
+					$document_details .= '	</tr>';
+
+				}
+				$document_details .= '	</tbody>';
+				$document_details .= '<table>';
+
+				// $to			= 	implode(',',$return['send_to']);
+				// $from		=	this_get_emp_name_by_username($return['username']);
+				// $cc			=	implode(',',$return['send_cc']);
+				
+				/* message: TEST EMAIL*/
+				$to			= 	'mclegaspi@pricon.ph';
+				$from		=	'issinfoservice@pricon.ph';
+				$cc			=	'';
+				$subject	=	"For DCC Conformance";
+				return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
+				// print_r($document_details);
+			} catch (\Throwable $th) {
+				throw $th;
+			}
+		}
 
 		public static function clearTblDocReviewDispositionColumn($docu_review_disposition_id){
 			try {
@@ -235,26 +321,11 @@ use Handler\DocuReviewDisposition;
 				$array_values = array(1);
 				$where = 'WHERE fkid = '.$docu_review_disposition_id.' AND system_name = "ACDCS_DRM"';
 				$query = Mailer::getInstance()->update_query_script($table,$array_fields,$array_values,$where);
-				return $query = Mailer::getInstance()->update_query($table,$array_fields,$array_values,$where);
+				// return $query = Mailer::getInstance()->update_query($table,$array_fields,$array_values,$where);
 			} catch (\Throwable $th) {
 				throw $th;
 			}
 		}
-		/*
-			// SELECT *
-			// FROM `tbl_auto_mailer`
-			// WHERE `fkid` =1
-			// AND `system_name` = 'ACDCS_DRM'
-			// LIMIT 0 , 30
-
-		$table = 'tbl_doc_review_disposition_approval_details';
-				$array_fields = array('status','remarks','updated_at');
-				$array_values = array($status, $return['approver_remarks'], date('Y-m-d H:i:s') );
-				$where = ' WHERE id = '.$arr_approval_id.' ';
-				$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
-		
-		*/
-
 	}
 
 	if(is_ajax()) {
@@ -276,7 +347,7 @@ use Handler\DocuReviewDisposition;
 	}
 	/*
 		TODO: Enable ACDCS Email format DCC to Process owner with table of data 
-		TODO: Enable the Email to PO and Approvers | FIND: EmailDetail::
+		TODO: Enable the Email to PO and Approvers | FIND: EmailDetail:: Mailer::getInstance()
 		* nedit
 	*/
 	function create_disposition_details()
@@ -534,19 +605,58 @@ use Handler\DocuReviewDisposition;
 		}
 	}
 
+	// function save_approver_decision()
+	// {
+	// 	try {
+	// 		require_once('../class/oop_acdcs.php');
+	// 		$return = $_POST;
+	// 		$status = ($return['is_approved'] == 'true') ? 1 : 2 ;
+	// 		$common_class = new CommonClass;
+	// 		// $common_class->sendEmailToDcc($return['filtered_arr_approval_id']);
+	// 		echo $return['approver_remarks'];
+	// 		return;
+	// 		foreach ($return['filtered_arr_approval_id'] as $key => $arr_approval_id) {
+	// 			/* Deactivate the Auto Emailer For Process Owner */
+	// 			$return = $common_class->deactivateAutoEmailToProcessOwner($arr_approval_id);
+
+	// 			$table = 'tbl_doc_review_disposition_approval_details';
+	// 			$array_fields = array('status','remarks','updated_at');
+	// 			$array_values = array($status, $return['approver_remarks'], date('Y-m-d H:i:s') );
+	// 			$where = ' WHERE id = '.$arr_approval_id.' ';
+	// 			$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+	// 			$doc_review_masterlist_id = DocReviewDispositionApprovalDetails::getDocReviewDispositionById($arr_approval_id);
+	// 			if($status == 1){
+	// 				$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],3);
+	// 			}else if($status == 2){
+	// 				$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],0);
+	// 			}
+	// 		}
+	// 		$response['is_success'] = 'true';
+	// 		$response['msg'] = 'Saved Successfully';
+	// 		echo json_encode($response);
+	// 	} catch (\Throwable $th) {
+	// 		throw $th;
+	// 	}
+	// }
+
 	function save_approver_decision()
 	{
 		try {
 			// docu_review_disposition_id
+		
 			require_once('../class/oop_acdcs.php');
 			$return = $_POST;
-			$status = ($return['is_approved'] == 'true') ? 1 : 2 ;
 			$common_class = new CommonClass;
-
+			if($return['is_approved'] == 'true') {
+				$status = 1;
+				/* Email from Approver to DCC */
+				$common_class->sendEmailToDcc($return['filtered_arr_approval_id']);
+			}else{
+				$status = 2;
+			}
 			foreach ($return['filtered_arr_approval_id'] as $key => $arr_approval_id) {
-				/* Deactivate the Auto Emailer For Process Owner */
-				$return = $common_class->deactivateAutoEmailToProcessOwner($arr_approval_id);
-
+				/* Deactivate the Auto Email For Process Owner */
+				$common_class->deactivateAutoEmailToProcessOwner($arr_approval_id);
 				$table = 'tbl_doc_review_disposition_approval_details';
 				$array_fields = array('status','remarks','updated_at');
 				$array_values = array($status, $return['approver_remarks'], date('Y-m-d H:i:s') );
@@ -557,6 +667,8 @@ use Handler\DocuReviewDisposition;
 					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],3);
 				}else if($status == 2){
 					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],0);
+					/* Email from Approver to Process Owner */
+					$common_class->sendScheduledEmailApproverToProcessOwner($arr_approval_id);
 				}
 			}
 			$response['is_success'] = 'true';
@@ -566,11 +678,9 @@ use Handler\DocuReviewDisposition;
 			throw $th;
 		}
 	}
-
 	function read_doc_review_masterlist()
 	{
 		try {
-			
 			$get_doc_review_disposition_by_id = DocReviewDisposition::getDocReviewDispositionApprovalDetailsById($_POST['doc_review_masterlist_id']);
 			echo json_encode($get_doc_review_disposition_by_id);
 		} catch (\Throwable $th) {

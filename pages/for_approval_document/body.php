@@ -251,7 +251,6 @@
 
 		$('#modalForApproval').on('hidden.bs.modal', function (e) {
 			removeAttrCheckedApproval();
-
 		});
 		$('#modal_alert').on('hidden.bs.modal', function (e) {
 			removeAttrCheckedApproval();

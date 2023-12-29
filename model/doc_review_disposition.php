@@ -31,6 +31,31 @@ class DocReviewDisposition{
         }
     }
 
+    public function getDocReviewMasterlist($doc_review_disposition_id)
+    {
+        try {
+            // require_once('../class/oop_acdcs.php'); //if error to email uncomment then look for excel_download
+            $request = array();
+            $array_fields = array('*');
+            $table 	   	= 'tbl_doc_review_disposition';
+            $joins 	   	= '';
+            $sql_where 	= ' WHERE id = '.$doc_review_disposition_id.' ';
+            $sql_order 	= '';
+            $sql_limit 	= '';
+            $script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+            $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+            while($row = mysqli_fetch_array($query)){
+                $request['tbl_doc_review_masterlist_id'] 	= $row['tbl_doc_review_masterlist_id'];
+                $request['disposition'] 	                = $row['disposition'];
+                $request['memo_file_name'] 	                = $row['memo_file_name'];
+                $request['memo_file_filtered_name'] 	    = $row['memo_file_filtered_name'];
+            }
+            return $request;
+        }catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
     public static function getDocReviewDispositionById($doc_review_masterlist_id)
     {
         try {
