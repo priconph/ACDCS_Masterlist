@@ -1,4 +1,11 @@
 /* Global Variable */
+
+$(document).ready(function () {
+    $('#btnUserManual').click(function (e) { 
+        e.preventDefault();
+        window.open("reports/pdf_download/user_manual.php");
+    });
+});
 var masterlist_temporary_handler = "handler/masterlist_temporary_handler.php";
 var $formDocReviewDisposition = $('#formDocReviewDisposition');
 function getDocReviewDisposition () {
@@ -62,3 +69,4 @@ function dispositionStatus($formId,disposition){
         $formId.find('#extension_date').removeAttr('required',true)
     }
 }
+

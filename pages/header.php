@@ -72,7 +72,8 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 			?>
 		</ul>
 	</aside>
-	<script src="./js/common_functions.js?4324234"></script>
+	<!-- <script src="./js/common_functions.js?n=4324234"></script> -->
+
 	<script>
 		var script_url = '';
 		var username = '<?php echo $_SESSION['username']?>';

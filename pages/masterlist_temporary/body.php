@@ -162,7 +162,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 	Modals - Start 
 ---------------------->
 
-<!-- Modal for Approver Decision -->
+<!-- Modal for DCC -->
 <div class="modal fade" tabindex="-1" role="dialog" id="modalAdvanceSearch">
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
@@ -174,7 +174,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		  <div class="modal-body">
 			<div class="row" id="">
 				<div class="col-sm-4">	
-					<label>Expiration Date:</label>
+					<label>DCC Email Date:</label>
 				</div>
 				<div class="col-sm-8">				
 					<input type="text" class="form-control" id="expiration_date_from_to" name="expiration_date_from_to" required></input>
@@ -305,7 +305,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 ?>
 
 <script src="js/common_functions.js?143123"></script>
-<script src="js/doc_review_masterlist.js?12345"></script>
+<script src="js/doc_review_masterlist.js?098765"></script>
 <script>
 	$(document).ready(function () {
 		/* Date Range Picker */
@@ -442,10 +442,10 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 			window.open("reports/pdf_download/memo.php?doc_review_disposition_id="+doc_review_disposition_id);
 		});
 
-		$('#btnUserManual').click(function (e) { 
-			e.preventDefault();
-			window.open("reports/pdf_download/user_manual.php");
-		});
+		// $('#btnUserManual').click(function (e) { 
+		// 	e.preventDefault();
+		// 	window.open("reports/pdf_download/user_manual.php");
+		// });
 		
 		$formReviewDocu.find('#disposition').change(function (e) { 
 			e.preventDefault()

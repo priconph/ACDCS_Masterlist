@@ -45,18 +45,19 @@ $excel->set_active_sheet(0);
 // $excel->set_print_area();
 
 $width_allowance_custom = 28;
-$width_allowance_custom_1 = 15;
+$width_allowance_custom_1 = 10;
 
 /* set width */
-$excel->set_width('B',$width_allowance_custom_1);
-$excel->set_width('C',$width_allowance_custom_1);
-$excel->set_width('D',$width_allowance_custom_1);
-$excel->set_width('E',$width_allowance_custom);
+$excel->set_width('B',$width_allowance_custom);
+$excel->set_width('C',$width_allowance_custom);
+$excel->set_width('D',$width_allowance_custom);
+$excel->set_width('E',$width_allowance_custom+20);
 $excel->set_width('F',$width_allowance_custom_1);
 $excel->set_width('G',$width_allowance_custom_1);
-$excel->set_width('H',$width_allowance_custom_1);
+$excel->set_width('H',$width_allowance_custom);
 $excel->set_width('I',$width_allowance_custom_1);
-$excel->set_width('J',$width_allowance_custom);
+$excel->set_width('J',$width_allowance_custom+10);
+$excel->set_width('K',$width_allowance_custom);
 
 $excel->place_value('B1','Date Received','string');
 $excel->place_value('C1','Model','string');
@@ -66,12 +67,8 @@ $excel->place_value('F1','Document No.','string');
 $excel->place_value('G1','Rev No.','string');
 $excel->place_value('H1','Expiration','string');
 $excel->place_value('I1','Disposition','string');
-$excel->place_value('J1','Reviewed by/ Reviewed Date','string');// Included
-// $excel->place_value('K1','Pages','string');
-// $excel->place_value('L1','Document Type','string');
-// $excel->place_value('M1','Encoded By','string');
-// $excel->place_value('N1','Effectivity Date','string');
-
+$excel->place_value('J1','Reviewed by/ Reviewed Date','string');
+$excel->place_value('K1','DCC Email Date','string');
 
 $row_cnt = 2;
 $script = ACDCS::getInstance()->export_advance_search_result_script($query);
@@ -109,9 +106,10 @@ while($row = mysqli_fetch_array($result)){
 	reviewed_by
 	*/
 	$date = date_create($row['created_at']);
-	$reviewed_by = Hris::get_emp_name_by_username_systemone('mclegaspi');
+	$reviewed_by = Hris::get_emp_name_by_username_systemone($row['reviewed_by']);
 
 	$excel->place_value('J'.$row_cnt,$reviewed_by.'/'.date_format($date,'m-d-Y').'','string');
+	$excel->place_value('K'.$row_cnt,date('Y-m-d', strtotime($row['dcc_email'])),'string');
 	$row_cnt++;
 }
 // exit;

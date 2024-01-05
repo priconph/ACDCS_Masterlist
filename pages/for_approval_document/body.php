@@ -17,13 +17,15 @@
 							<div class="panel-heading"><i class="fa fa-file fa-lg"> For Approval</i></div>
 							<div class="panel-body">
 								<div class="col-sm-12">
+								<div class="col-sm-12 mt-5">
 									<?php
 										// if($sa_user_access){
 										// 	echo '<button class="btn btn-success fa fa-plus pull-right" id="btn_sa"> New Special Acceptance</button>';
 										// }
 									?>
 									<button class="btn btn-primary btn-lg fa pull-right" id="btnBatchApproval" disabled> For Approval <span id="countApproval">(0)</span> </button>
-
+									<button class="btn btn-info fa fa-file-pdf-o pull-left" id="btnUserManual"> User Manual </button>
+								</div>
 								</div> <br><br><br>
 									<div class="col-sm-12">
 										<table class="table table-condensed table-bordered table-responsive" id="tbl_for_approval_document">
@@ -146,7 +148,7 @@
 ?>
 
 <script src="js/common_functions.js?09876"></script>
-<script src="js/doc_review_masterlist.js?1234"></script>
+<script src="js/doc_review_masterlist.js?098765"></script>
 <script>
 	$(document).ready(function () {
 		$('.modal').on('hidden.bs.modal', function (e) {
