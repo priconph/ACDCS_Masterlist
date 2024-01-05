@@ -217,15 +217,15 @@ use Handler\DocuReviewDisposition;
 				require_once('../class/oop_acdcs.php');
 				$active_docs = DocReviewDispositionApprovalDetails::getActiveDocDetailsById($approval_id);
 				
-				$from = 'cbretusto@pricon.ph';
-				$to = 'mclegaspi@pricon.ph'; 
-				$cc = '';
+				// $from = 'cbretusto@pricon.ph';
+				// $to = 'mclegaspi@pricon.ph'; 
+				// $cc = '';
 				
-				// $from 	 = RapidEmailer::get_user_email_add_by_username($_SESSION['username']);
-				// $to 	 = RapidEmailer::get_user_email_add_by_username($sec_heads_username); 
-				// $cc 	 = RapidEmailer::get_user_email_add_by_username($_SESSION['username']);;
+				$from 	 = RapidEmailer::get_user_email_add_by_username($active_docs['sec_heads_username']);
+				$to 	 = RapidEmailer::get_user_email_add_by_username($active_docs['reviewed_by']); 
+				$cc 	 = RapidEmailer::get_user_email_add_by_username($active_docs['sec_heads_username']);
 				$subject = 'DISAPPROVED: ACDCS Document Review'.' | Doc No. : '.$active_docs['doc_no'].' ';
-				$message = 'Please be informed that you have ACDCS Document Review for approval <br><br>';
+				$message = 'Please be informed that you have ACDCS Document Review has been disapproved <br><br>';
 				$message .= 'Request Details	: <br>';
 				$message .= 'Disposition		: '.DocReviewDisposition::getDispositionCode($active_docs['disposition']).' '.'<br>';
 				$message .= 'Date Received		: '.$active_docs['date_received'].'<br>';

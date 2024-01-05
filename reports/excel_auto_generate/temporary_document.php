@@ -48,13 +48,13 @@ $width_allowance_custom = 28;
 $width_allowance_custom_1 = 10;
 
 /* set width */
-$excel->set_width('B',$width_allowance_custom);
-$excel->set_width('C',$width_allowance_custom);
-$excel->set_width('D',$width_allowance_custom);
+$excel->set_width('B',$width_allowance_custom_1);
+$excel->set_width('C',$width_allowance_custom+5);
+$excel->set_width('D',$width_allowance_custom_1+5);
 $excel->set_width('E',$width_allowance_custom+20);
 $excel->set_width('F',$width_allowance_custom_1);
 $excel->set_width('G',$width_allowance_custom_1);
-$excel->set_width('H',$width_allowance_custom);
+$excel->set_width('H',$width_allowance_custom_1);
 $excel->set_width('I',$width_allowance_custom_1);
 $excel->set_width('J',$width_allowance_custom+10);
 $excel->set_width('K',$width_allowance_custom);

@@ -104,7 +104,7 @@
 						<input type="file" class="form-control" id="file_memo" name="file_memo" style="width:100%;">
 					</div>
 					<div class="col-sm-12" style="display:block;">				
-						<a class="fa fa-file-pdf-o" id="link_file_memo" name="link_file_memo" style="width:100%;"> View Attachment</a>
+						<a class="fa fa-file-pdf-o" id="link_file_memo" name="link_file_memo" style="width:100%;display:none;"> View Attachment</a>
 					</div>
 				</div>
 				<div class="row" id="is_approver_remarks"  style="display:none;">

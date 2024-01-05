@@ -305,7 +305,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 ?>
 
 <script src="js/common_functions.js?143123"></script>
-<script src="js/doc_review_masterlist.js?098765"></script>
+<script src="js/doc_review_masterlist.js?5243324"></script>
 <script>
 	$(document).ready(function () {
 		/* Date Range Picker */

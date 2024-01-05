@@ -46,6 +46,7 @@
 		'active.rev_no',
 		'active.effectivity_date',
 		'masterlist.originator_code',
+		'disposition.reviewed_by',
 	);
 	/* used this field for searching data typed in the search box */
 
@@ -74,6 +75,7 @@
 	$sTable = "tbl_doc_review_masterlist masterlist";
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
+	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
 
 	if(file_exists($database_config)){
 		require_once($database_config);
@@ -277,17 +279,24 @@
 		/* Document Status */
 		switch ($aRow['document_status']) {
 			case 0:
-				$button = '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center>';
+				if($_GET['username'] == $aRow['reviewed_by']){
+					$button = '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center><br>';
+				}else{
+					$button = '';
+				}
 				$status = '<span class="badge highlight-color-red">DISAPPROVED</span>';
-				// $status = '<button type="button" class="btn btn-danger" style="">DISAPPROVED</button>';
 				break;
 			case 1:
 				$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-plus" type="button" style="background-color:yellow;color:black;"> Add Review</button></center>';
 				$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
 				break;
 			case 2:
-            	$button = '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center> <br>';
-				$button .= '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center>';
+				if($_GET['username'] == $aRow['reviewed_by']){
+					$button = '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center><br>';
+				}else{
+					$button = '';
+				}
+				$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center> <br>';
 				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
 				break;
 			case 3:
@@ -298,10 +307,32 @@
 				$button = '';
 				$status = '<span class="badge highlight-color-gray">Unknown Status</span>';
 				break;
-
-            // $button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm btn-primary fa fa-edit" type="button"> Edit Review</button></center> <br>';
-				
 		}
+		// if($aRow['document_status'] == 0){
+		// 	if($_GET['username'] == $aRow['reviewed_by']){
+		// 		$button = '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center><br>';
+		// 	}else{
+		// 		$button = '';
+		// 	}
+		// 	$status = '<span class="badge highlight-color-red">DISAPPROVED</span>';
+		// }else if($aRow['document_status'] == 1){
+		// 	$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-plus" type="button" style="background-color:yellow;color:black;"> Add Review</button></center>';
+		// 	$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
+		// }else if ($aRow['document_status'] == 2){
+		// 	if($_GET['username'] == $aRow['reviewed_by']){
+		// 		$button = '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center><br>';
+		// 	}else{
+		// 		$button = '';
+		// 	}
+		// 	$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center> <br>';
+		// 	$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
+		// }else if ($aRow['document_status'] == 3){
+		// 	$button = '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
+		// 	$status = '<span class="badge highlight-color-blue">DCC CONFORMANCE</span>';
+		// }else{
+		// 	$button = '';
+		// 	$status = '<span class="badge highlight-color-gray">Unknown Status</span>';
+		// }
 		/* Disposition */
 		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
 
@@ -319,7 +350,7 @@
 		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
 		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
 		$row[]= ( $aRow['doc_no'] != NULL ) ? 
-					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active">'.' '.$aRow['doc_no'].'</a>'  :
+					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>'  :
 					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
 		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
 		$row[]= ( $aRow['originator_code'] != NULL ) ? 
@@ -327,7 +358,10 @@
 					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
 					$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
 					$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];
+		// $row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
 		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
+		// $row[]= $aRow['reviewed_by'];
+		// $row[]= $_GET['username'];
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );

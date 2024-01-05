@@ -30,7 +30,7 @@ function getDocReviewDisposition () {
         let doc_review_disposition_id = result['id'];
         $('#modalDocReviewDisposition').modal();
         (approver_remarks != null) ? $formDocReviewDisposition.find('#is_approver_remarks').show() : $formDocReviewDisposition.find('#is_approver_remarks').hide()
-        
+        console.log(approver_remarks);
         $formDocReviewDisposition.find('#approver_remarks').html(approver_remarks);
         $formDocReviewDisposition.find('#doc_review_masterlist_id').val(doc_review_masterlist_id);
         $formDocReviewDisposition.find('#docu_review_disposition_id').val(doc_review_disposition_id);

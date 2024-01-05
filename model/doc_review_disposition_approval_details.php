@@ -77,15 +77,18 @@ class DocReviewDispositionApprovalDetails{
 		$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 		while($row = mysqli_fetch_array($query)){
 			$request['tbl_doc_review_masterlist_id'] 	= $row['tbl_doc_review_masterlist_id'];
-			$request['sec_heads_username']			= $row['sec_heads_username'];
-			$request['status'] 						= $row['status'];
+			$request['sec_heads_username']				= $row['sec_heads_username'];
+			$request['reviewed_by']						= $row['reviewed_by'];
+			//reviewed_by
+			//
+			$request['status'] 							= $row['status'];
 			$request['disposition'] 					= $row['disposition'];
-			$request['date_received'] 				= $row['date_received'];
-			$request['model'] 						= $row['model'];
+			$request['date_received'] 					= $row['date_received'];
+			$request['model'] 							= $row['model'];
 			$request['originator_code'] 				= $row['originator_code'];
-			$request['doc_title'] 					= $row['doc_title'];
-			$request['doc_no']						= $row['doc_no'];
-			$request['rev_no'] 						= $row['rev_no'];
+			$request['doc_title'] 						= $row['doc_title'];
+			$request['doc_no']							= $row['doc_no'];
+			$request['rev_no'] 							= $row['rev_no'];
 			$request['expiration_date'] 				= $row['expiration_date'];
 			$request['doc_type'] 						= $row['doc_type'];
 
