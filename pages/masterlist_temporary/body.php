@@ -31,6 +31,9 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 										<li class="nav-item">
 											<a class="nav-link" data-toggle="tab" href="#menu2">For Review</a>
 										</li>
+										<li class="nav-item">
+											<a class="nav-link" data-toggle="tab" href="#menu3">Reviewed Tab</a>
+										</li>
 									';
 									$dcc_active = 'active';
 									$process_owner_active = '';
@@ -63,7 +66,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 						</div> <!--end tabpanel-->
 						<div role="tabpanel" id="menu2" class="tab-pane <?php echo $process_owner_active?>"><br>
 							<div class="col-sm-12">
-							<div class="panel panel-info" style="overflow:scroll;">
+								<div class="panel panel-info" style="overflow:scroll;">
 								<div class="panel-heading"><i class="fa fa-file fa-lg"> For Review</i></div>
 								<div class="panel-body">
 									<div class="card" style="border-color: #D3D3D3;">
@@ -149,8 +152,54 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 										</div>
 									</div>
 								</div>
-							</div> <!--end div panel info -->
-						</div> <!--end tabpanel-->
+							</div> 
+						</div>
+						<div role="tabpanel" id="menu3" class="tab-pane"><br>
+							<div class="col-sm-12">
+								<div class="panel panel-info" style="overflow:scroll;">
+								<div class="panel-heading"><i class="fa fa-file fa-lg"> Reviewed Tab</i></div>
+								<div class="panel-body">
+									<div class="card" style="border-color: #D3D3D3;">
+										<div class="card-body">
+											<div class="row">
+												<div class="col-sm-4">	
+												<span class="badge highlight-color-blue">DCC CONFORMANCE</span>
+												<label><b>- DCC / QAS</b></label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<br>
+									<div class="col-sm-12 mt-5">
+										<button class="btn btn-success fa fa-file-excel-o pull-right" id="btnExportDocReviewMasterlist"> Export </button>
+										<button class="btn btn-info fa fa-file-pdf-o pull-left" id="btnUserManual"> User Manual </button>
+									</div> <br><br><br><br>
+										<div class="col-sm-12">
+											<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary_for_dcc">
+												<thead>
+													<tr>
+														<!-- <th></th> -->
+														<th><span class="fa fa-cogs"></span></th>
+														<th>Document Status</th>
+														<th>Disposition</th>
+														<th>Date Received</th>
+														<th>Model</th>
+														<th>Title</th>
+														<th>Document No.</th>
+														<th>Rev No.</th>
+														<th>Orignator Code</th>
+														<th>Effectivity Date</th>
+														<th>Expiration Date</th>
+														<th>Active/Obsolete</th>
+														<!--<th>Document Type</th> -->
+													</tr>
+												</thead>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div> 
+						</div>
 					</div> <!--end tab-content--> 
 				</div>
 			</section>
@@ -349,6 +398,8 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		var $formReviewDocu = $('#formReviewDocu');
 		var $formDocReviewDisposition = $('#formDocReviewDisposition');
 		var $formAdvanceSearch = $('#formAdvanceSearch');
+		var tbl_masterlist_temporary_for_dcc = 'tbl_masterlist_temporary_for_dcc';
+		/* DataTables */
 		var dt_masterlist_temporary = $(tbl_masterlist_temporary).DataTable({
 			"aaSorting"	: [],
 			"bProcessing": true,
@@ -360,6 +411,19 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 			"ordering":false,
 			"drawCallback": function( settings ) {
 				$(tbl_masterlist_temporary).attr('style','width:100%;')
+			}
+		});
+		var dt_masterlist_temporary_for_dcc = $('#tbl_masterlist_temporary_for_dcc').DataTable({
+			"aaSorting"	: [],
+			"bProcessing": true,
+			"bServerSide": true,
+			"sAjaxSource": "server_side_scripts/dt_masterlist_temporary_for_dcc.php?username="+"<?php echo $_SESSION['username'];?>",
+			// "columnDefs":[
+			// 	{"orderable":false,"targets":[0,1,2,3]}
+			// ],
+			"ordering":false,
+			"drawCallback": function( settings ) {
+				$('#tbl_masterlist_temporary_for_dcc').attr('style','width:100%;')
 			}
 		});
 
@@ -433,7 +497,8 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		});
 
 		$('a').click(function (e) { 
-			($(this).attr('href') === '#menu2')? dt_masterlist_temporary.draw() : '';
+			( $(this).attr('href') === '#menu2' ) ? dt_masterlist_temporary.draw() : '';
+			( $(this).attr('href') === '#menu3' ) ? dt_masterlist_temporary_for_dcc.draw() : '';
 		});
 
 		$('#link_file_memo').click(function (e) { 
