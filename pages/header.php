@@ -19,6 +19,33 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 // $_SESSION['rapid_account_type'] = 2; 
 /* used for standalone testing purposed only - remove on live or do not patch this page */
 ?>
+<style>
+	.my-loading-state {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.3);
+	z-index: 9999;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	}
+	.my-loading {
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+		border: 10px solid #ddd;
+		border-top-color: orange;
+		animation: loading 1s linear infinite;
+		}
+	@keyframes loading {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+</style>
 <input type="text" id="hd_username" value="<?php echo $_SESSION['username']; ?>">
 </head>
 <body>
@@ -29,6 +56,9 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 				<h2>Loading Module...</h2>
 			</center>
 		</div>
+	</div>
+	<div class="" id="my-loading-state">
+		<div class="" id="my-loading"></div>
 	</div>
 	<nav class="navbar navbar-default navbar-fixed-top topbar">
 		<div class="">

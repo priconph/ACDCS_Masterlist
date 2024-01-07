@@ -89,7 +89,7 @@ class DocReviewDisposition{
         require_once('../model/systemone.php');
 
         $request = $_POST;
-        $array_fields = array('disposition.*,approval.sec_heads_username,approval.tbl_doc_review_disposition_id,approval.remarks');
+        $array_fields = array('disposition.*,approval.sec_heads_username,approval.tbl_doc_review_disposition_id,approval.remarks,disposition.remarks as process_owner_remarks');
         $table 	   	= 'tbl_doc_review_disposition disposition';
         $joins 	   	= 'LEFT JOIN tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id';
         $sql_where 	=  'WHERE disposition.tbl_doc_review_masterlist_id = '.$doc_review_masterlist_id.' AND disposition.deleted_at IS NULL';
@@ -105,6 +105,7 @@ class DocReviewDisposition{
                 $return['due_date'] = $row['due_date'];
                 $return['extension_date'] = $row['extension_date'];
                 $return['remarks'] = $row['remarks'];
+                $return['process_owner_remarks'] = $row['process_owner_remarks'];
                 $reviewed_by[] = $row['reviewed_by'];
                 $person_in_charge[] = $row['person_in_charge'];
                 $sec_heads_username[] = $row['sec_heads_username'];

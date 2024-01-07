@@ -172,7 +172,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
-				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 				// print_r($message);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -206,7 +206,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
 				$date_start = $email_due_date;
 				$frequency = 2;
-				// return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
+				return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
 			} catch (\Throwable $th) {
 				throw $th;
 			}
@@ -235,7 +235,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
-				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 				// print_r($message);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -289,7 +289,7 @@ use Handler\DocuReviewDisposition;
 				$from		=	'issinfoservice@pricon.ph';
 				$cc			=	'';
 				$subject	=	"For DCC Conformance";
-				// return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
+				return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
 				// print_r($document_details);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -477,6 +477,7 @@ use Handler\DocuReviewDisposition;
 			$return = $_POST ;
 			$response = array();
 			$username = $_SESSION['username'];
+			$remarks = $return['remarks'];
 			$disposition = $return['disposition'];
 			$sec_heads_username = $return['sec_heads_username'];
 			$datetime_today = date('Y-m-d H:i:s');
@@ -490,8 +491,8 @@ use Handler\DocuReviewDisposition;
 			$table = 'tbl_doc_review_disposition';
 			if($disposition == 1){ //Revision
 				
-				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','updated_at');
-				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$datetime_today);
+				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','remarks','updated_at');
+				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$remarks,$datetime_today);
 				$where = 'WHERE id = '.$docu_review_disposition_id.'';
 				//Before updating the disposition, clear the doc review disposition table then update the data by id
 				$clear_tbl_disposition[] = $common_class->clearTblDocReviewDispositionColumn($docu_review_disposition_id);
@@ -513,8 +514,8 @@ use Handler\DocuReviewDisposition;
 			}
 
 			if($disposition == 2 || $disposition == 3 ){ //Retain & Obsolete
-				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','created_at');
-				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$datetime_today);
+				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','remarks','created_at');
+				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$remarks,$datetime_today);
 				$where = 'WHERE id = '.$docu_review_disposition_id.'';
 				//Before updating the disposition, clear the doc review disposition table.
 				$clear_tbl_disposition[] = $common_class->clearTblDocReviewDispositionColumn($docu_review_disposition_id);
@@ -554,8 +555,8 @@ use Handler\DocuReviewDisposition;
 						return;
 					}
 					/* saved extended disposition w/ memo file */
-					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_filtered_name','extension_date','reviewed_by','dcc_email');
-					$array_values = array($doc_review_masterlist_id,$disposition,$file_memo_name,$filtered_filename,$return['extension_date'],$username,$dcc_emailed_at);
+					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_filtered_name','extension_date','reviewed_by','remarks','dcc_email');
+					$array_values = array($doc_review_masterlist_id,$disposition,$file_memo_name,$filtered_filename,$return['extension_date'],$username,$remarks,$dcc_emailed_at);
 					$where = 'WHERE id = '.$docu_review_disposition_id.'';
 					$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
 					/* Uploading of Data */
@@ -581,8 +582,8 @@ use Handler\DocuReviewDisposition;
 						return;
 					}
 					/* saved extended disposition w/o memo file */
-					$array_fields = array('tbl_doc_review_masterlist_id','disposition','extension_date','reviewed_by','dcc_email','created_at');
-					$array_values = array($doc_review_masterlist_id,$disposition,$return['extension_date'],$username,$dcc_emailed_at,$datetime_today);
+					$array_fields = array('tbl_doc_review_masterlist_id','disposition','extension_date','reviewed_by','dcc_email','remarks','created_at');
+					$array_values = array($doc_review_masterlist_id,$disposition,$return['extension_date'],$username,$dcc_emailed_at,$remarks,$datetime_today);
 					$where = 'WHERE id = '.$docu_review_disposition_id.'';
 					$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
 					/* Approval Details	and Send Email to Approvers	*/

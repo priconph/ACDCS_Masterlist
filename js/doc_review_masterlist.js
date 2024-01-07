@@ -26,6 +26,7 @@ function getDocReviewDisposition () {
     
     call_ajax(data, masterlist_temporary_handler,function(result){
         let approver_remarks = result['remarks'];
+        let process_owner_remarks = result['process_owner_remarks'];
         let disposition = result['disposition'];
         let doc_review_disposition_id = result['id'];
         $('#modalDocReviewDisposition').modal();
@@ -35,6 +36,7 @@ function getDocReviewDisposition () {
         $formDocReviewDisposition.find('#doc_review_masterlist_id').val(doc_review_masterlist_id);
         $formDocReviewDisposition.find('#docu_review_disposition_id').val(doc_review_disposition_id);
         $formDocReviewDisposition.find('#disposition').val(disposition);
+        $formDocReviewDisposition.find('#remarks').val(process_owner_remarks);
         $formDocReviewDisposition.find('#reviewed_by').html(result['reviewed_by'][0].text);
         assign_value_select2('#formDocReviewDisposition #sec_heads_username',result['sec_heads_username']);
         if(disposition === '1'){

@@ -101,17 +101,28 @@
 						<input type="date" class="form-control" id="extension_date" name="extension_date" style="width:100%;" required>
 					</div>
 					<div class="col-sm-12">				
-						<input type="file" class="form-control" id="file_memo" name="file_memo" style="width:100%;">
+						<label>Memo File: (if the document is greater than 9 months based on effectivity date)</label>
+					</div>
+					<div class="col-sm-12">				
+						<input type="file" class="form-control" id="file_memo" name="file_memo" style="width:100%;" accept=".pdf">
 					</div>
 					<div class="col-sm-12" style="display:block;">				
 						<a class="fa fa-file-pdf-o" id="link_file_memo" name="link_file_memo" style="width:100%;display:none;"> View Attachment</a>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">				
+						<label>Process Owner Remarks:</label>
+					</div>
+					<div class="col-sm-12">	
+						<input type="text" name="remarks" id="remarks" class="form-control">
 					</div>
 				</div>
 				<div class="row" id="is_approver_remarks"  style="display:none;">
 					<div class="col-sm-3">				
 						<label>Approver Remarks:</label>
 					</div>
-					<div class="col-sm-2">	
+					<div class="col-sm-9">	
 						<i><p id="approver_remarks"></p></i>
 					</div>
 				</div>
