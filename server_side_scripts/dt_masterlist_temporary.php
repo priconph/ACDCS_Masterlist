@@ -333,8 +333,8 @@
 		$row[]= ( $aRow['originator_code'] != NULL ) ? 
 					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
 					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
-					$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
-					$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];
+		$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
+		$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];
 		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
 		array_push($output['aaData'],$row);
 	}

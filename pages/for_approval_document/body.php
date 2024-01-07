@@ -48,6 +48,7 @@
 													<th>Document Type</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th>
+													<th>Active/Obsolete</th>
 													<!-- <th>Reviewed by</th>
 													<th>Date of review</th>
 													<th>Person in charge</th>

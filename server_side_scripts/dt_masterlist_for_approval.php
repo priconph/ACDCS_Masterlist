@@ -24,14 +24,25 @@
 	ini_set('display_errors', 1);
 
 	$aColumns = array( 
-		'disposition.disposition',
-		'masterlist.id as masterlist_id',
+		'obsolete.expiration_date AS obsolete_expiration_date',
+		'obsolete.date_received AS obsolete_date_received',
+		'obsolete.model AS obsolete_model',
+		'obsolete.doc_title AS obsolete_doc_title',
+		'obsolete.doc_no AS obsolete_doc_no',
+		'obsolete.doc_type AS obsolete_doc_type',
+		'obsolete.rev_no AS obsolete_rev_no',
+		'obsolete.effectivity_date AS obsolete_effectivity_date',
+
 		'approval.id',
 		'approval.sec_heads_username',
+		'masterlist.id as masterlist_id',
 		'masterlist.fkid_document',
 		'masterlist.document_status',
 		'masterlist.is_expiration_date_exist',
 		'masterlist.deleted_at',
+		'masterlist.originator_code',
+		'disposition.disposition',
+	
 		'active.date_received',
 		'active.model',
 		'active.doc_title',
@@ -39,13 +50,20 @@
 		'active.doc_type',
 		'active.rev_no',
 		'active.effectivity_date',
-		'active.expiration_date',
-		'masterlist.originator_code',
+		'active.expiration_date'
 	);
 
 	/* used this field for searching data typed in the search box */
 
 	$array_search = array(
+		'obsolete.date_received',
+		'obsolete.model',
+		'obsolete.doc_title',
+		'obsolete.doc_no',
+		'obsolete.rev_no',
+		'obsolete.effectivity_date',
+		'obsolete.doc_type',
+		'obsolete.expiration_date',
 		'active.date_received',
 		'active.model',
 	 	'active.doc_title',
@@ -63,6 +81,7 @@
 	/* DB table to use */
 	$sTable = "tbl_doc_review_masterlist masterlist";
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
+	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
 	$sJoin .= " RIGHT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
 	$sJoin .= " RIGHT JOIN tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id";
 	
@@ -177,26 +196,6 @@
         return;
     */
 
-	/* Individual column filtering */
-	for ( $i=0 ; $i<count($array_search) ; $i++ )
-	{
-		//NOTE: $_GET['bSearchable_'.$i] accept only 11  $array_search
-		if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
-		{
-			if ( $sWhere == "" )
-			{
-				$sWhere = "WHERE ";
-			}
-			else
-			{
-				$sWhere .= " AND ";
-			}
-			$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
-		}
-	}
-	
-
-
 	/* 
 		dito ka mag add ng where mo, una check mo kung may laman na yung $sWhere pag wala append mo yung where mo na meron
 		kasama where kapag naman may laman na AND na syempre diba :)
@@ -208,8 +207,8 @@
 		$sWhere .= "AND ";
 	}
 	// $sWhere .= '(active.view_status =1 AND active.`logdel` =0) AND (masterlist.deleted_at IS NULL AND masterlist.document_status = 2) AND disposition.deleted_at IS NULL AND (approval.deleted_at IS NULL AND approval.sec_heads_username= "'.$_GET['username'].'") ';
-	$sWhere .= '(active.view_status =1 AND active.`logdel` =0)';
-	$sWhere .= ' AND (masterlist.deleted_at IS NULL AND masterlist.document_status = 2)';
+	// $sWhere .= '(active.view_status =1 AND active.`logdel` =0)';
+	$sWhere .= '(masterlist.deleted_at IS NULL AND masterlist.document_status = 2)';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	$sWhere .= ' AND (approval.deleted_at IS NULL AND approval.sec_heads_username= "'.$_GET['username'].'" AND approval.status = 0 )';
     
@@ -281,15 +280,21 @@
 		// $row[]= $getActiveDocumentById['fkid_document'];
 		// $row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> <span class="badge highlight-color-green">' .$disposition. '</span> </center>';
-		$row[]= $aRow['date_received'];
-		$row[]= $aRow['model'];
-		$row[]= $aRow['doc_title'];
-		$row[]= '<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc_no="' .$aRow['doc_no']. '">'.' '.$aRow['doc_no'].'</a>';
-		$row[]= $aRow['rev_no'];
-		$row[]= $aRow['originator_code'];
-		$row[]= $aRow['doc_type'];
-		$row[]= $aRow['effectivity_date'];
-		$row[]= $aRow['expiration_date'];
+		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
+		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
+		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
+		$row[]= ( $aRow['doc_no'] != NULL ) ? 
+					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>'  :
+					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
+		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
+		$row[]= ( $aRow['originator_code'] != NULL ) ? 
+					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
+					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
+
+		$row[]= ( $aRow['doc_type'] != NULL ) ? $aRow['doc_type'] : $aRow['obsolete_doc_type'];
+		$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
+		$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];+
+		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
