@@ -9,11 +9,19 @@ function call_ajax(data, handler, fn) {
 		dataType: "json",
 		data: data,
 		url: handler,
+		beforeSend:function (result){
+			$('#my-loading-state').addClass('my-loading-state');
+			$('#my-loading').addClass('my-loading');
+		},
 		success: function (result) {
 			fn(result);
+			$('#my-loading-state').removeClass('my-loading-state');
+			$('#my-loading').removeClass('my-loading');
 		},
 		error: function (result) {
-			fn(result);
+			alert('ERROR: '+result['upload_msg']+'Please contact the ISS !');
+			$('#my-loading-state').removeClass('my-loading-state');
+			$('#my-loading').removeClass('my-loading');
 		}
 	});
 }
@@ -25,11 +33,20 @@ function call_ajax_serialize(data, serialized_data, handler, fn) {
 		dataType: "json",
 		data: data,
 		url: handler,
+		beforeSend:function (result){
+			$('#my-loading-state').addClass('my-loading-state');
+			$('#my-loading').addClass('my-loading');
+		},
 		success: function (result) {
 			fn(result);
+			//156874
+			$('#my-loading-state').removeClass('my-loading-state');
+			$('#my-loading').removeClass('my-loading');
 		},
 		error: function (result) {
-			alert('error ajax');
+			alert('ERROR: '+result['upload_msg']+'Please contact the ISS !');
+			$('#my-loading-state').removeClass('my-loading-state');
+			$('#my-loading').removeClass('my-loading');
 		}
 	});
 }
@@ -42,33 +59,22 @@ function call_ajax_attachment(serialized_data, handler, fn) {
 		contentType		: false,       
 		dataType		: 'json',
 		cache			: false,             
-		processData		: false,     
-		success			: function(result)  
-		{
+		processData		: false,   
+		beforeSend:function (result){
+			$('#my-loading-state').addClass('my-loading-state');
+			$('#my-loading').addClass('my-loading');
+		},
+		success	: function(result){
 			fn(result);
+			$('#my-loading-state').removeClass('my-loading-state');
+			$('#my-loading').removeClass('my-loading');
 		}, error : function (result) {
 			alert('ERROR: '+result['upload_msg']+'Please contact the ISS !');
+			$('#my-loading-state').removeClass('my-loading-state');
+			$('#my-loading').removeClass('my-loading');
 		}
 	}); 
 }
-
-function call_ajax_async_false(data, handler, fn) {
-	data = $.param(data);
-	$.ajax({
-		type: "post",
-		dataType: "json",
-		data: data,
-		url: handler,
-		async: false,
-		success: function (result) {
-			fn(result);
-		},
-		error: function (result) {
-			alert('error ajax');
-		}
-	});
-}
-
 
 
 function create_table(table_id, table_class, array_theader, array_tbody) {

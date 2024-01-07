@@ -148,7 +148,7 @@
 	include_once('pages/components/modal.php');
 ?>
 
-<script src="js/common_functions.js?09876"></script>
+<script src="js/common_functions.js?12345"></script>
 <script src="js/doc_review_masterlist.js?3434134"></script>
 <script>
 	$(document).ready(function () {

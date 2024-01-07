@@ -3,8 +3,40 @@ use Pages\GetUserRoles\Rapid;
 $is_dcc_staff = Rapid::getIsDccStaff();
 $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR $is_dcc_staff['section'][0] == "EMO/QMS" OR $is_dcc_staff['division'][0] =="Quality Assurance Di" ) ? 'true': 'false';
 ?>
+<style lang="">
+	.my-loading-state {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.3);
+	z-index: 9999;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	}
+	.my-loading {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	border: 10px solid #ddd;
+	border-top-color: orange;
+	animation: loading 1s linear infinite;
+	}
+	@keyframes loading {
+	to {
+		transform: rotate(360deg);
+	}
+	
+}
 
-<section class="main">		
+</style>
+<section class="main">
+		<div class="" id="my-loading-state">
+			<div class="" id="my-loading"></div>
+		</div>	
+		<div class="box"></div>
 		<section class="tab-content" id="tab-content">
 		   <section class="tab-pane active fade in content" id="iqc">
 				<div class="row">
@@ -353,7 +385,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 	include_once('pages/components/modal.php');
 ?>
 
-<script src="js/common_functions.js?143123"></script>
+<script src="js/common_functions.js?0986"></script>
 <script src="js/doc_review_masterlist.js?5243324"></script>
 <script>
 	$(document).ready(function () {
