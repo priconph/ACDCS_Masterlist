@@ -2,6 +2,7 @@
 use Pages\GetUserRoles\Rapid;
 $is_dcc_staff = Rapid::getIsDccStaff();
 $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR $is_dcc_staff['section'][0] == "EMO/QMS" OR $is_dcc_staff['division'][0] =="Quality Assurance Di" ) ? 'true': 'false';
+
 ?>
 
 <section class="main">
@@ -13,7 +14,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 				   	<div class="col-xs-12">
 						<legend style="margin-bottom:0px;"><a href="#" id="a_menu"><i class="fa fa-puzzle-piece"></i> ACDCS Document Review Process</a></legend>
 					    <ol class="breadcrumb">
-						  <li id="bc_menu"><a href="#" class="active"><i class="fa fa-home"></i> Home</a></li>
+						  <li id="bc_menu"><a href="#" class="active"><i class="fa fa-home"></i> Homes </a></li>
 	
 						</ol>
 						<div class="row" id="container_menu">
@@ -25,7 +26,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 						<div class="">
 							<ul class="nav nav-tabs" role="tablist">
 							<?php 
-								if($is_dcc_access == 'true'){
+								if($is_dcc_access == 'true' || $_SESSION['username'] == 'mclegaspi'){
 									echo '
 										<li class="nav-item active">
 												<a class="nav-link" data-toggle="tab" href="#menu1">Pending</a>
@@ -173,8 +174,8 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 									</div>
 									<br>
 									<div class="col-sm-12 mt-5">
-										<button class="btn btn-success fa fa-file-excel-o pull-right" id="btnExportDocReviewMasterlist"> Export </button>
-										<button class="btn btn-info fa fa-file-pdf-o pull-left" id="btnUserManual"> User Manual </button>
+										<button class="btn btn-success fa fa-file-excel-o pull-right" id="btnExportDocReviewMasterlistDcc"> Export </button>
+										<!-- <button class="btn btn-info fa fa-file-pdf-o pull-left" id="btnUserManual"> User Manual </button> -->
 									</div> <br><br><br><br>
 										<div class="col-sm-12">
 											<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary_for_dcc">
@@ -355,8 +356,8 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 	include_once('pages/components/modal.php');
 ?>
 
-<script src="js/common_functions.js?0986"></script>
-<script src="js/doc_review_masterlist.js?12345"></script>
+<script src="js/common_functions.js?98765"></script>
+<script src="js/doc_review_masterlist.js?74645"></script>
 <script>
 	$(document).ready(function () {
 		/* Date Range Picker */
@@ -479,10 +480,22 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 			(doc_type === 'active') ? window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no) :
 									window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_obsolete?doc_no="+doc_no);
 		});
+		$('#tbl_masterlist_temporary_for_dcc').on('click','#btnSearchDocNum', function () {
+			let doc_no = $(this).attr('doc-no');
+			let doc_type = $(this).attr('doc-type');
+
+			(doc_type === 'active') ? window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no) :
+									window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_obsolete?doc_no="+doc_no);
+		});
 
 		$(tbl_masterlist_temporary).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
 		
 		$(tbl_masterlist_temporary).on('click','#btnEditDocReviewDisposition' ,getDocReviewDisposition);
+
+		$('#tbl_masterlist_temporary_for_dcc').on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
+		// $('#tbl_masterlist_temporary_for_dcc').on('click','#btnViewDocReviewDisposition', function () {
+		// 	alert('asdsad')
+		// });
 		
 		$('#btnBatchApproval').click(function (e) { 
 			e.preventDefault();
@@ -493,6 +506,12 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		});
 
 		$('#btnExportDocReviewMasterlist').click(function (e) { 
+			e.preventDefault();
+			$('#modalAdvanceSearch').modal();
+			date_time_picker('expiration_date_from_to');
+		});
+
+		$('#btnExportDocReviewMasterlistDcc').click(function (e) { 
 			e.preventDefault();
 			$('#modalAdvanceSearch').modal();
 			date_time_picker('expiration_date_from_to');
@@ -572,7 +591,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 			call_ajax_serialize(data, $(this).serialize() , masterlist_temporary_handler, function(result){
 				// window.location.href = " ?query="+result['script'];
 				window.location.href = "reports/excel_auto_generate/temporary_document.php?query="+result['script'];
-				$('#expiration_date_from_to').val('');
+			$('#expiration_date_from_to').val('');
 				$('#modalAdvanceSearch').modal('hide');
 			});
 		});

@@ -217,6 +217,7 @@
 	}
 	/* Default WHERE query without search inputs */
 	$sWhere .= 'masterlist.deleted_at IS NULL AND masterlist.document_status = 3'; //
+	$sWhere .= ' AND disposition.deleted_at IS NULL'; //
 	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
 
 	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
@@ -310,13 +311,30 @@
 				$status = '<span class="badge highlight-color-gray">Unknown Status</span>';
 				break;
 		}
+		
 		/* Disposition */
 		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
-
-		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
-
-		/**
-		 * TODO: check if dcc need to have checked box to approved then transfer to REVIEWED TABLE
+		switch ($arr_doc_review_disposition['disposition']) {
+                case 1:
+                    $doc_review_disposition = 'Revision';
+                    break;
+                case 2:
+                    $doc_review_disposition = 'Retain';
+                    break;
+                case 3:
+                    $doc_review_disposition = '<span class="badge highlight-color-red">Obsolete</span>';
+                    break;
+                case 4:
+                    $doc_review_disposition = 'Extended';
+                    break;
+                default:
+                    $doc_review_disposition = '';
+                    break;
+        }
+		
+		
+		/* 
+			TODO: check if dcc need to have checked box to approved then transfer to REVIEWED TABLE 
 		*/
 		// $row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
 		$row[]= $button;
@@ -328,14 +346,15 @@
 		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
 		$row[]= ( $aRow['doc_no'] != NULL ) ? 
 					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>'  :
-					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
+					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
 		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
 		$row[]= ( $aRow['originator_code'] != NULL ) ? 
 					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
 					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
 					$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
 					$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];
-		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
+		// $row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
+		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : '<span class="badge highlight-color-red">OBSOLETE</span>';
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );

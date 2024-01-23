@@ -171,8 +171,9 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Title				: '.$active_docs['doc_title'].'<br>';
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
-				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
-				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				// $message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
+				$message .= 'Due Date 			: '.$get_doc_review_disposition_by_id['due_date'].'<br>';
+				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 				// print_r($message);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -235,7 +236,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
-				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 				// print_r($message);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -285,11 +286,11 @@ use Handler\DocuReviewDisposition;
 				// $cc			=	implode(',',$return['send_cc']);
 				
 				/* message: TEST EMAIL*/
-				$to			= 	'mclegaspi@pricon.ph';
+				$to			= 	'dmmarmol@pricon.ph,';
 				$from		=	'issinfoservice@pricon.ph';
 				$cc			=	'';
 				$subject	=	"For DCC Conformance";
-				return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
+				// return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
 				// print_r($document_details);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -349,6 +350,7 @@ use Handler\DocuReviewDisposition;
 	function create_disposition_details()
 	{
 		try{
+			
 			require_once('../class/oop_acdcs.php');
 			
 			/* Class List */
@@ -365,13 +367,20 @@ use Handler\DocuReviewDisposition;
 			$doc_review_masterlist = $common_class->docReviewMasterlist($doc_review_masterlist_id);
 			$dcc_emailed_at = $doc_review_masterlist['created_at'];
 			$new_status = 2;
-
 			$table = 'tbl_doc_review_disposition';
+			
+			/* Get the document disposition then delete the previos disposition to count as review history */
+			$get_doc_review_disposition_descending_id =  DocReviewDisposition::getDocReviewDispositionDescending($doc_review_masterlist_id);
+			$array_fields = array( 'deleted_at' ,'review_count');
+			$array_values = array( date('Y-m-d H:i:s') , 1);
+			$where = 'WHERE id = '.$get_doc_review_disposition_descending_id['id'].'';
+			$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+			
 			if($disposition == 1){ //Revision
-				
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','created_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$datetime_today);
-				$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values); 
+				$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values);
+
 				/* Scheduled email to Process owner */
 				$scheduled_email[] = $common_class->sendScheduledEmailToProcessOwner($docu_review_disposition_id,$return['person_in_charge'],$return['due_date'],$username);
 				

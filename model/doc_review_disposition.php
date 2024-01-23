@@ -24,6 +24,28 @@ class DocReviewDisposition{
                 $request['disposition'] 	                = $row['disposition'];
                 $request['memo_file_name'] 	                = $row['memo_file_name'];
                 $request['memo_file_filtered_name'] 	    = $row['memo_file_filtered_name'];
+                $request['due_date'] 	                    = $row['due_date'];
+            }
+            return $request;
+        }catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    public function getDocReviewDispositionDescending($doc_review_masterlist_id)
+    {
+        try {
+            require_once('../class/oop_acdcs.php'); //if error to email uncomment then look for excel_download
+            $request = array();
+            $array_fields = array('*');
+            $table 	   	= 'tbl_doc_review_disposition';
+            $joins 	   	= '';
+            $sql_where 	= 'WHERE tbl_doc_review_masterlist_id = '.$doc_review_masterlist_id.' ';
+            $sql_order 	= 'ORDER BY id DESC';
+            $sql_limit 	= 'LIMIT 0,1';
+            $script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+            $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+            while($row = mysqli_fetch_array($query)){
+                $request['id'] 	= $row['id'];
             }
             return $request;
         }catch (\Throwable $th) {

@@ -287,6 +287,7 @@
 				}else{
 					$button = '';
 				}
+				$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center> <br>';
 				$status = '<span class="badge highlight-color-red">DISAPPROVED</span>';
 				break;
 			case 1:
