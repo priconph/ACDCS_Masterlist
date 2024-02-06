@@ -148,8 +148,8 @@
 	include_once('pages/components/modal.php');
 ?>
 
-<script src="js/common_functions.js?12345"></script>
-<script src="js/doc_review_masterlist.js?12345"></script>
+<script src="js/common_functions.js?098765"></script>
+<script src="js/doc_review_masterlist.js?0987654"></script>
 <script>
 	$(document).ready(function () {
 		$('.modal').on('hidden.bs.modal', function (e) {
@@ -215,8 +215,13 @@
 		$('#'+tbl_for_approval_document).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
 
 		$('#'+tbl_for_approval_document).on('click','#btnSearchDocNum', function () {
-			let doc_no = $(this).attr('doc_no');
-			window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no)
+			// let doc_no = $(this).attr('doc_no');
+			// window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no)
+			let doc_no = $(this).attr('doc-no');
+			let doc_type = $(this).attr('doc-type');
+
+			(doc_type === 'active') ? window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_active?doc_no="+doc_no) :
+									window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_obsolete?doc_no="+doc_no);
 		});
 
 		$('#btnBatchApproval').click(function (e) { 

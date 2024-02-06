@@ -282,8 +282,8 @@
 		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
 		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
 		$row[]= ( $aRow['doc_no'] != NULL ) ? 
-					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>'  :
-					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
+			'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>'  :
+			'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
 		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
 		$row[]= ( $aRow['originator_code'] != NULL ) ? 
 					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 

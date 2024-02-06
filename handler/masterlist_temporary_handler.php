@@ -173,8 +173,8 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				// $message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
 				$message .= 'Due Date 			: '.$get_doc_review_disposition_by_id['due_date'].'<br>';
-				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
-				// print_r($message);
+				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				print_r($message);
 			} catch (\Throwable $th) {
 				throw $th;
 			}
@@ -236,8 +236,8 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
-				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
-				// print_r($message);
+				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				print_r($message);
 			} catch (\Throwable $th) {
 				throw $th;
 			}
@@ -290,8 +290,8 @@ use Handler\DocuReviewDisposition;
 				$from		=	'issinfoservice@pricon.ph';
 				$cc			=	'';
 				$subject	=	"For DCC Conformance";
-				// return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
-				// print_r($document_details);
+				return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
+				print_r($document_details);
 			} catch (\Throwable $th) {
 				throw $th;
 			}

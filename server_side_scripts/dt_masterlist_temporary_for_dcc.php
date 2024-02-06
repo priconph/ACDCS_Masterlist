@@ -218,7 +218,8 @@
 	/* Default WHERE query without search inputs */
 	$sWhere .= 'masterlist.deleted_at IS NULL AND masterlist.document_status = 3'; //
 	$sWhere .= ' AND disposition.deleted_at IS NULL'; //
-	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
+	// $sWhere .= '( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
+	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
 
 	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
