@@ -20,7 +20,7 @@ $search = trim(strip_tags($_GET['q']));
 // $search = trim(strip_tags($_GET['searchTerms']));
 
 /* Query Here  */
-$sql  = "SELECT CONCAT(`name`) as `Emp_name`,`username` FROM tbl_useraccounts WHERE `name` LIKE '%$search%' AND `logdel`=0 LIMIT 0,10";
+$sql  = "SELECT CONCAT(`name`) as `Emp_name`,`username` FROM tbl_useraccounts WHERE `name` LIKE '%$search%' AND `logdel`=0 LIMIT 0,50";
 $result = mysqli_query($conn,$sql);
 
 if(!$result){
@@ -37,7 +37,7 @@ while($row = mysqli_fetch_assoc($result)){
 /* Make sure we have a result */
 if(count($list) > 0){
    foreach ($list as $key => $value) {
-		$data[] = array('id' => $value['username'], 'text' => $value['Emp_name']);              
+		$data[] = array('id' => $value['username'], 'text' => $value['Emp_name']);//NOTE: 
    } 
 } else {
    $data[] = array('id' => '0', 'text' => 'No Employee Found');

@@ -44,8 +44,11 @@ class DocReviewDisposition{
             $sql_limit 	= 'LIMIT 0,1';
             $script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
             $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-            while($row = mysqli_fetch_array($query)){
+            if($row = mysqli_fetch_array($query)){
                 $request['id'] 	= $row['id'];
+                $request['is_exist'] = 1; //true
+            }else{
+                $request['is_exist'] = 0; //false
             }
             return $request;
         }catch (\Throwable $th) {
