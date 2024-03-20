@@ -369,13 +369,14 @@ use Handler\DocuReviewDisposition;
 			$new_status = 2;
 			$table = 'tbl_doc_review_disposition';
 			
-			/* Get the document disposition then delete the previos disposition to count as review history */
+			/* Get the document disposition then delete the previous disposition to count as review history */
 			$get_doc_review_disposition_descending_id =  DocReviewDisposition::getDocReviewDispositionDescending($doc_review_masterlist_id);
-			$array_fields = array( 'deleted_at' ,'review_count');
-			$array_values = array( date('Y-m-d H:i:s') , 1);
-			$where = 'WHERE id = '.$get_doc_review_disposition_descending_id['id'].'';
-			$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
-			
+			if( $get_doc_review_disposition_descending_id['is_exist'] == 1 ){
+				$array_fields = array( 'deleted_at' ,'review_count');
+				$array_values = array( date('Y-m-d H:i:s') , 1);
+				$where = 'WHERE id = '.$get_doc_review_disposition_descending_id['id'].'';
+				$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+			}
 			if($disposition == 1){ //Revision
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','created_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$datetime_today);
@@ -451,9 +452,9 @@ use Handler\DocuReviewDisposition;
 				}
 
 				if($file_memo_tmp == ""){
-					if($month >= 9 || $year >= 1){
+					if($month >= 10 || $year >= 1){
 						$response['is_success'] ='false';
-						$response['result_msg'] = 'Please submit the memo!';
+						$response['result_msg'] = 'This document is more than 9 months. Please submit a memo!';
 						echo json_encode($response);
 						return;
 					}
@@ -474,7 +475,7 @@ use Handler\DocuReviewDisposition;
 				}
 			}
 		}catch(\Exception $e){
-			throw $th;
+			throw $e;
 		}
 	}
 
@@ -586,7 +587,7 @@ use Handler\DocuReviewDisposition;
 				if($file_memo_tmp == ""){
 					if($month >= 9 || $year >= 1){
 						$response['is_success'] ='false';
-						$response['result_msg'] = 'Please submit the memo!';
+						$response['result_msg'] = 'This document is more than 9 months. Please submit a memo!';
 						echo json_encode($response);
 						return;
 					}
