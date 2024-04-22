@@ -217,7 +217,7 @@
 	}
 	/* Default WHERE query without search inputs */
 	$sWhere .= 'masterlist.deleted_at IS NULL AND masterlist.document_status = 3'; //
-	$sWhere .= ' AND disposition.deleted_at IS NULL'; //
+	$sWhere .= ' AND disposition.deleted_at IS NULL AND MONTH(disposition.dcc_email) = 2'; //
 	// $sWhere .= '( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
 	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
 
@@ -230,6 +230,14 @@
 	 * SQL queries
 	 * Get data to display
 	 */
+	$script = "
+		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
+		FROM   $sTable
+		$sJoin
+		$sWhere
+		$sOrder
+		$sLimit
+	";
 	$sQuery = "
 		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
 		FROM   $sTable
@@ -265,6 +273,7 @@
 		"iTotalRecords" => $iTotal,
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
+		"script" => $script,
 	);
 	/*
 		Class Object
@@ -304,7 +313,9 @@
 				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
 				break;
 			case 3:
-            	$button = '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
+				$button = '';
+            	$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnReviewAgain" class="btn btn-sm btn-primary fa fa-edit" type="button">Review Again</button></center> <br>';
+            	$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
 				$status = '<span class="badge highlight-color-blue">DCC CONFORMANCE</span>';
 				break;
 			default:

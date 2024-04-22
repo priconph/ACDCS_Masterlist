@@ -56,7 +56,8 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 					</div>
 					<!-- Tab content -->
 					<div class="tab-content">
-						<div role="tabpanel" id="menu1" class="tab-pane <?php echo $dcc_active?>"><br>
+						<!-- <div role="tabpanel" id="menu1" class="tab-pane <?php echo $dcc_active?>"><br> -->
+						<div role="tabpanel" id="menu1" class="tab-pane"><br>
 							<div class="col-sm-12">
 							<div class="panel panel-info" style="overflow:scroll;">
 								<div class="panel-heading"><i class="fa fa-file fa-lg"> Pending</i></div>
@@ -67,7 +68,8 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 								</div>
 							</div> <!--end div panel info -->
 						</div> <!--end tabpanel-->
-						<div role="tabpanel" id="menu2" class="tab-pane <?php echo $process_owner_active?>"><br>
+						<!-- <div role="tabpanel" id="menu2" class="tab-pane <?php echo $process_owner_active?>"><br> -->
+						<div role="tabpanel" id="menu2" class="tab-pane"><br>
 							<div class="col-sm-12">
 								<div class="panel panel-info" style="overflow:scroll;">
 								<div class="panel-heading"><i class="fa fa-file fa-lg"> For Review</i></div>
@@ -157,7 +159,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 								</div>
 							</div> 
 						</div>
-						<div role="tabpanel" id="menu3" class="tab-pane"><br>
+						<div role="tabpanel" id="menu3" class="tab-pane active"><br>
 							<div class="col-sm-12">
 								<div class="panel panel-info" style="overflow:scroll;">
 								<div class="panel-heading"><i class="fa fa-file fa-lg"> Reviewed Tab</i></div>
@@ -266,6 +268,29 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> Disapproved</button>
 		  </div>
 		</form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Modal for Approver Decision -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal_dcc_review_again">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><i class="fa fa-question-circle-o"></i> System Confirmation</h4>
+      </div>
+		  <div class="modal-body">
+			<div class="row" id="">
+				<div class="col-sm-12" id="">				
+					<label>Are you sure you want to Review Again?</label>
+				</div>
+			</div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="submit" class="btn btn-primary fa fa-check" id="yes_dcc_review_again"> Yes</button>
+			<button type="button" class="btn btn-default fa fa-close" data-dismiss="modal" id="btn_close"> No</button>
+		  </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
@@ -396,6 +421,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 					Start
 		*************************** */
 		var arr_doc_review_masterlist_id = [];
+		var arr_dcc_review_again_masterlist_id = [];
 		var handler_ = 'handler_qfr';
 		var masterlist_temporary_handler = 'handler/masterlist_temporary_handler.php'
 		var $formReviewDocu = $('#formReviewDocu');
@@ -447,6 +473,20 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 			dispositionStatus($formId,disposition);
 		}
 
+			 
+		const dccReviewAgain = (doc_review_masterlist_id) => {
+		let data = {'action':'dcc_review_again','doc_review_masterlist_id':doc_review_masterlist_id}
+			call_ajax(data, masterlist_temporary_handler,function(result){
+				if(result['is_success'] === 'true'){
+					$('#modal_dcc_review_again').modal('hide');
+					notif_success(result['is_success']);
+					dt_masterlist_temporary_for_dcc.draw();
+					dt_masterlist_temporary.draw();
+				}
+			})
+			
+		}
+
 		$(tbl_masterlist_temporary).on('click','#btnReviewDocu',function (e) { 
 			e.preventDefault()
 			$('#modalReviewDocu').modal()
@@ -458,7 +498,6 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 
 		$(tbl_masterlist_temporary).on('click','#cBoxBatchSelect' ,function () {
 			let doc_review_masterlist_id = $(this).attr('data-id');
-
 			if ($(this).prop('checked')) {
 				$(this).each(function () {
 					arr_doc_review_masterlist_id.push(doc_review_masterlist_id);
@@ -493,10 +532,18 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		
 		$(tbl_masterlist_temporary).on('click','#btnEditDocReviewDisposition' ,getDocReviewDisposition);
 
+		$('#tbl_masterlist_temporary_for_dcc').on('click','#btnReviewAgain' , function () {
+			let doc_review_masterlist_id = $(this).attr('data-id');
+			arr_dcc_review_again_masterlist_id.push(doc_review_masterlist_id);
+			$('#modal_dcc_review_again').modal();
+		});
+		$('#yes_dcc_review_again').click(function (e) { 
+			e.preventDefault();
+			dccReviewAgain(arr_dcc_review_again_masterlist_id);
+			
+		});
+
 		$('#tbl_masterlist_temporary_for_dcc').on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
-		// $('#tbl_masterlist_temporary_for_dcc').on('click','#btnViewDocReviewDisposition', function () {
-		// 	alert('asdsad')
-		// });
 		
 		$('#btnBatchApproval').click(function (e) { 
 			e.preventDefault();
@@ -564,7 +611,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 				}
 			});
 		});
-		//nmodify
+		
 		$formReviewDocu.submit(function (e) { 
 			e.preventDefault();
 			var form_data = new FormData(this);
@@ -573,9 +620,9 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 			// form_data.append("username",username);
 			call_ajax_attachment(form_data, masterlist_temporary_handler, function(response){
 				if(response['is_success'] === 'true'){
-					$('#modalReviewDocu').modal('hide')
-					notif_success('Save Successfully')
-					dt_masterlist_temporary.draw()
+					$('#modalReviewDocu').modal('hide');
+					notif_success('Save Successfully');
+					dt_masterlist_temporary.draw();
 				}else{
 					$('#modalReviewDocu').modal('hide');
 					$('#alert_message').text(response['result_msg'])
@@ -609,6 +656,12 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		});
 		$('#modalAdvanceSearch').on('hidden.bs.modal', function (e) {
 			$('#expiration_date_from_to').val('');
+		});
+		$('#modal_dcc_review_again').on('hidden.bs.modal', function (e) {
+			console.log(arr_dcc_review_again_masterlist_id);
+			arr_dcc_review_again_masterlist_id = [];
+			console.log('after',arr_dcc_review_again_masterlist_id);
+
 		});
 		
 	});

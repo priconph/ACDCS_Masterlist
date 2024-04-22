@@ -173,7 +173,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				// $message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
 				$message .= 'Due Date 			: '.$get_doc_review_disposition_by_id['due_date'].'<br>';
-				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 				print_r($message);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -207,7 +207,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
 				$date_start = $email_due_date;
 				$frequency = 2;
-				return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
+				// return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
 			} catch (\Throwable $th) {
 				throw $th;
 			}
@@ -236,7 +236,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
-				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 				print_r($message);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -290,7 +290,7 @@ use Handler\DocuReviewDisposition;
 				$from		=	'issinfoservice@pricon.ph';
 				$cc			=	'';
 				$subject	=	"For DCC Conformance";
-				return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
+				// return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
 				print_r($document_details);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -335,6 +335,7 @@ use Handler\DocuReviewDisposition;
 				case "save_approver_decision" 						: save_approver_decision(); break; 
 				case "read_doc_review_masterlist" 					: read_doc_review_masterlist(); break; 
 				case "advanced_search" 								: advanced_search(); break; 
+				case "dcc_review_again" 							: dcc_review_again(); break; 
 			}	
 		}
 	}
@@ -344,7 +345,7 @@ use Handler\DocuReviewDisposition;
 	}
 	/*
 		TODO: Enable ACDCS Email format DCC to Process owner with table of data 
-		TODO: Enable the Email to PO and Approvers | FIND: EmailDetail:: Mailer::getInstance()
+		// TODO: Enable the Email to PO and Approvers | FIND: EmailDetail:: Mailer::getInstance()
 		* nedit
 	*/
 	function create_disposition_details()
@@ -479,7 +480,8 @@ use Handler\DocuReviewDisposition;
 		}
 	}
 
-	function edit_disposition_details(){
+	function edit_disposition_details()
+	{
 		try {
 			require_once('../class/oop_acdcs.php');
 
@@ -709,6 +711,27 @@ use Handler\DocuReviewDisposition;
 		} catch (\Throwable $th) {
 			throw $th;
 		}
+	}
+
+	function dcc_review_again(){
+		require_once('../class/oop_acdcs.php');
+		try {
+			$return = $_POST;
+			foreach ($return['doc_review_masterlist_id'] as $key => $arr_masterlist_id) {
+				$table = ' tbl_doc_review_masterlist';
+				$array_fields = array('document_status');
+				$array_values = array(5);
+				$where = ' WHERE id = '.$arr_masterlist_id.' ';
+				$script = ACDCS::getInstance()->update_query_script($table,$array_fields,$array_values,$where);
+				$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
+			}
+			$response['is_success'] = 'true';
+			$response['msg'] = 'Saved Successfully';
+			echo json_encode($response);
+		} catch (\Throwable $th) {
+			throw $th;
+		}
+		
 	}
 
 	function Slug($string, $slug = '-', $extra = null)
