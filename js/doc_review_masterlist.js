@@ -72,3 +72,22 @@ function dispositionStatus($formId,disposition){
     }
 }
 
+function readTemporaryReviewDocu(dataId){
+    let data = {'action':'read_temporary_review_docu','temporary_document_id':dataId}
+
+    call_ajax(data, masterlist_temporary_handler,function(result){
+        console.log(result);
+        $('#modalDocReviewDisposition').modal();
+    })
+}
+
+function changeEventDisposition($formId,disposition){
+    $formId.find('#person_in_charge').empty()
+    $formId.find('#due_date').val('')
+    $formId.find('#extension_date').val('')
+    $formId.find('#file_memo').val('')
+    dispositionStatus($formId,disposition);
+}
+
+     
+

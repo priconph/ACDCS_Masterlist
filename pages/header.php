@@ -86,20 +86,6 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 	<aside class="sidebar">
 		<ul class="sidebar-nav">
 			<li class="active" link-id="dashboard"><a href="#dashboard" data-toggle="tab"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
-			<?php 
-				/*omodify
-				Check if there is a read role on one IQC modules
-				$user_iqc_read_access = false;
-				foreach($user_role['subsystem_code'] as $key => $subsystem_code ){
-					if($subsystem_code == "IQC" && $user_role['read'][$key] == 1){
-						$user_iqc_read_access = true;
-					}
-				}
-				if( $user_iqc_read_access ){
-					echo '<li id="li_iqc"><a href="#" data-toggle="tab"><i class="fa fa-puzzle-piece"></i> <span>IQC</span></a></li>';
-				}
-				*/
-			?>
 		</ul>
 	</aside>
 	<!-- <script src="./js/common_functions.js?n=4324234"></script> -->

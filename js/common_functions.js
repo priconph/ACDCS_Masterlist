@@ -19,7 +19,7 @@ function call_ajax(data, handler, fn) {
 			$('#my-loading').removeClass('my-loading');
 		},
 		error: function (result) {
-			alert('ERROR: '+result['upload_msg']+'Please contact the ISS !');
+			alert('ERROR: Please contact the ISS !');
 			$('#my-loading-state').removeClass('my-loading-state');
 			$('#my-loading').removeClass('my-loading');
 		}
@@ -39,12 +39,11 @@ function call_ajax_serialize(data, serialized_data, handler, fn) {
 		},
 		success: function (result) {
 			fn(result);
-			//156874
 			$('#my-loading-state').removeClass('my-loading-state');
 			$('#my-loading').removeClass('my-loading');
 		},
 		error: function (result) {
-			alert('ERROR: '+result['upload_msg']+'Please contact the ISS !');
+			alert('ERROR: Please contact the ISS !');
 			$('#my-loading-state').removeClass('my-loading-state');
 			$('#my-loading').removeClass('my-loading');
 		}
@@ -69,7 +68,7 @@ function call_ajax_attachment(serialized_data, handler, fn) {
 			$('#my-loading-state').removeClass('my-loading-state');
 			$('#my-loading').removeClass('my-loading');
 		}, error : function (result) {
-			alert('ERROR: '+result['upload_msg']+'Please contact the ISS !');
+			alert('ERROR: Please contact the ISS !');
 			$('#my-loading-state').removeClass('my-loading-state');
 			$('#my-loading').removeClass('my-loading');
 		}

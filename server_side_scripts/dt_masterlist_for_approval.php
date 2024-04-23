@@ -209,7 +209,7 @@
 	$sWhere .= '(masterlist.deleted_at IS NULL AND masterlist.document_status = 2)';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	$sWhere .= ' AND (approval.deleted_at IS NULL AND approval.sec_heads_username= "'.$_GET['username'].'" AND approval.status = 0 )';
-	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
+	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0) OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0))';
 
     
 	// $sWhere .= " `status` = 0 OR `status` = 2 OR `status` = 8 OR `status` = 'A' AND `logdel` = 0";
