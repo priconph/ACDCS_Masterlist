@@ -22,7 +22,6 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-
 <!---------------------
 	Modals - View Review 
 ---------------------->
@@ -137,12 +136,6 @@
 </div><!-- /.modal -->
 
 
-
-
-<!---------------------
-	Modals - Start 
----------------------->
-
 <!-- Modal for DCC -->
 <div class="modal fade" tabindex="-1" role="dialog" id="modalAdvanceSearch">
   <div class="modal-dialog modal-sm" role="document">
@@ -222,11 +215,6 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!-- Modal Modal Alert  #modal_alert-->
-<?php
-	include_once('pages/components/modal.php');
-?>
-
 <!---------------------
 	Modals - Add Review 
 ---------------------->
@@ -301,6 +289,3 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!---------------------
-	Modals - View Review  - #formDocReviewDisposition
----------------------->
