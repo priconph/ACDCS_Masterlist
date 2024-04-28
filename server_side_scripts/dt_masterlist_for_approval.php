@@ -217,6 +217,14 @@
 	 * SQL queries
 	 * Get data to display
 	 */
+	$script = "
+		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
+		FROM   $sTable
+		$sJoin
+		$sWhere
+		$sOrder
+		$sLimit
+	";
 	$sQuery = "
 		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
 		FROM   $sTable
@@ -257,6 +265,7 @@
 		"iTotalRecords" => $iTotal,
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
+		"script" => array(),
 	);
 
 	
@@ -277,7 +286,7 @@
 		// $row[]= $aRow['id'];
 		// $row[]= $getActiveDocumentById['fkid_document'];
 		// $row[]= '<center> '.$status.' </center>';
-		$row[]= '<center> <span class="badge highlight-color-green">' .$disposition. '</span> </center>';
+		$row[]= '<center>  '.$disposition.' </center>';
 		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
 		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
 		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
@@ -295,7 +304,4 @@
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
-	/* 
-		Functions 
-	*/
 ?>

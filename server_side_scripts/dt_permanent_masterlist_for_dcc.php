@@ -26,13 +26,6 @@
 	ini_set('display_errors', 1);
     
 	$aColumns = array(
-		'obsolete.expiration_date AS obsolete_expiration_date',
-		'obsolete.date_received AS obsolete_date_received',
-		'obsolete.model AS obsolete_model',
-		'obsolete.doc_title AS obsolete_doc_title',
-		'obsolete.doc_no AS obsolete_doc_no',
-		'obsolete.rev_no AS obsolete_rev_no',
-		'obsolete.effectivity_date AS obsolete_effectivity_date',
 		'active.expiration_date',
 		'masterlist.id',
 		'masterlist.fkid_document',
@@ -48,17 +41,11 @@
 		'masterlist.originator_code',
 		'disposition.reviewed_by',
 		'disposition.disposition',
+		'disposition.dcc_email',
 	);
 	/* used this field for searching data typed in the search box */
 
 	$array_search = array(
-		'obsolete.date_received',
-		'obsolete.model',
-		'obsolete.doc_title',
-		'obsolete.doc_no',
-		'obsolete.rev_no',
-		'obsolete.effectivity_date',
-		'obsolete.expiration_date',
 		'active.date_received',
 		'active.model',
 	 	'active.doc_title',
@@ -67,6 +54,7 @@
 	 	'active.effectivity_date',
 	 	'active.expiration_date',
 	 	'masterlist.originator_code',
+		'disposition.dcc_email',
 	);
 							
 	/* Indexed column (used for fast and accurate table cardinality) */
@@ -216,10 +204,11 @@
 		$sWhere .= "AND ";
 	}
 	/* Default WHERE query without search inputs */
-	$sWhere .= 'masterlist.deleted_at IS NULL AND masterlist.document_status = 3'; //
+	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
+	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
+	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status = 3 AND masterlist.is_expiration_date_exist = "false")';
 	$sWhere .= ' AND disposition.deleted_at IS NULL'; //
-	// $sWhere .= '( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
-	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date ="") OR (obsolete.`logdel` = 0 AND obsolete.expiration_date =""))';
+	$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""';
 
 	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
@@ -316,7 +305,7 @@
 				$button = '';
             	$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnReviewAgain" class="btn btn-sm btn-primary fa fa-edit" type="button">Review Again</button></center> <br>';
             	$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
-				$status = '<span class="badge highlight-color-blue">DCC CONFORMANCE</span>';
+				$status = '<span class="badge highlight-color-blue">FOR DCC CONFORMANCE</span>';
 				break;
 			default:
 				$button = '';
@@ -326,49 +315,23 @@
 		
 		/* Disposition */
 		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
-		switch ($arr_doc_review_disposition['disposition']) {
-                case 1:
-                    $doc_review_disposition = 'Revision';
-                    break;
-                case 2:
-                    $doc_review_disposition = 'Retain';
-                    break;
-                case 3:
-                    $doc_review_disposition = '<span class="badge highlight-color-red">Obsolete</span>';
-                    break;
-                case 4:
-                    $doc_review_disposition = 'Extended';
-                    break;
-                default:
-                    $doc_review_disposition = '';
-                    break;
-        }
-		/* 
-			TODO: check if dcc need to have checked box to approved then transfer to REVIEWED TABLE 
-		*/
+		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
+		
 		// $row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
 		$row[]= $button;
-		// $row[]= $aRow['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
-		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
-		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
-		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
-		$row[]= ( $aRow['doc_no'] != NULL ) ? 
-					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>'  :
-					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
-		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
-		$row[]= ( $aRow['originator_code'] != NULL ) ? 
-					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
-					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
-					$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
-					$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];
-		// $row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
-		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : '<span class="badge highlight-color-red">OBSOLETE</span>';
+		$row[]= $aRow['date_received'];
+		$row[]= $aRow['model'] ;
+		$row[]= $aRow['doc_title'];
+		$row[]= '<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>';
+		$row[]= $aRow['rev_no'];
+		$row[]='<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>';
+		$row[]= $aRow['effectivity_date'];
+		$row[]= $aRow['expiration_date'];
+		$row[]= '<center> ' .$aRow['dcc_email'] !=NULL ? date('Y-m-d',strtotime($aRow['dcc_email'])) : "" . ' </center>';
+		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
-	/* 
-		Functions 
-	*/
 ?>

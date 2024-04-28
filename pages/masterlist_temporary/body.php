@@ -32,6 +32,9 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 									<li class="nav-item">
 										<a class="nav-link" data-toggle="tab" href="#menu3">Reviewed Tab</a>
 									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#menu4">Obsolete Tab</a>
+									</li>
 								';
 								$dcc_active = 'active';
 								$process_owner_active = '';
@@ -51,8 +54,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 				</div>
 				<!-- Tab content -->
 				<div class="tab-content">
-					<!-- <div role="tabpanel" id="menu1" class="tab-pane <?php echo $dcc_active?>"><br> -->
-					<div role="tabpanel" id="menu1" class="tab-pane"><br>
+					<div role="tabpanel" id="menu1" class="tab-pane <?php echo $dcc_active?>"><br>
 						<div class="col-sm-12">
 						<div class="panel panel-success" style="overflow:scroll;">
 							<div class="panel-heading"><i class="fa fa-file fa-lg"> Pending</i></div>
@@ -63,8 +65,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 							</div>
 						</div> <!--end div panel info -->
 					</div> <!--end tabpanel-->
-					<!-- <div role="tabpanel" id="menu2" class="tab-pane <?php echo $process_owner_active?>"><br> -->
-					<div role="tabpanel" id="menu2" class="tab-pane"><br>
+					<div role="tabpanel" id="menu2" class="tab-pane <?php echo $process_owner_active?>"><br>
 						<div class="col-sm-12">
 							<div class="panel panel-success" style="overflow:scroll;">
 							<div class="panel-heading"><i class="fa fa-file fa-lg"> For Review</i></div>
@@ -109,6 +110,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 													<th>Orignator Code</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th>
+													<th>DCC Reviewed Date</th>
 													<th>Active/Obsolete</th>
 													<!--<th>Document Type</th>
 													<th>Expiration Date</th> -->
@@ -154,7 +156,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 							</div>
 						</div> 
 					</div>
-					<div role="tabpanel" id="menu3" class="tab-pane active"><br>
+					<div role="tabpanel" id="menu3" class="tab-pane"><br>
 						<div class="col-sm-12">
 							<div class="panel panel-success" style="overflow:scroll;">
 							<div class="panel-heading"><i class="fa fa-file fa-lg"> Reviewed Tab</i></div>
@@ -190,6 +192,39 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 													<th>Orignator Code</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th>
+													<th>DCC Reviewed Date</th>
+													<th>Active/Obsolete</th>
+													<!--<th>Document Type</th> -->
+												</tr>
+											</thead>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div> 
+					</div>
+					<div role="tabpanel" id="menu4" class="tab-pane"><br>
+						<div class="col-sm-12">
+							<div class="panel panel-success" style="overflow:scroll;">
+							<div class="panel-heading"><i class="fa fa-file fa-lg">Obsolete Tab</i></div>
+							<div class="panel-body">
+									<div class="col-sm-12">
+										<table class="table table-condensed table-bordered table-responsive" id="tbl_masterlist_temporary_obsolete">
+											<thead>
+												<tr>
+													<!-- <th></th> -->
+													<th><span class="fa fa-cogs"></span></th>
+													<th>Document Status</th>
+													<th>Disposition</th>
+													<th>Date Received</th>
+													<th>Model</th>
+													<th>Title</th>
+													<th>Document No.</th>
+													<th>Rev No.</th>
+													<th>Orignator Code</th>
+													<th>Effectivity Date</th>
+													<th>Expiration Date</th>
+													<th>DCC Reviewed Date</th>
 													<th>Active/Obsolete</th>
 													<!--<th>Document Type</th> -->
 												</tr>
@@ -234,6 +269,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		var $formDocReviewDisposition = $('#formDocReviewDisposition');
 		var $formAdvanceSearch = $('#formAdvanceSearch');
 		var tbl_masterlist_temporary_for_dcc = 'tbl_masterlist_temporary_for_dcc';
+		var tbl_masterlist_temporary_obsolete = 'tbl_masterlist_temporary_obsolete';
 		/* DataTables */
 		var dt_masterlist_temporary = $(tbl_masterlist_temporary).DataTable({
 			"aaSorting"	: [],
@@ -248,6 +284,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 				$(tbl_masterlist_temporary).attr('style','width:100%;')
 			}
 		});
+		
 		var dt_masterlist_temporary_for_dcc = $('#tbl_masterlist_temporary_for_dcc').DataTable({
 			"aaSorting"	: [],
 			"bProcessing": true,
@@ -259,6 +296,19 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 			"ordering":false,
 			"drawCallback": function( settings ) {
 				$('#tbl_masterlist_temporary_for_dcc').attr('style','width:100%;')
+			}
+		});
+		var dt_masterlist_temporary_obsolete = $('#'+tbl_masterlist_temporary_obsolete).DataTable({
+			"aaSorting"	: [],
+			"bProcessing": true,
+			"bServerSide": true,
+			"sAjaxSource": "server_side_scripts/dt_masterlist_temporary_obsolete.php?username="+"<?php echo $_SESSION['username'];?>",
+			"columnDefs":[
+				{"orderable":false,"targets":[0]}
+			],
+			"ordering":false,
+			"drawCallback": function( settings ) {
+				$('#'+tbl_masterlist_temporary_obsolete).attr('style','width:100%;')
 			}
 		});
 		
@@ -308,7 +358,13 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 									window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_obsolete?doc_no="+doc_no);
 		});
 		
-		$('#tbl_masterlist_temporary_for_dcc').on('click','#btnSearchDocNum', function () {
+		$(tbl_masterlist_temporary).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
+		
+		$(tbl_masterlist_temporary).on('click','#btnEditDocReviewDisposition' ,getDocReviewDisposition);
+
+		$('#'+tbl_masterlist_temporary_obsolete).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
+
+		$('#'+tbl_masterlist_temporary_for_dcc).on('click','#btnSearchDocNum', function () {
 			let doc_no = $(this).attr('doc-no');
 			let doc_type = $(this).attr('doc-type');
 
@@ -316,22 +372,20 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 									window.open("http://rapid/ACDCS/prdn_home_acdcs_masterlist_obsolete?doc_no="+doc_no);
 		});
 
-		$(tbl_masterlist_temporary).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
-		
-		$(tbl_masterlist_temporary).on('click','#btnEditDocReviewDisposition' ,getDocReviewDisposition);
+		$('#'+tbl_masterlist_temporary_for_dcc).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
 
-		$('#tbl_masterlist_temporary_for_dcc').on('click','#btnReviewAgain' , function () {
+		$('#'+tbl_masterlist_temporary_for_dcc).on('click','#btnReviewAgain' , function () {
 			let doc_review_masterlist_id = $(this).attr('data-id');
 			arr_dcc_review_again_masterlist_id.push(doc_review_masterlist_id);
 			$('#modal_dcc_review_again').modal();
 		});
+		
 		$('#yes_dcc_review_again').click(function (e) { 
 			e.preventDefault();
 			dccReviewAgain(arr_dcc_review_again_masterlist_id);
 			
 		});
 
-		$('#tbl_masterlist_temporary_for_dcc').on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
 		
 		$('#btnBatchApproval').click(function (e) { 
 			e.preventDefault();
@@ -356,6 +410,10 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		$('a').click(function (e) { 
 			( $(this).attr('href') === '#menu2' ) ? dt_masterlist_temporary.draw() : '';
 			( $(this).attr('href') === '#menu3' ) ? dt_masterlist_temporary_for_dcc.draw() : '';
+			( $(this).attr('href') === '#menu4' ) ? dt_masterlist_temporary_obsolete.draw() : '';
+
+
+
 		});
 
 		$('#link_file_memo').click(function (e) { 
@@ -429,11 +487,12 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		*************************** */
 		$('#modalReviewDocu').on('hidden.bs.modal', function (e) {
 			$formReviewDocu[0].reset()
-			$('#sec_heads_username').empty()
-			$('#person_in_charge').empty()
-			$('#isRevisionRow').hide()
-			$('#isExtension').hide()
+			$formReviewDocu.find('#sec_heads_username').empty()
+			$formReviewDocu.find('#person_in_charge').empty()
+			$formReviewDocu.find('#isRevisionRow').hide()
+			$formReviewDocu.find('#isExtension').hide()
 		});
+		
 		$('#modalAdvanceSearch').on('hidden.bs.modal', function (e) {
 			$('#expiration_date_from_to').val('');
 		});

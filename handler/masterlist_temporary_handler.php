@@ -36,9 +36,7 @@ use Handler\DocuReviewDisposition;
 		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
 	/*
-		TODO: Enable ACDCS Email format DCC to Process owner with table of data 
-		// TODO: Enable the Email to PO and Approvers | FIND: EmailDetail:: Mailer::getInstance()
-		* nedit
+		TODO: Enable the Email to PO and Approvers | FIND: EmailDetail:: Mailer::getInstance()
 	*/
 	
 	function create_disposition_details()
@@ -59,10 +57,9 @@ use Handler\DocuReviewDisposition;
 			$doc_review_masterlist_id = $return['doc_review_masterlist_id'];
 			
 			$doc_review_masterlist = $common_class->docReviewMasterlist($doc_review_masterlist_id);
-			$dcc_emailed_at = $doc_review_masterlist['created_at'];
+			$dcc_emailed_at = $doc_review_masterlist['updated_at']; //NOTE: When DCC Email the For Review Document
 			$new_status = 2;
 			$table = 'tbl_doc_review_disposition';
-			
 			/* Get the document disposition then delete the previous disposition to count as review history */
 			$get_doc_review_disposition_descending_id =  DocReviewDisposition::getDocReviewDispositionDescending($doc_review_masterlist_id);
 			if( $get_doc_review_disposition_descending_id['is_exist'] == 1 ){
@@ -454,6 +451,7 @@ use Handler\DocuReviewDisposition;
 				$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 				while($row = mysqli_fetch_array($query)){
 					$request['created_at'] = $row['created_at'];
+					$request['updated_at'] = $row['updated_at'];
 					$request['fkid_document'] = $row['fkid_document'];
 				}
 				return $request;
@@ -594,7 +592,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				// $message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
 				$message .= 'Due Date 			: '.$get_doc_review_disposition_by_id['due_date'].'<br>';
-				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 				// print_r($message);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -657,7 +655,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
-				// return EmailDetail::send_email($to, $from, $cc, $subject, $message);
+				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 				// print_r($message);
 			} catch (\Throwable $th) {
 				throw $th;
@@ -711,7 +709,7 @@ use Handler\DocuReviewDisposition;
 				$from		=	'issinfoservice@pricon.ph';
 				$cc			=	'';
 				$subject	=	"For DCC Conformance";
-				// return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
+				return EmailDetail::send_email_with_table($to, $from, $cc, $subject, $document_details);
 				// print_r($document_details);
 			} catch (\Throwable $th) {
 				throw $th;
