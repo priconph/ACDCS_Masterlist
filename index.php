@@ -7,6 +7,7 @@ if( isset($_GET['page']) ){
 	switch($page){
 		case "dashboard" 		: $page_link = 'pages/dashboard/index.php'; break;
 		case "temporaryDocu" 	: $page_link = 'pages/masterlist_temporary/index.php'; break;
+		case "permanentDocu" 	: $page_link = 'pages/masterlist_permanent/index.php'; break;
 		case "forApproval" 		: $page_link = 'pages/for_approval_document/index.php'; break;
 		default 				: $page_link = 'pages/redirect_page/index.php';
 	}

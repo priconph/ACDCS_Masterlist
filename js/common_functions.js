@@ -1,250 +1,276 @@
-/* Note: you need to call jquery or other library for these to work */
-var handler_common_handler		= "handler/handler_common_handler.php";
+// $(document).ready(function () {
+	/* Note: you need to call jquery or other library for these to work */
+	var handler_common_handler		= "handler/handler_common_handler.php";
 
-/* Call basic ajax for submit */
-function call_ajax(data, handler, fn) {
-	data = $.param(data);
-	$.ajax({
-		type: "post",
-		dataType: "json",
-		data: data,
-		url: handler,
-		beforeSend:function (result){
-			$('#my-loading-state').addClass('my-loading-state');
-			$('#my-loading').addClass('my-loading');
-		},
-		success: function (result) {
-			fn(result);
-			$('#my-loading-state').removeClass('my-loading-state');
-			$('#my-loading').removeClass('my-loading');
-		},
-		error: function (result) {
-			alert('ERROR: '+result['upload_msg']+'Please contact the ISS !');
-			$('#my-loading-state').removeClass('my-loading-state');
-			$('#my-loading').removeClass('my-loading');
-		}
-	});
-}
-
-function call_ajax_serialize(data, serialized_data, handler, fn) {
-	data = $.param(data) + '&' + serialized_data;
-	$.ajax({
-		type: "post",
-		dataType: "json",
-		data: data,
-		url: handler,
-		beforeSend:function (result){
-			$('#my-loading-state').addClass('my-loading-state');
-			$('#my-loading').addClass('my-loading');
-		},
-		success: function (result) {
-			fn(result);
-			//156874
-			$('#my-loading-state').removeClass('my-loading-state');
-			$('#my-loading').removeClass('my-loading');
-		},
-		error: function (result) {
-			alert('ERROR: '+result['upload_msg']+'Please contact the ISS !');
-			$('#my-loading-state').removeClass('my-loading-state');
-			$('#my-loading').removeClass('my-loading');
-		}
-	});
-}
-
-function call_ajax_attachment(serialized_data, handler, fn) {
-	$.ajax({
-		url				: handler, 		
-		type			: "POST",          
-		data			: serialized_data, 
-		contentType		: false,       
-		dataType		: 'json',
-		cache			: false,             
-		processData		: false,   
-		beforeSend:function (result){
-			$('#my-loading-state').addClass('my-loading-state');
-			$('#my-loading').addClass('my-loading');
-		},
-		success	: function(result){
-			fn(result);
-			$('#my-loading-state').removeClass('my-loading-state');
-			$('#my-loading').removeClass('my-loading');
-		}, error : function (result) {
-			alert('ERROR: '+result['upload_msg']+'Please contact the ISS !');
-			$('#my-loading-state').removeClass('my-loading-state');
-			$('#my-loading').removeClass('my-loading');
-		}
-	}); 
-}
-
-
-function create_table(table_id, table_class, array_theader, array_tbody) {
-	var html = '<table id="' + table_id + '" class="' + table_class + '">';
-	/* Generate table header */
-	html += '	<thead>';
-	for(x=0;x<array_theader.length;x++){
-		html += '	<th>' + array_theader[x] + '</th>';
+	/* Call basic ajax for submit */
+	function call_ajax(data, handler, fn) {
+		data = $.param(data);
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			data: data,
+			url: handler,
+			beforeSend:function (result){
+				$('#my-loading-state').addClass('my-loading-state');
+				$('#my-loading').addClass('my-loading');
+			},
+			success: function (result) {
+				fn(result);
+				$('#my-loading-state').removeClass('my-loading-state');
+				$('#my-loading').removeClass('my-loading');
+			},
+			error: function (result) {
+				alert('ERROR: Please contact the ISS !');
+				$('#my-loading-state').removeClass('my-loading-state');
+				$('#my-loading').removeClass('my-loading');
+			}
+		});
 	}
-	html += '	</thead>'
-	/* Generate table body */
-	html += '	<tbody>';
-	for(x=0;x<array_theader.length;x++){
-		html += '	<td>' + array_tbody[x] + '</td>';
+
+	function call_ajax_serialize(data, serialized_data, handler, fn) {
+		data = $.param(data) + '&' + serialized_data;
+		$.ajax({
+			type: "post",
+			dataType: "json",
+			data: data,
+			url: handler,
+			beforeSend:function (result){
+				$('#my-loading-state').addClass('my-loading-state');
+				$('#my-loading').addClass('my-loading');
+			},
+			success: function (result) {
+				fn(result);
+				$('#my-loading-state').removeClass('my-loading-state');
+				$('#my-loading').removeClass('my-loading');
+			},
+			error: function (result) {
+				alert('ERROR: Please contact the ISS !');
+				$('#my-loading-state').removeClass('my-loading-state');
+				$('#my-loading').removeClass('my-loading');
+			}
+		});
 	}
-	html += '	</tbody>';
-	html += '</table>';
-	return html;
-}
 
-function table_loading_screen(tbl_id,colspan){
-	var html  = '<tr>';
-		html += ' <td colspan="'+colspan+'"><center><span class="fa fa-4x fa-circle-o-notch fa-spin"></span> <h3>Loading.....</h3></center></td>'; 
-		html += '</tr>';
-	$('#'+tbl_id + ' tbody').empty();
-	$('#'+tbl_id + ' tbody').append( html );
-}
+	function call_ajax_attachment(serialized_data, handler, fn) {
+		$.ajax({
+			url				: handler, 		
+			type			: "POST",          
+			data			: serialized_data, 
+			contentType		: false,       
+			dataType		: 'json',
+			cache			: false,             
+			processData		: false,   
+			beforeSend:function (result){
+				$('#my-loading-state').addClass('my-loading-state');
+				$('#my-loading').addClass('my-loading');
+			},
+			success	: function(result){
+				fn(result);
+				$('#my-loading-state').removeClass('my-loading-state');
+				$('#my-loading').removeClass('my-loading');
+			}, error : function (result) {
+				alert('ERROR: Please contact the ISS !');
+				$('#my-loading-state').removeClass('my-loading-state');
+				$('#my-loading').removeClass('my-loading');
+			}
+		}); 
+	}
 
-function fn_system_message_timer(system_message_id){
-	var counter = 5;
-	$('#'+system_message_id+' .modal-footer #div_countdown').empty();
-	$('#'+system_message_id+' .modal-footer #div_countdown').append("System message will automatically close in "+counter+"...");
-	var interval = setInterval(function() {
-		counter--;
-		/* Display 'counter' wherever you want to display it */
+
+	function create_table(table_id, table_class, array_theader, array_tbody) {
+		var html = '<table id="' + table_id + '" class="' + table_class + '">';
+		/* Generate table header */
+		html += '	<thead>';
+		for(x=0;x<array_theader.length;x++){
+			html += '	<th>' + array_theader[x] + '</th>';
+		}
+		html += '	</thead>'
+		/* Generate table body */
+		html += '	<tbody>';
+		for(x=0;x<array_theader.length;x++){
+			html += '	<td>' + array_tbody[x] + '</td>';
+		}
+		html += '	</tbody>';
+		html += '</table>';
+		return html;
+	}
+
+	function table_loading_screen(tbl_id,colspan){
+		var html  = '<tr>';
+			html += ' <td colspan="'+colspan+'"><center><span class="fa fa-4x fa-circle-o-notch fa-spin"></span> <h3>Loading.....</h3></center></td>'; 
+			html += '</tr>';
+		$('#'+tbl_id + ' tbody').empty();
+		$('#'+tbl_id + ' tbody').append( html );
+	}
+
+	function fn_system_message_timer(system_message_id){
+		var counter = 5;
 		$('#'+system_message_id+' .modal-footer #div_countdown').empty();
 		$('#'+system_message_id+' .modal-footer #div_countdown').append("System message will automatically close in "+counter+"...");
-		if (counter == 0) {
-			/* Clear counter */
-			clearInterval(interval);
+		var interval = setInterval(function() {
+			counter--;
+			/* Display 'counter' wherever you want to display it */
 			$('#'+system_message_id+' .modal-footer #div_countdown').empty();
-			/* 
-				Close all the modal with ID that starts with modal_ and ends with _system message
-				Regex Used:
-				div[id^=modal_][id$=_system_message]
-			*/
-			$('div[id^=modal_][id$=_system_message]').modal('hide');
-		}
-	}, 1000);
-}
+			$('#'+system_message_id+' .modal-footer #div_countdown').append("System message will automatically close in "+counter+"...");
+			if (counter == 0) {
+				/* Clear counter */
+				clearInterval(interval);
+				$('#'+system_message_id+' .modal-footer #div_countdown').empty();
+				/* 
+					Close all the modal with ID that starts with modal_ and ends with _system message
+					Regex Used:
+					div[id^=modal_][id$=_system_message]
+				*/
+				$('div[id^=modal_][id$=_system_message]').modal('hide');
+			}
+		}, 1000);
+	}
 
-function assign_value_select2(combo_id,data_value){
-	$(combo_id).select2({
-		data : data_value
-	});
-	var username_array = [];
-	$.each(data_value, function(key, value){
-		username_array.push(value['id']);
-	});
-	$(combo_id).val(username_array).trigger('change');
-	console.log(data_value);
-	
-}
+	function assign_value_select2(combo_id,data_value){
+		$(combo_id).select2({
+			data : data_value
+		});
+		var username_array = [];
+		$.each(data_value, function(key, value){
+			username_array.push(value['id']);
+		});
+		$(combo_id).val(username_array).trigger('change');
+		console.log(data_value);
+		
+	}
 
-function re_initialize_select2_server_side(combo_id,dropdown_parent,data_value,ajax_url){
-	$(combo_id).select2({
-		dropdownParent	: $(dropdown_parent),
-		minimumInputLength: 2,
-		triggerChange: true,
-		allowClear: true,
-		placeholder: {
-			id: "",
-			placeholder: "Leave blank to ..."
-		},
-		ajax: {
-		url: ajax_url,
-			dataType: 'json',
-			delay: 100,
-			data: function (params) {
-				return {
-					q: params.term, // search term
-				};
+	function re_initialize_select2_server_side(combo_id,dropdown_parent,data_value,ajax_url){
+		$(combo_id).select2({
+			dropdownParent	: $(dropdown_parent),
+			minimumInputLength: 2,
+			triggerChange: true,
+			allowClear: true,
+			placeholder: {
+				id: "",
+				placeholder: "Leave blank to ..."
 			},
-			processResults: function (data) {
-				return {
-					/* get the json encode data data[id => [], text => []] */
-					results: data
-				};
-			},
-			cache: true
+			ajax: {
+			url: ajax_url,
+				dataType: 'json',
+				delay: 100,
+				data: function (params) {
+					return {
+						q: params.term, // search term
+					};
+				},
+				processResults: function (data) {
+					return {
+						/* get the json encode data data[id => [], text => []] */
+						results: data
+					};
+				},
+				cache: true
+			}
+		});
+	}
+
+	/* 
+		Common Functions 
+	*/
+	function fn_get_emp_name_by_username(username, txt_id){
+		var data = {
+			"action"	: "get_emp_name_by_username2",
+			"username"	: username
 		}
-	});
-}
-
-/* 
-	Common Functions 
-*/
-function fn_get_emp_name_by_username(username, txt_id){
-	var data = {
-		"action"	: "get_emp_name_by_username2",
-		"username"	: username
+		call_ajax(data, handler_common_handler, function(result){
+			$('#'+txt_id).val(result['emp_name']);
+		});
 	}
-	call_ajax(data, handler_common_handler, function(result){
-		$('#'+txt_id).val(result['emp_name']);
-	});
-}
-function fn_get_emp_name_by_username_array(username_array, txt_id){
-	var data = {
-		"action"			: "get_emp_name_by_username_array",
-		"username_array"	: username_array
+	function fn_get_emp_name_by_username_array(username_array, txt_id){
+		var data = {
+			"action"			: "get_emp_name_by_username_array",
+			"username_array"	: username_array
+		}
+		call_ajax(data, handler_common_handler, function(result){
+			$('#'+txt_id).val(result['emp_name']);
+		});
 	}
-	call_ajax(data, handler_common_handler, function(result){
-		$('#'+txt_id).val(result['emp_name']);
-	});
-}
-/**
- * GetPageLink 
- * @param {*} linkId 
- */
+	/**
+	 * GetPageLink 
+	 * @param {*} linkId 
+	 */
 
-function fnGetPageLink(linkId){
-	var data = {
-		"action"	: "get_page_link",
-		"link_id"	: linkId
+	function fnGetPageLink(linkId){
+		var data = {
+			"action"	: "get_page_link",
+			"link_id"	: linkId
+		}
+		call_ajax(data, 'handler/route_handler.php', function (result) {
+			window.location.href = "index.php?page="+result['page'];
+		});
+		// link_handler
 	}
-	call_ajax(data, 'handler/route_handler.php', function (result) {
-		window.location.href = "index.php?page="+result['page'];
-	});
-	// link_handler
-}
 
-/* ***************************
-	End
-/****************************/
-/**
- * !Toaster Notification
- */
-function notif_success(data) {
-    notif({
-        type: "success",
-        msg: "<b>Success:</b> " + data,
-        type: "success",
-        position: "right",
-        timeout: 3000
-    });
-}
+	/* ***************************
+		End
+	/****************************/
+	/**
+	 * !Toaster Notification
+	 */
+	function notif_success(data) {
+		notif({
+			type: "success",
+			msg: "<b>Success:</b> " + data,
+			type: "success",
+			position: "right",
+			timeout: 3000
+		});
+	}
 
-function notif_warning(data) {
-    notif({
-        type: "warning",
-        msg: "<b>Warning:</b> " + data,
-        position: "right",
-        timeout: 3000
-    });
-}
+	function notif_warning(data) {
+		notif({
+			type: "warning",
+			msg: "<b>Warning:</b> " + data,
+			position: "right",
+			timeout: 3000
+		});
+	}
 
-function notif_info(data) {
-    notif({
-        type: "info",
-        msg: "<b>Info:</b> " + data,
-        position: "right",
-        timeout: 3000
-    });
-}
+	function notif_info(data) {
+		notif({
+			type: "info",
+			msg: "<b>Info:</b> " + data,
+			position: "right",
+			timeout: 3000
+		});
+	}
 
-function notif_err(data) {
-    notif({
-        type: "error",
-        msg: "<b>Error:</b> " + data,
-        position: "right",
-        timeout: 3000
-    });
-}
+	function notif_err(data) {
+		notif({
+			type: "error",
+			msg: "<b>Error:</b> " + data,
+			position: "right",
+			timeout: 3000
+		});
+	}
+
+	/* Date Range Picker */
+	function date_time_picker(id) {
+		$('#'+id).daterangepicker(
+				{
+					ranges: {
+						'Today': [moment(), moment()],
+						'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+						'Last 7 Days': [moment().subtract('days', 6), moment()],
+						'Last 30 Days': [moment().subtract('days', 29), moment()],
+						'This Month': [moment().startOf('month'), moment().endOf('month')],
+						'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+					},
+					startDate: moment().subtract('days', 29),
+					endDate: moment()
+				},
+			function(start, end) {
+				$('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+				if(id == "date_created_search_group") {
+					load_all_control_number_per_date_created('control_number_search_list_group','control_number_search',$('#date_created_search_group').val());
+				}
+			}
+		);
+		return false;
+	}
+// });

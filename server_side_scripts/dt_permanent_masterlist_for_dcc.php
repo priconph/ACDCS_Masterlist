@@ -1,3 +1,4 @@
+<?php
 	/*
 	 * Script:    DataTables server-side script for PHP and MySQL
 	 * Copyright: 2010 - Allan Jardine
@@ -11,13 +12,14 @@
 	/* Array of database columns which should be read and sent back to DataTables. Use a space where
 	 * you want to insert a non-database field (for example a counter or static image)
 	 */
+	// echo 
 	/* Model */
 	$database_config = '../db_config/config_acdcs.php';
 	$active_document_class = '../model/active_document.php';
-	$common_function_handler = '../handler/common_function_handler.php';
+	$doc_review_disposition_class = '../model/doc_review_disposition.php';
 
 
-	use Handler\DocuReviewDisposition;
+	use Model\DocReviewDisposition;
 	use Model\ActiveDocument;
 
 	error_reporting(E_ALL);
@@ -35,7 +37,11 @@
 		'active.doc_title',
 		'active.doc_no',
 		'active.rev_no',
+		'active.effectivity_date',
 		'masterlist.originator_code',
+		'disposition.reviewed_by',
+		'disposition.disposition',
+		'disposition.dcc_email',
 	);
 	/* used this field for searching data typed in the search box */
 
@@ -45,7 +51,10 @@
 	 	'active.doc_title',
 	 	'active.doc_no',
 	 	'active.rev_no',
+	 	'active.effectivity_date',
+	 	'active.expiration_date',
 	 	'masterlist.originator_code',
+		'disposition.dcc_email',
 	);
 							
 	/* Indexed column (used for fast and accurate table cardinality) */
@@ -54,27 +63,27 @@
 	/* DB table to use */
 	$sTable = "tbl_doc_review_masterlist masterlist";
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
-	
-
+	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
+	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
 
 	if(file_exists($database_config)){
 		require_once($database_config);
 	} else {
-		echo "config_acdcs does not exist!";
-		exit;
-	}
-
-	if(file_exists($common_function_handler)){
-		require_once($common_function_handler);
-	} else {
-		echo "common_function_handler file does not exist!";
+		echo "config file does not exist!";
 		exit;
 	}
 
 	if(file_exists($active_document_class)){
 		require_once($active_document_class);
 	} else {
-		echo "common_function_handler file does not exist!";
+		echo "active_document_class file does not exist!";
+		exit;
+	}
+
+	if(file_exists($doc_review_disposition_class)){
+		require_once($doc_review_disposition_class);
+	} else {
+		echo "doc_review_disposition_class file does not exist!";
 		exit;
 	}
 
@@ -134,7 +143,8 @@
 		}
 	}
 	if($sOrder == ""){
-		$sOrder = "ORDER BY masterlist.id DESC";
+		$sOrder = "ORDER BY masterlist.id ASC";
+		// $sOrder = "ORDER BY disposition.disposition ASC";
 	}
 
 	/* 
@@ -150,16 +160,14 @@
 	{
 		// $sWhere .= ')'; 
 		$sWhere = "WHERE (";
-		for ( $i=0 ; $i<count($aColumns) ; $i++ )
+		for ( $i=0 ; $i<count($array_search) ; $i++ )
 		{
-			if( in_array($aColumns[$i],$array_search) ){
-			$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
-			}
+			$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
 		}
 		$sWhere = substr_replace( $sWhere, "", -3 );
 		$sWhere .= ')';
 	}
-    
+
     /* The number of UI column is required to be equal to table column
         Ex. 5 db table column == 5 UI column. Uncomment the script below to show.
         echo json_encode($aColumns);
@@ -167,25 +175,24 @@
     */
 
 	/* Individual column filtering */
-	for ( $i=0 ; $i<count($array_search) ; $i++ )
-	{
-		//NOTE: $_GET['bSearchable_'.$i] accept only 11  $array_search
-		if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
-		{
-			if ( $sWhere == "" )
-			{
-				$sWhere = "WHERE ";
-			}
-			else
-			{
-				$sWhere .= " AND ";
-			}
-			$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
-		}
-	}
+	// for ( $i=0 ; $i<count($array_search) ; $i++ )
+	// {
+	// 	//NOTE: $_GET['bSearchable_'.$i] accept only 11  $array_search
+	// 	if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
+	// 	{
+	// 		if ( $sWhere == "" )
+	// 		{
+	// 			$sWhere = "WHERE ";
+	// 		}
+	// 		else
+	// 		{
+	// 			$sWhere .= " AND ";
+	// 		}
+	// 		$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
+			
+	// 	}
+	// }
 	
-
-
 	/* 
 		dito ka mag add ng where mo, una check mo kung may laman na yung $sWhere pag wala append mo yung where mo na meron
 		kasama where kapag naman may laman na AND na syempre diba :)
@@ -196,17 +203,23 @@
 	}else{
 		$sWhere .= "AND ";
 	}
-	/* NOTE: Cannot get nullable column so I add this mysql query 
-			 YEAR(active.expiration_date) BETWEEN 1970 AND '.date('Y').'
-	*/
-	// $sWhere .= '(active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date ="") AND masterlist.`deleted_at` IS NULL';
-	$sWhere .= '(active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") AND masterlist.`deleted_at` IS NULL';
-    
+	/* Default WHERE query without search inputs */
+	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
+	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
+	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status = 3 AND masterlist.is_expiration_date_exist = "false")';
+	$sWhere .= ' AND disposition.deleted_at IS NULL'; //
+	$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""';
+
+	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
+	if ( $_GET['sSearch'] == "" ){
+		// ilagay dito kung pwede based sa date, or customized advance search
+	}
+	
 	/*
 	 * SQL queries
 	 * Get data to display
 	 */
-	 $sQuery = "
+	$script = "
 		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
 		FROM   $sTable
 		$sJoin
@@ -214,7 +227,14 @@
 		$sOrder
 		$sLimit
 	";
-
+	$sQuery = "
+		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
+		FROM   $sTable
+		$sJoin
+		$sWhere
+		$sOrder
+		$sLimit
+	";
 	$rResult = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
 	
 	/* Data set length after filtering */
@@ -242,11 +262,12 @@
 		"iTotalRecords" => $iTotal,
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
+		"script" => $script,
 	);
 	/*
 		Class Object
 	*/
-	$request_doc_review_disposition = new DocuReviewDisposition;
+	$get_doc_review_disposition = new DocReviewDisposition;
 	$active_documents = new ActiveDocument;
 	
 	while ( $aRow = mysql_fetch_array( $rResult ) )
@@ -256,73 +277,61 @@
 
 		$doc_review_masterlist_id = $aRow['id'];
 		$fkid_document = $aRow['fkid_document'];
-	/* 
-		Button
-	*/
-        $getActiveDocumentById = $active_documents->getActiveDocumentById($fkid_document);
-		if($getActiveDocumentById['document_status'] == 1){
-			$button = '<center><button  data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-edit" type="button" style="background-color:yellow;color:black;"> Review</button></center>';
-        }else if($getActiveDocumentById['document_status'] == 2){
-            $button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnViewDetails" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
-        }else{
-			$button = '';
-		}
-	/* 
-		Document Status
-	*/
-		switch ($getActiveDocumentById['document_status']) {
+	
+		/* Document Status */
+		switch ($aRow['document_status']) {
+			case 0:
+				if($_GET['username'] == $aRow['reviewed_by']){
+					$button = '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center><br>';
+				}else{
+					$button = '';
+				}
+				$status = '<span class="badge highlight-color-red">DISAPPROVED</span>';
+				break;
 			case 1:
+				$button = '<center><button data-id="'.$doc_review_masterlist_id.'" id="btnReviewDocu" class="btn btn-sm fa fa-plus" type="button" style="background-color:yellow;color:black;"> Add Review</button></center>';
 				$status = '<span class="badge highlight-color-yellow">FOR REVIEW</span>';
-
 				break;
 			case 2:
+				if($_GET['username'] == $aRow['reviewed_by']){
+					$button = '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center><br>';
+				}else{
+					$button = '';
+				}
+				$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center> <br>';
 				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
 				break;
-			default:
-				# code...
-				$status = '<span class="badge highlight-color-blue">DCC CHECKING</span>';
-				break;
-		}
-
-	/* 
-		Disposition
-	*/
-		$arr_doc_review_disposition = $request_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
-		switch ($arr_doc_review_disposition['disposition']) {
-			case 1:
-				$doc_review_disposition = 'Revision';
-				break;
-			case 2:
-				$doc_review_disposition = 'Retain';
-				break;
 			case 3:
-				$doc_review_disposition = '<span class="">Obsolete';
-				break;
-			case 4:
-				$doc_review_disposition = 'Extended';
+				$button = '';
+            	$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnReviewAgain" class="btn btn-sm btn-primary fa fa-edit" type="button">Review Again</button></center> <br>';
+            	$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';
+				$status = '<span class="badge highlight-color-blue">FOR DCC CONFORMANCE</span>';
 				break;
 			default:
-				$doc_review_disposition = '';
+				$button = '';
+				$status = '<span class="badge highlight-color-gray">Unknown Status</span>';
 				break;
 		}
-		/**
-		 * TODO: check if dcc need to have checked box to approved then transfer to REVIEWED TABLE
-		*/
-		$row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
+		
+		/* Disposition */
+		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
+		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
+		
+		// $row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
 		$row[]= $button;
-		$row[]= $getActiveDocumentById['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
 		$row[]= $aRow['date_received'];
-		$row[]= $aRow['model'];
+		$row[]= $aRow['model'] ;
 		$row[]= $aRow['doc_title'];
-		$row[]= $aRow['doc_no'];
+		$row[]= '<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>';
 		$row[]= $aRow['rev_no'];
-		$row[]= $aRow['originator_code'];
+		$row[]='<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>';
+		$row[]= $aRow['effectivity_date'];
+		$row[]= $aRow['expiration_date'];
+		$row[]= '<center> ' .$aRow['dcc_email'] !=NULL ? date('Y-m-d',strtotime($aRow['dcc_email'])) : "" . ' </center>';
+		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
-	/* 
-		Functions 
-	*/
 ?>

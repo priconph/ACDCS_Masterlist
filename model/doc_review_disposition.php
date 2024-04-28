@@ -165,13 +165,13 @@ class DocReviewDisposition{
         try {
             switch ($disposition_code) {
                 case 1:
-                    return $doc_review_disposition = 'Revision';
+                    return $doc_review_disposition = '<span class="badge highlight-color-red">Revision</span>';
                     break;
                 case 2:
                     return $doc_review_disposition = 'Retain';
                     break;
                 case 3:
-                    return $doc_review_disposition = '<span class="">Obsolete';
+                    return $doc_review_disposition = '<span class="badge highlight-color-red">Obsolete</span>';
                     break;
                 case 4:
                     return $doc_review_disposition = 'Extended';

@@ -209,7 +209,7 @@
 	$sWhere .= '(masterlist.deleted_at IS NULL AND masterlist.document_status = 2)';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	$sWhere .= ' AND (approval.deleted_at IS NULL AND approval.sec_heads_username= "'.$_GET['username'].'" AND approval.status = 0 )';
-	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
+	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0) OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0))';
 
     
 	// $sWhere .= " `status` = 0 OR `status` = 2 OR `status` = 8 OR `status` = 'A' AND `logdel` = 0";
@@ -217,6 +217,14 @@
 	 * SQL queries
 	 * Get data to display
 	 */
+	$script = "
+		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
+		FROM   $sTable
+		$sJoin
+		$sWhere
+		$sOrder
+		$sLimit
+	";
 	$sQuery = "
 		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
 		FROM   $sTable
@@ -257,6 +265,7 @@
 		"iTotalRecords" => $iTotal,
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
+		"script" => array(),
 	);
 
 	
@@ -277,7 +286,7 @@
 		// $row[]= $aRow['id'];
 		// $row[]= $getActiveDocumentById['fkid_document'];
 		// $row[]= '<center> '.$status.' </center>';
-		$row[]= '<center> <span class="badge highlight-color-green">' .$disposition. '</span> </center>';
+		$row[]= '<center>  '.$disposition.' </center>';
 		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
 		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
 		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
@@ -295,7 +304,4 @@
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
-	/* 
-		Functions 
-	*/
 ?>
