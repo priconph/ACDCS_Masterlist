@@ -102,6 +102,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 													<th><span class="fa fa-cogs"></span></th>
 													<th>Document Status</th>
 													<th>Disposition</th>
+													<th>DCC Reviewed Date</th>
 													<th>Date Received</th>
 													<th>Model</th>
 													<th>Title</th>
@@ -110,7 +111,6 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 													<th>Orignator Code</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th>
-													<th>DCC Reviewed Date</th>
 													<th>Active/Obsolete</th>
 													<!--<th>Document Type</th>
 													<th>Expiration Date</th> -->
@@ -184,6 +184,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 													<th><span class="fa fa-cogs"></span></th>
 													<th>Document Status</th>
 													<th>Disposition</th>
+													<th>DCC Reviewed Date</th>
 													<th>Date Received</th>
 													<th>Model</th>
 													<th>Title</th>
@@ -192,7 +193,6 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 													<th>Orignator Code</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th>
-													<th>DCC Reviewed Date</th>
 													<th>Active/Obsolete</th>
 													<!--<th>Document Type</th> -->
 												</tr>
@@ -216,6 +216,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 													<th><span class="fa fa-cogs"></span></th>
 													<th>Document Status</th>
 													<th>Disposition</th>
+													<th>DCC Reviewed Date</th>
 													<th>Date Received</th>
 													<th>Model</th>
 													<th>Title</th>
@@ -224,7 +225,6 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 													<th>Orignator Code</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th>
-													<th>DCC Reviewed Date</th>
 													<th>Active/Obsolete</th>
 													<!--<th>Document Type</th> -->
 												</tr>
