@@ -88,8 +88,7 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 			<li class="active" link-id="dashboard"><a href="#dashboard" data-toggle="tab"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
 		</ul>
 	</aside>
-	<!-- <script src="./js/common_functions.js?n=4324234"></script> -->
-
+	<script src="./js/common_functions.js?n=4324234"></script>
 	<script>
 		var script_url = '';
 		var username = '<?php echo $_SESSION['username']?>';
@@ -104,6 +103,7 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 		
 		$('.sidebar li').click( function (){
 			let linkId = $(this).attr('link-id');
+			
 			fnGetPageLink(linkId);
 		});
 		

@@ -165,13 +165,12 @@
 		</section>
 	</section>
 </article>
-<script src="js/common_functions.js?1234"></script>
+<script src="js/common_functions.js?12345"></script>
 <script>
 	$(document).ready(function () {
 		$('a').click(function (e) { 
 			e.preventDefault();
 			let linkId = $(this).attr('link-id');
-
 			if(linkId != undefined){
 				fnGetPageLink(linkId)
 			}

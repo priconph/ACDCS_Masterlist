@@ -10,7 +10,6 @@
     var masterlist_temporary_handler = "handler/masterlist_temporary_handler.php";
     var $formDocReviewDisposition = $('#formDocReviewDisposition');
 
-
     function getDocReviewDisposition () {
         let doc_review_masterlist_id = $(this).attr('data-id');
         

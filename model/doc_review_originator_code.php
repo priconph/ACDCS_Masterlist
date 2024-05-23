@@ -3,7 +3,7 @@ namespace Model;
 
 use ACDCS;
 
-class DocReviewOriginatorCode{
+class DocReviewOriginatorCode {
     function getDeptIdById($department_id){
         if(file_exists('../class/oop_acdcs.php')) {
             require_once('../class/oop_acdcs.php');
@@ -30,6 +30,28 @@ class DocReviewOriginatorCode{
         $result			= ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
         while($row = mysqli_fetch_array($result)) {
             $return[] = $row['originator_code'];
+        }
+        return $return;
+    }
+    function getOriginatorCodeByDeptId($originator_code){
+        if(file_exists('../class/oop_acdcs.php')) {
+            require_once('../class/oop_acdcs.php');
+        } else {
+            require_once('../../class/oop_acdcs.php');
+        }
+        $return		= array();
+        $array_fields 	= array('`department_id`');
+        $table			= 'tbl_doc_review_originator_code';
+        $joins			= '';
+        $sql_where		= 'WHERE 1=1';
+        $sql_where		.= ' AND originator_code ="'.$originator_code.'" ';
+        $sql_order		= '';
+        $sql_limit		= '';
+        $html_select	= '';
+        $script			= ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+        $result			= ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+        while($row = mysqli_fetch_array($result)) {
+            $return[] = $row['department_id'];
         }
         return $return;
     }

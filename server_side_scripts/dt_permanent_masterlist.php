@@ -19,7 +19,6 @@
 	$doc_review_disposition_class = '../model/doc_review_disposition.php';
 	$user_name = $_GET['username'];
 
-
 	use Model\DocReviewDisposition;
 	use Model\ActiveDocument;
 

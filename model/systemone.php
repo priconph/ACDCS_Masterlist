@@ -88,12 +88,43 @@ class Hris {
 		$sql_order		= '';
 		$sql_limit		= 'LIMIT 0,1';
 		$html_select	= '';
+		$script			= SYSTEMONE::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 		$result			= SYSTEMONE::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 		if($row = mysqli_fetch_array($result)) {
 			$section = $row['Dept_id'];
 		}else{
 			$section = 'Username Not Found !';
-
+		}
+		return $section;
+	}
+	function getDepartmentByDeptId($arr_dept_id){
+		if(file_exists('../class/oop_acdcs.php')) {
+			require_once('../class/oop_acdcs.php');
+		} else {
+			require_once('../../class/oop_acdcs.php');
+		}
+		$section	=  array();
+		$arr_sql_or = array();
+		$array_fields 	= array('`pkid`,`Department`');
+		$table			= 'tbl_Department';
+		$joins			= '';
+		$sql_where		= 'WHERE 1=1';
+		foreach ($arr_dept_id as $key => $value) {
+			$arr_sql_or[] = ' `pkid` = "'.$arr_dept_id[$key].'" ';
+		}
+		if(count($arr_dept_id) == 1){
+			$sql_where 	.= ' AND `pkid` = "'.$arr_dept_id[0].'" ';
+		}else if(count($arr_dept_id) > 1){
+			$sql_or = implode(' OR',$arr_sql_or);
+			$sql_where 	.= ' AND '.$sql_or.'';
+		}
+		$sql_order		= '';
+		$sql_limit		= '';
+		$html_select	= '';
+		$script			= SYSTEMONE::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		$result			= SYSTEMONE::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		while($row = mysqli_fetch_array($result)) {
+			$section[] = $row['Department'];
 		}
 		return $section;
 	}

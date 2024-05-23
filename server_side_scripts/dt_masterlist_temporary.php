@@ -244,8 +244,8 @@
 	$user_name = $_GET['username'];
 	$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
 	$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
-	echo $arr_dept_id;
-	return;
+	// echo $arr_dept_id;
+	// return;
 	$arr_sql_or = array();
 
 	foreach ($arr_dept_id as $key => $value) {

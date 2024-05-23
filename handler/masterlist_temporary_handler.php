@@ -28,6 +28,7 @@ use Handler\DocuReviewDisposition;
 				case "read_doc_review_masterlist" 					: read_doc_review_masterlist(); break; 
 				case "advanced_search" 								: advanced_search(); break; 
 				case "dcc_review_again" 							: dcc_review_again(); break; 
+				case "get_dept_originator_code_by_originator_code" 	: get_dept_originator_code_by_originator_code(); break; 
 			}	
 		}
 	}
@@ -38,7 +39,29 @@ use Handler\DocuReviewDisposition;
 	/*
 		TODO: Enable the Email to PO and Approvers | FIND: EmailDetail:: Mailer::getInstance()
 	*/
-	
+	function get_dept_originator_code_by_originator_code(){
+		require_once('../class/oop_acdcs.php');
+		if(file_exists('../class/oop_acdcs.php')) {
+			require_once('../class/oop_acdcs.php');
+		} else {
+			require_once('../../class/oop_acdcs.php');
+		}
+		$return		= array();
+		$array_fields 	= array('`department_id`');
+		$table			= 'tbl_doc_review_originator_code';
+		$joins			= '';
+		$sql_where		= 'WHERE 1=1';
+		$sql_where		.= ' AND originator_code ="'.$originator_code.'" ';
+		$sql_order		= '';
+		$sql_limit		= '';
+		$html_select	= '';
+		$script			= ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		$result			= ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		while($row = mysqli_fetch_array($result)) {
+			$return[] = $row['department_id'];
+		}
+		return $return;
+	}
 	function create_disposition_details()
 	{
 		try{
