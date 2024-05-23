@@ -17,6 +17,7 @@
 	$database_config = '../db_config/config_acdcs.php';
 	$active_document_class = '../model/active_document.php';
 	$doc_review_disposition_class = '../model/doc_review_disposition.php';
+	$user_name = $_GET['username'];
 
 
 	use Model\DocReviewDisposition;
@@ -81,7 +82,7 @@
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
-
+	
 	if(file_exists($database_config)){
 		require_once($database_config);
 	} else {

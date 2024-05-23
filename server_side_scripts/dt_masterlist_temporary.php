@@ -12,15 +12,50 @@
 	/* Array of database columns which should be read and sent back to DataTables. Use a space where
 	 * you want to insert a non-database field (for example a counter or static image)
 	 */
-	// echo 
 	/* Model */
 	$database_config = '../db_config/config_acdcs.php';
 	$active_document_class = '../model/active_document.php';
 	$doc_review_disposition_class = '../model/doc_review_disposition.php';
+	$systemone = '../model/systemone.php';
+	$doc_review_originator_code = '../model/doc_review_originator_code.php';
 
+	if(file_exists($database_config)){
+		require_once($database_config);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
+
+	if(file_exists($active_document_class)){
+		require_once($active_document_class);
+	} else {
+		echo "active_document_class file does not exist!";
+		exit;
+	}
+
+	if(file_exists($doc_review_disposition_class)){
+		require_once($doc_review_disposition_class);
+	} else {
+		echo "doc_review_disposition_class file does not exist!";
+		exit;
+	}
+	if(file_exists($systemone)){
+		require_once($systemone);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
+	if(file_exists($doc_review_originator_code)){
+		require_once($doc_review_originator_code);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
 
 	use Model\DocReviewDisposition;
 	use Model\ActiveDocument;
+	use Model\Hris;
+	use Model\DocReviewOriginatorCode;
 
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
@@ -82,27 +117,7 @@
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
 
-	if(file_exists($database_config)){
-		require_once($database_config);
-	} else {
-		echo "config file does not exist!";
-		exit;
-	}
-
-	if(file_exists($active_document_class)){
-		require_once($active_document_class);
-	} else {
-		echo "active_document_class file does not exist!";
-		exit;
-	}
-
-	if(file_exists($doc_review_disposition_class)){
-		require_once($doc_review_disposition_class);
-	} else {
-		echo "doc_review_disposition_class file does not exist!";
-		exit;
-	}
-
+	
 	/* Database connection information */
 	$gaSql['user']       = $username;
 	$gaSql['password']   = $password;
@@ -225,7 +240,24 @@
 	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "true")';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""';
-	// $sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
+
+	$user_name = $_GET['username'];
+	$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
+	$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
+	echo $arr_dept_id;
+	return;
+	$arr_sql_or = array();
+
+	foreach ($arr_dept_id as $key => $value) {
+		$arr_sql_or[] = ' active.`originator_code` = "'.$arr_dept_id[$key].'" ';
+	}
+
+	if(count($arr_dept_id) == 1){
+		$sWhere 	.= ' AND active.`originator_code` = "'.$arr_dept_id[0].'" ';
+	}else if(count($arr_dept_id) > 1){
+		$sql_or = implode(' OR',$arr_sql_or);
+		$sWhere 	.= ' AND '.$sql_or.'';
+	}
 
 	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
@@ -280,6 +312,9 @@
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
 		"script" => $script,
+		"getSectionByUserName" => Hris::getDeptIdByUserName($user_name),
+		"sWhere" => $sWhere, //modify
+
 	);
 	/*
 		Class Object
@@ -355,6 +390,10 @@
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
+
+	
+
+
 	/* 
 		Functions 
 	*/
