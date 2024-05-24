@@ -128,4 +128,26 @@ class Hris {
 		}
 		return $section;
 	}
+	function getArrDepartmentByDeptId($arr_dept_id){
+		if(file_exists('../class/oop_acdcs.php')) {
+			require_once('../class/oop_acdcs.php');
+		} else {
+			require_once('../../class/oop_acdcs.php');
+		}
+		$arr_sql_or = array();
+		$array_fields 	= array('`pkid`,`Department`');
+		$table			= 'tbl_Department';
+		$joins			= '';
+		$sql_where		= 'WHERE 1=1';
+		$sql_where		.= ' AND `pkid` = "'.$arr_dept_id.'" ';
+		$sql_order		= '';
+		$sql_limit		= '';
+		$html_select	= '';
+		$script			= SYSTEMONE::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		$result			= SYSTEMONE::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		while($row = mysqli_fetch_array($result)) {
+			$section = $row['Department'];
+		}
+		return $section;
+	}
 }

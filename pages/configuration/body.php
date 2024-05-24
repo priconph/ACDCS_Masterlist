@@ -5,13 +5,13 @@
 		   <section class="tab-pane active fade in content" id="configuration">
 			   <div class="row">
 				   <div class="col-xs-12 col-sm-8 col-md-9">
-						<a href="#"><span aria-hidden="true" class="fa fa-users fa-2x"> Configuration</span></a>
+						<a href="#"><span aria-hidden="true" class="fa fa-users fa-2x"> Settings</span></a>
 					</div>
 			    </div><br />
 				<div class="row">
 				  <!-- Nav tabs -->
 				  <ul class="nav nav-tabs" role="tablist">
-					<li role="presentation" class="active"><a href="#originator_code" aria-controls="originator_code" role="tab" data-toggle="tab"> User Roles</a></li>
+					<li role="presentation" class="active"><a href="#originator_code" aria-controls="originator_code" role="tab" data-toggle="tab"> Originator Code</a></li>
 				  </ul>
 
 				  <!-- Tab panes -->
@@ -31,12 +31,6 @@
 <script>
 var username 				= $('#hd_username') .val();
 var handler_configuration 	= 'handler/handler_configuration.php';
-
-
-/* ****************
-	Test Codes
-****************** */
-// $('#container_user_crud .panel-body,#container_user_crud .panel-heading').toggle(500);
 </script>
 
-<script type="text/javascript" src="../common_functions/common_functions.js?3"></script>
+<script src="js/common_functions.js?n="+<?php echo date("YmdHis");?>></script>

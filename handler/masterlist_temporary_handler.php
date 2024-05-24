@@ -8,6 +8,7 @@ require_once('../model/send_email.php');
 require_once('../model/doc_review_disposition_approval_details.php');
 require_once('../model/doc_review_disposition.php');
 require_once('../model/active_document.php');
+require_once('../model/systemone.php');
 require_once('./common_function_handler.php');
 
 use Model\EmailDetail;
@@ -15,6 +16,7 @@ use Model\RapidEmailer;
 use Model\DocReviewDispositionApprovalDetails;
 use Model\DocReviewDisposition;
 use Model\ActiveDocument;
+use Model\Hris;
 use Handler\DocuReviewDisposition;
 
 	if(is_ajax()) {
@@ -29,6 +31,7 @@ use Handler\DocuReviewDisposition;
 				case "advanced_search" 								: advanced_search(); break; 
 				case "dcc_review_again" 							: dcc_review_again(); break; 
 				case "get_dept_originator_code_by_originator_code" 	: get_dept_originator_code_by_originator_code(); break; 
+				case "save_originator_code" 						: save_originator_code(); break; 
 			}	
 		}
 	}
@@ -39,6 +42,31 @@ use Handler\DocuReviewDisposition;
 	/*
 		TODO: Enable the Email to PO and Approvers | FIND: EmailDetail:: Mailer::getInstance()
 	*/
+	function save_originator_code(){
+		require_once('../class/oop_acdcs.php');
+		if(file_exists('../class/oop_acdcs.php')) {
+			require_once('../class/oop_acdcs.php');
+		} else {
+			require_once('../../class/oop_acdcs.php');
+		}
+		$return = $_POST;
+		$originator_code_id = $return['originator_code_id'];
+		if( $return['originator_code_id'] == ''){
+			echo 'true';
+
+		}else{
+			$table = 'tbl_doc_review_originator_code';
+			$array_fields = array('deleted_at');
+			$array_values = array(date('Y-m-d H:s:i'));
+			$where = 'WHERE originator_code = "'.$return['originator_code'].'" ';
+			$update_query = ACDCS::getInstance()->update_query_script($table,$array_fields,$array_values,$where);
+			foreach ($return['department'] as $key => $value_department) {
+				$array_fields = array('department_id','originator_code','updated_by','created_at');
+				$array_values = array($value_department,$return['originator_code'],$_SESSION['username'],date('Y-m-d H:i:s'));
+				echo $query = ACDCS::getInstance()->insert_query_script($table,$array_fields,$array_values);
+			}
+		}
+	}
 	function get_dept_originator_code_by_originator_code(){
 		require_once('../class/oop_acdcs.php');
 		if(file_exists('../class/oop_acdcs.php')) {
@@ -46,21 +74,32 @@ use Handler\DocuReviewDisposition;
 		} else {
 			require_once('../../class/oop_acdcs.php');
 		}
-		$return		= array();
-		$array_fields 	= array('`department_id`');
+
+		$return			= $_POST;
+		$response		= array();
+		$array_fields 	= array('`id`,`department_id`,`originator_code`');
 		$table			= 'tbl_doc_review_originator_code';
 		$joins			= '';
 		$sql_where		= 'WHERE 1=1';
-		$sql_where		.= ' AND originator_code ="'.$originator_code.'" ';
+		$sql_where		.= ' AND originator_code ="'.$return['tbl_doc_review_originator_code_originator_code'].'" ';
 		$sql_order		= '';
 		$sql_limit		= '';
 		$html_select	= '';
 		$script			= ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 		$result			= ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+		$response['arr_department_id'] 	= array();
 		while($row = mysqli_fetch_array($result)) {
-			$return[] = $row['department_id'];
+			$arr_department_id[] 			= $row['department_id'];
+			$response['originator_code'] 	= $row['originator_code'];
+			$response['id'] 				= $row['id'];
 		}
-		return $return;
+		foreach($arr_department_id as $key => $value){
+			$array_data_app 				= array();
+			$array_data_app['id'] 			= $value;
+			$array_data_app['text'] 		= Hris::getArrDepartmentByDeptId($value);
+			$response['arr_department_id'][]	= $array_data_app;
+		}
+		echo json_encode($response);
 	}
 	function create_disposition_details()
 	{

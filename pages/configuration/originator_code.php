@@ -1,9 +1,15 @@
 <div class="col-xs-12 col-sm-8 col-md-9" id="container_user_crud">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<i class="fa fa-users fa-lg"></i> Users CRUD
+			<i class="fa fa-users fa-lg"></i> Originator Code Table
 		</div>
 		<div class="panel-body">
+			<div class="row">
+				<div class="col-12">
+					<button class="btn btn-success fa fa-plus pull-right" id="btnAddOriginatorCode" modal-target> Add New </button>
+				</div>
+			</div>
+			<br>
 			<table class="table table-hover table-striped table-bordered table-condensed" id="tbl_dept_originator_code">
 				<thead>
 					<tr>
@@ -32,31 +38,40 @@
 <!---------------------
 		Modals
 ---------------------->
-<div class="modal fade" tabindex="-1" role="dialog" id="modal_edit_user_roles">
-  <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" tabindex="-1" role="dialog" id="modalEditOriginatorCode">
+  <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"> <i class="fa fa-edit"></i> Edit User Roles</h4>
+        <h4 class="modal-title"> <i class="fa fa-edit"></i> Edit </h4>
       </div>
       <div class="modal-body">
-        <form id="frm_edit_user_roles">
+        <form id="frmEditOriginatorCode">
 			<div class="row">
 				<div class="col-sm-12">
-					<table class="table table-condensed table-bordered" id="tbl_user_role">
-						<thead>
-							<tr>
-								<th>Action</th>
-								<th>Department</th>
-								<th>Originator Code</th>
-								<th>Updated By</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
+					<div class="row">
+						<div class="col-sm-12">				
+							<label>Originator Code ID</label>
+						</div>
+						<div class="col-sm-12">
+							<input type="text" class="form-control" id="text_originator_code_id" name="originator_code_id" style="width:100%;">
+						</div>
+						<div class="col-sm-12">				
+							<label>Department</label>
+						</div>
+						<div class="col-sm-12">
+							<select class="form-control" id="text_department" name="department[]" style="width:100%;" multiple></select>
+						</div>
+						<div class="col-sm-12">				
+							<label>Originator Code</label>
+							<input type="text" class="form-control" id="text_originator_code" name="originator_code" style="width:100%;" required>
+						</div>
+						<div class="col-sm-12">				
+						</div>
+					</div>
 				</div>
 			</div>
+			<br><br><br>
       </div>
       <div class="modal-footer">
 		 <button type="submit" class="btn btn-primary">Save</button> 
@@ -72,6 +87,7 @@
 		// tbl_dept_originator_code
 		var tbl_dept_originator_code = 'tbl_dept_originator_code';
 		var masterlist_temporary_handler = 'handler/masterlist_temporary_handler.php'
+		var frmEditOriginatorCode = $('#frmEditOriginatorCode');
 		var dt_dept_originator_code = $('#'+tbl_dept_originator_code).DataTable({
 			"aaSorting"	: [],
 			"bProcessing": true,
@@ -88,15 +104,35 @@
 
 		$('#'+tbl_dept_originator_code).on('click','.fa-cogs', function () {
 			let tbl_doc_review_originator_code_originator_code = $(this).attr('tbl_doc_review_originator_code_originator_code');
-			alert(tbl_doc_review_originator_code_originator_code);
 			let data ={
 				'tbl_doc_review_originator_code_originator_code' : tbl_doc_review_originator_code_originator_code,
 				action : 'get_dept_originator_code_by_originator_code',
 			}
-			call_ajax(data, masterlist_temporary_handler, function (response){
+			call_ajax(data, masterlist_temporary_handler, function (response){ //zx
+				$('#modalEditOriginatorCode').modal();
+				assign_value_select2('#frmEditOriginatorCode #text_department',response['arr_department_id']);
+            	re_initialize_select2_server_side('#modalEditOriginatorCode #text_department','#modalEditOriginatorCode #frmEditOriginatorCode',[],"server_side_scripts/dropdown/settings/dd_systemone_department_list.php");
+				frmEditOriginatorCode.find('[name=originator_code]').val(response['originator_code']);
+				frmEditOriginatorCode.find('[name=originator_code_id]').val(response['id']);
+			});
+		});
+		$('#btnAddOriginatorCode').click(function (e) { 
+			e.preventDefault();
+			$('#modalEditOriginatorCode').modal();
+			re_initialize_select2_server_side('#modalEditOriginatorCode #text_department','#modalEditOriginatorCode #frmEditOriginatorCode',[],"server_side_scripts/dropdown/settings/dd_systemone_department_list.php");
+		});
+
+		frmEditOriginatorCode.submit(function (e) { //zx
+			e.preventDefault();
+			let data ={
+				action : 'save_originator_code',
+			}
+			let serialized_data = $(this).serialize();
+			call_ajax_serialize(data, serialized_data, masterlist_temporary_handler, function (response){
 				console.log(response);
 			});
-			
 		});
+
+		
 	});
 </script>

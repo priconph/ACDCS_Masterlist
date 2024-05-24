@@ -216,7 +216,6 @@
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
 		"script" => $script,
-		"originator_code" => DocReviewOriginatorCode::getOriginatorCodeByDeptId('PPC-TS MOLD')
 	);
 	while ( $aRow = mysql_fetch_array( $rResult ) )
 	{
