@@ -115,8 +115,7 @@ class Hris {
 		if(count($arr_dept_id) == 1){
 			$sql_where 	.= ' AND `pkid` = "'.$arr_dept_id[0].'" ';
 		}else if(count($arr_dept_id) > 1){
-			$sql_or = implode(' OR',$arr_sql_or);
-			$sql_where 	.= ' AND '.$sql_or.'';
+			$sql_where 	.= ' AND '.implode(' OR',$arr_sql_or).'';
 		}
 		$sql_order		= '';
 		$sql_limit		= '';

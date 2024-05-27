@@ -8,6 +8,7 @@
 require_once('libraries/includes.php'); 
 // require_once('get_is_approver.php');
 require_once('get_user_roles.php');
+
 echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 
 ?>
@@ -74,6 +75,19 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 					<li>
 						<a href="#" class="sidebar-toggle" id="toggle-menu">
 							<i class="fa fa-bars"></i>
+						</a>
+					</li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li>
+						<a href="#" class="navbar-brand">
+							<?php 
+								use Pages\GetUserRoles\Hris;
+								// fullname
+								$get_dept_id_by_user_name = Hris::getDeptIdByUserName($_SESSION['username']); 
+								echo '<span class="hidden-xs">' . $get_dept_id_by_user_name['fullname']. '</span>';
+								echo '( '.$get_dept_id_by_user_name['department'] . ' ) ';
+							?>
 						</a>
 					</li>
 				</ul>

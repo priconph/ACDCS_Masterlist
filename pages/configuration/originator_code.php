@@ -16,7 +16,6 @@
 						<th><i class="fa fa-cogs"></i></th>
 						<th>Department</th>
 						<th>Originator Code</th>
-						<th>Updated By</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -43,24 +42,26 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"> <i class="fa fa-edit"></i> Edit </h4>
+        <h4 class="modal-title" id="modalTitle"> </h4>
       </div>
       <div class="modal-body">
         <form id="frmEditOriginatorCode">
 			<div class="row">
 				<div class="col-sm-12">
-					<div class="row">
+					<div class="row" style="display:none;">
 						<div class="col-sm-12">				
-							<label>Originator Code ID</label>
+								<label>Originator Code ID</label>
+							</div>
+							<div class="col-sm-12">
+								<input type="text" class="form-control" id="text_originator_code_id" name="originator_code_id" style="width:100%;">
+							</div>
 						</div>
-						<div class="col-sm-12">
-							<input type="text" class="form-control" id="text_originator_code_id" name="originator_code_id" style="width:100%;">
-						</div>
+					<div class="row">
 						<div class="col-sm-12">				
 							<label>Department</label>
 						</div>
 						<div class="col-sm-12">
-							<select class="form-control" id="text_department" name="department[]" style="width:100%;" multiple></select>
+							<select class="form-control" id="text_department" name="department[]" style="width:100%;" multiple required></select>
 						</div>
 						<div class="col-sm-12">				
 							<label>Originator Code</label>
@@ -87,14 +88,14 @@
 		// tbl_dept_originator_code
 		var tbl_dept_originator_code = 'tbl_dept_originator_code';
 		var masterlist_temporary_handler = 'handler/masterlist_temporary_handler.php'
-		var frmEditOriginatorCode = $('#frmEditOriginatorCode');
+		var $frmEditOriginatorCode = $('#frmEditOriginatorCode');
 		var dt_dept_originator_code = $('#'+tbl_dept_originator_code).DataTable({
 			"aaSorting"	: [],
 			"bProcessing": true,
 			"bServerSide": true,
 			"sAjaxSource": "server_side_scripts/configuration/dt_dept_originator_code.php?username="+"<?php echo $_SESSION['username'];?>",
 			"columnDefs":[
-				{"orderable":false,"targets":[0,1]}
+				{"orderable":false,"targets":[0]}
 			],
 			"ordering":true,
 			"drawCallback": function( settings ) {
@@ -110,29 +111,43 @@
 			}
 			call_ajax(data, masterlist_temporary_handler, function (response){ //zx
 				$('#modalEditOriginatorCode').modal();
-				assign_value_select2('#frmEditOriginatorCode #text_department',response['arr_department_id']);
-            	re_initialize_select2_server_side('#modalEditOriginatorCode #text_department','#modalEditOriginatorCode #frmEditOriginatorCode',[],"server_side_scripts/dropdown/settings/dd_systemone_department_list.php");
-				frmEditOriginatorCode.find('[name=originator_code]').val(response['originator_code']);
-				frmEditOriginatorCode.find('[name=originator_code_id]').val(response['id']);
+				re_initialize_select2_server_side('#modalEditOriginatorCode #text_department','#modalEditOriginatorCode #frmEditOriginatorCode',[],"server_side_scripts/dropdown/settings/dd_systemone_department_list.php");
+				$frmEditOriginatorCode.find('[name=originator_code_id]').val(response['id']);
+				$frmEditOriginatorCode.find('[name=originator_code]').val(response['originator_code']);
+				if(	response['is_success'] === 'true'	){
+					$('#modalTitle').html('<i class="fa fa-edit"></i> Edit Originator Code');
+					assign_value_select2('#frmEditOriginatorCode #text_department',response['arr_department_id']);
+				}
 			});
 		});
 		$('#btnAddOriginatorCode').click(function (e) { 
 			e.preventDefault();
 			$('#modalEditOriginatorCode').modal();
+			$('#modalTitle').html('<i class="fa fa-edit"></i> Add Originator Code');
 			re_initialize_select2_server_side('#modalEditOriginatorCode #text_department','#modalEditOriginatorCode #frmEditOriginatorCode',[],"server_side_scripts/dropdown/settings/dd_systemone_department_list.php");
 		});
 
-		frmEditOriginatorCode.submit(function (e) { //zx
+		$frmEditOriginatorCode.submit(function (e) { //zx
 			e.preventDefault();
 			let data ={
 				action : 'save_originator_code',
 			}
 			let serialized_data = $(this).serialize();
 			call_ajax_serialize(data, serialized_data, masterlist_temporary_handler, function (response){
-				console.log(response);
+				if( response['is_success'] === 'true' ){
+					$('#modalEditOriginatorCode').modal('hide');
+					dt_dept_originator_code.draw();
+					notif_success(response['system_msg']);
+				}else{
+					notif_err(response['system_msg']);
+				}
 			});
 		});
-
+		
+		$('#modalEditOriginatorCode').on('hidden.bs.modal', function (e) {
+			$frmEditOriginatorCode[0].reset()
+			$frmEditOriginatorCode.find('#text_department').empty()
+		});
 		
 	});
 </script>

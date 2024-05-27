@@ -37,7 +37,6 @@
 	$aColumns = array(  'id',
 						'department_id',
 						'originator_code',
-						'updated_by',
 						);
 	
 	/* used this field for searching data typed in the search box */
@@ -221,11 +220,11 @@
 	{
 		$row = array();
 		unset($row);
+		$get_originator_code_by_dept_id = DocReviewOriginatorCode::getOriginatorCodeByOriginatorCode($aRow['originator_code']);
+		
 		$row[] = '<button type="button" class="btn btn-primary fa fa-cogs" tbl_doc_review_originator_code_originator_code="'.$aRow['originator_code'].'"> View / Edit </button>';
-		$get_originator_code_by_dept_id = DocReviewOriginatorCode::getOriginatorCodeByDeptId($aRow['originator_code']);
 		$row[] = Hris::getDepartmentByDeptId($get_originator_code_by_dept_id);
 		$row[] = $aRow['originator_code'];
-		$row[] = $aRow['updated_by'];
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );

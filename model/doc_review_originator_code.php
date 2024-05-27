@@ -20,8 +20,8 @@ class DocReviewOriginatorCode {
         if($department_id != 51 && $department_id != 5){ // Administration dept cannot access operation documents
             $sql_where		.= ' OR department_id = 0';
         }
-        if($department_id == 5){ // Administration dept has - in systemone
-            $sql_where		.= ' OR department_id = 51';
+        if($department_id == 51 || $department_id == 5){ // Administration dept has - in systemone
+            $sql_where		.= ' OR department_id = 5 OR department_id = 51';
         }
         $sql_order		= '';
         $sql_limit		= '';
@@ -33,7 +33,7 @@ class DocReviewOriginatorCode {
         }
         return $return;
     }
-    function getOriginatorCodeByDeptId($originator_code){
+    function getOriginatorCodeByOriginatorCode($originator_code){
         if(file_exists('../class/oop_acdcs.php')) {
             require_once('../class/oop_acdcs.php');
         } else {

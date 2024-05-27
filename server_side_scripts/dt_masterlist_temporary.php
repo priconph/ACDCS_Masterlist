@@ -234,36 +234,35 @@
 	}else{
 		$sWhere .= "AND ";
 	}
-	/* Default WHERE query without search inputs */
-	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
-	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
-	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "true")';
-	$sWhere .= ' AND disposition.deleted_at IS NULL';
-	$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""';
-
 	$user_name = $_GET['username'];
-	$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
-	$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
-	// echo $arr_dept_id;
-	// return;
-	$arr_sql_or = array();
+	/* Default WHERE query without search inputs */
+	//? NOTE: According to QAS/requestor active permanent document has no exp date but as per checking obsolete permanent has exp date,
+	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column
+	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "true" ';
+	$sWhere .= ' AND disposition.deleted_at IS NULL';
 
-	foreach ($arr_dept_id as $key => $value) {
-		$arr_sql_or[] = ' active.`originator_code` = "'.$arr_dept_id[$key].'" ';
+	if($user_name == "mclegaspi" || $user_name == "dormarm"){ // display all document for the Super User
+		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
+	}else{
+		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
+		$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
+		$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
+		$arr_sql_or = array();
+		
+		foreach ($arr_dept_id as $key => $value) {
+			$arr_sql_or[] = ' active.`originator_code` = "'.$arr_dept_id[$key].'" ';
+		}
+		if(count($arr_dept_id) == 1){
+			$sWhere 	.= ' AND active.`originator_code` = "'.$arr_dept_id[0].'" )';
+		}else if(count($arr_dept_id) > 1){
+			$sWhere 	.= ' AND '.implode(' OR',$arr_sql_or).' )';
+		}
 	}
-
-	if(count($arr_dept_id) == 1){
-		$sWhere 	.= ' AND active.`originator_code` = "'.$arr_dept_id[0].'" ';
-	}else if(count($arr_dept_id) > 1){
-		$sql_or = implode(' OR',$arr_sql_or);
-		$sWhere 	.= ' AND '.$sql_or.'';
-	}
-
+	
 	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
 		// ilagay dito kung pwede based sa date, or customized advance search
 	}
-	
 	/*
 	 * SQL queries
 	 * Get data to display
@@ -312,11 +311,21 @@
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
 		"script" => $script,
-		"getSectionByUserName" => Hris::getDeptIdByUserName($user_name),
+		// "getSectionByUserName" => $arr_dept_id,
 		"sWhere" => $sWhere, //modify
 
 	);
+
 	/*
+
+	
+		SELECT SQL_CALC_FOUND_ROWS obsolete.expiration_date AS obsolete_expiration_date, obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model, obsolete.doc_title AS obsolete_doc_title, obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no, obsolete.effectivity_date AS obsolete_effectivity_date, active.expiration_date, masterlist.id, masterlist.fkid_document, masterlist.document_status, masterlist.is_expiration_date_exist, masterlist.deleted_at, active.date_received, active.model, active.doc_title, active.doc_no, active.rev_no, active.effectivity_date, masterlist.originator_code, disposition.reviewed_by, disposition.disposition, disposition.dcc_email
+		FROM   tbl_doc_review_masterlist masterlist
+		LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id
+		WHERE masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "true"  AND disposition.deleted_at IS NULL AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""
+		ORDER BY masterlist.document_status ASC
+		LIMIT 0, 10
+	
 		Class Object
 	*/
 	$get_doc_review_disposition = new DocReviewDisposition;

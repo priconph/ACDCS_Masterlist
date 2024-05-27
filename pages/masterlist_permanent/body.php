@@ -465,7 +465,6 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 			console.log(arr_dcc_review_again_masterlist_id);
 			arr_dcc_review_again_masterlist_id = [];
 			console.log('after',arr_dcc_review_again_masterlist_id);
-
 		});
 		$('.modal').on('hidden.bs.modal', function (e) {
 			/* Allows the overlayed modal to be scrollable */
