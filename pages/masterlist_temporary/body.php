@@ -59,7 +59,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 						<div class="panel panel-success" style="overflow:scroll;">
 							<div class="panel-heading"><i class="fa fa-file fa-lg"> Pending</i></div>
 								<div class="panel-body">
-										<iframe src="../../ACDCS/dcc_home.php?page=./search_masterlist_temporary.php" width="100%" height="100%" style="border:none;" title="Pending">
+										<iframe src="../../ACDCS_test/dcc_home.php?page=./search_masterlist_temporary.php" width="100%" height="100%" style="border:none;" title="Pending">
 										</iframe>
 								</div>
 							</div>
@@ -361,6 +361,22 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		$(tbl_masterlist_temporary).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
 		
 		$(tbl_masterlist_temporary).on('click','#btnEditDocReviewDisposition' ,getDocReviewDisposition);
+
+		const getViewDispositionHistoryById = function (){
+			let doc_review_masterlist_id = $(this).attr('doc-review-masterlist-id');
+			console.log(doc_review_masterlist_id);
+
+			let data = {
+				'action' : 'get_view_disposition_history_by_id',
+				'doc_review_masterlist_id' : doc_review_masterlist_id,
+			}
+			
+			call_ajax(data, masterlist_temporary_handler,function(result){
+				console.log(result);
+			})
+		}
+
+		$(tbl_masterlist_temporary).on('click','#btnViewDispositionHistory' ,getViewDispositionHistoryById);
 
 		$('#'+tbl_masterlist_temporary_obsolete).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
 

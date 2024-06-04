@@ -62,7 +62,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 						<div class="panel panel-warning" style="overflow:scroll;">
 							<div class="panel-heading"><i class="fa fa-file fa-lg"> Pending</i></div>
 								<div class="panel-body">
-										<iframe src="../../ACDCS/dcc_home.php?page=./search_masterlist_temporary.php" width="100%" height="100%" style="border:none;" title="Pending">
+										<iframe src="../../ACDCS_test/dcc_home.php?page=./search_masterlist_temporary.php" width="100%" height="100%" style="border:none;" title="Pending">
 										</iframe>
 								</div>
 							</div>

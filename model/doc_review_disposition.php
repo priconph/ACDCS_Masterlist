@@ -144,7 +144,61 @@ class DocReviewDisposition{
             foreach ($sec_heads_username as $key => $value) {
                 $array_data_app 				= array();
                 $array_data_app['id'] 			= $value;
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value) == "Ni-An Alcazar"? "Ni-An Lim" : Hris::get_emp_name_by_username_systemone($value);;
+                $return['sec_heads_username'][]	= $array_data_app;
+            }
+            foreach ($reviewed_by as $key => $value) {
+                $array_data_app 				= array();
+                $array_data_app['id'] 			= $value;
                 $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
+                $return['reviewed_by'][]	= $array_data_app;
+            }
+
+        }else{
+            $return['result'] = 'Data not found ';
+            $return['disposition'] = 0; //no disposition
+        }
+        return $return;
+    }
+    public function getDocReviewDispositionHistory($doc_review_masterlist_id)
+    { //TODO: Create Modal, DataTable of History
+        require_once('../class/oop_acdcs.php');
+        require_once('../model/systemone.php');
+
+        $request = $_POST;
+        $array_fields = array('disposition.*,approval.sec_heads_username,approval.tbl_doc_review_disposition_id,approval.remarks,disposition.remarks as process_owner_remarks');
+        $table 	   	= 'tbl_doc_review_disposition disposition';
+        $joins 	   	= 'LEFT JOIN tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id';
+        $sql_where 	=  'WHERE 1=1';
+        $sql_where 	.=  '  AND disposition.tbl_doc_review_masterlist_id = 28 AND disposition.review_count = 1 AND disposition.deleted_at IS NOT NULL';
+        // $sql_where 	=  ' AND disposition.tbl_doc_review_masterlist_id = '.$doc_review_masterlist_id.' AND disposition.review_count = 1 AND disposition.deleted_at IS NOT NULL';
+        $sql_where 	.=  ' AND approval.deleted_at IS NULL';
+        $sql_order 	= 'ORDER BY disposition.id desc'; //
+        $sql_limit 	= 'limit 0,2'; //
+        $script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+        $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+        if($query->num_rows > 0){
+            while($row = mysqli_fetch_array($query)){
+                $return['id'][] = $row['id'];
+                $return['disposition'][] = $row['disposition'];
+                $return['due_date'][] = $row['due_date'];
+                $return['extension_date'][] = $row['extension_date'];
+                $return['remarks'][] = $row['remarks'];
+                $return['process_owner_remarks'][] = $row['process_owner_remarks'];
+                $reviewed_by[] = $row['reviewed_by'];
+                $person_in_charge[] = $row['person_in_charge'];
+                $sec_heads_username[] = $row['sec_heads_username'];
+            }
+            foreach ($person_in_charge as $key => $value) {
+                $array_data_app 				= array();
+                $array_data_app['id'] 			= $value;
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
+                $return['person_in_charge'][]	= $array_data_app;
+            }
+            foreach ($sec_heads_username as $key => $value) {
+                $array_data_app 				= array();
+                $array_data_app['id'] 			= $value;
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value) == "Ni-An Alcazar"? "Ni-An Lim" : Hris::get_emp_name_by_username_systemone($value);
                 $return['sec_heads_username'][]	= $array_data_app;
             }
             foreach ($reviewed_by as $key => $value) {

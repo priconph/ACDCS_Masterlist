@@ -64,34 +64,34 @@
 															</div>
 														</a>
 													</div>';
-												// echo '<div class="col-xs-3">
-												// 		<a href="#" id="router" link-id="permanentDocu">
-												// 			<div class="panel panel-warning" style="padding:0px;">
-												// 				<div class="panel-heading">
-												// 					<div class="row">
-												// 						<div class="col-xs-5">
-												// 						<i class="fa fa-search fa-5x"></i>
-												// 						</div>
-												// 						<div class="col-xs-7 text-right">
-												// 						<p class="announcement-heading"></p>
-												// 						<p class="announcement-text fa-2x"> Permanent Documents</p>
-												// 						</div>
-												// 					</div>
-												// 					<br/>
-												// 				</div>
-												// 				<div class="panel-footer announcement-bottom">
-												// 					<div class="row">
-												// 						<div class="col-xs-6">
-												// 							Open
-												// 						</div>
-												// 						<div class="col-xs-6 text-right">
-												// 							<i class="fa fa-arrow-circle-right"></i>
-												// 						</div>
-												// 					</div>
-												// 				</div>
-												// 			</div>
-												// 		</a>
-												// 	</div>';
+												echo '<div class="col-xs-3">
+														<a href="#" id="router" link-id="permanentDocu">
+															<div class="panel panel-warning" style="padding:0px;">
+																<div class="panel-heading">
+																	<div class="row">
+																		<div class="col-xs-5">
+																		<i class="fa fa-search fa-5x"></i>
+																		</div>
+																		<div class="col-xs-7 text-right">
+																		<p class="announcement-heading"></p>
+																		<p class="announcement-text fa-2x"> Permanent Documents</p>
+																		</div>
+																	</div>
+																	<br/>
+																</div>
+																<div class="panel-footer announcement-bottom">
+																	<div class="row">
+																		<div class="col-xs-6">
+																			Open
+																		</div>
+																		<div class="col-xs-6 text-right">
+																			<i class="fa fa-arrow-circle-right"></i>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</a>
+													</div>';
 												echo '<div class="col-xs-3">
 														<a href="#" id="router" link-id="settings">
 															<div class="panel panel-primary" style="padding:0px;">

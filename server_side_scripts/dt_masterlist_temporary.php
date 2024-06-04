@@ -259,7 +259,15 @@
 		}
 	}
 	
-	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
+	/* 
+			SELECT SQL_CALC_FOUND_ROWS obsolete.expiration_date AS obsolete_expiration_date, obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model, obsolete.doc_title AS obsolete_doc_title, obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no, obsolete.effectivity_date AS obsolete_effectivity_date, active.expiration_date, masterlist.id, masterlist.fkid_document, masterlist.document_status, masterlist.is_expiration_date_exist, masterlist.deleted_at, active.date_received, active.model, active.doc_title, active.doc_no, active.rev_no, active.effectivity_date, masterlist.originator_code, disposition.reviewed_by, disposition.disposition, disposition.dcc_email
+		FROM   tbl_doc_review_masterlist masterlist
+		LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id
+		WHERE   masterlist.deleted_at IS NULL AND masterlist.document_status < 3  AND masterlist.is_expiration_date_exist = "false" AND disposition.deleted_at IS NULL AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""
+		ORDER BY masterlist.document_status ASC
+		LIMIT 0, 10
+	
+	NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
 		// ilagay dito kung pwede based sa date, or customized advance search
 	}
@@ -376,8 +384,8 @@
 		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
 
 		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
-
-		// $row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
+		
+		$button .= '<br><center><button btn-type="view" doc-review-masterlist-id="'.$doc_review_masterlist_id.'" id="btnViewDispositionHistory" class="btn btn-sm btn-default fa fa-file" type="button"> View History</button></center>';
 		$row[]= $button;
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';

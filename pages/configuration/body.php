@@ -5,7 +5,7 @@
 		   <section class="tab-pane active fade in content" id="configuration">
 			   <div class="row">
 				   <div class="col-xs-12 col-sm-8 col-md-9">
-						<a href="#"><span aria-hidden="true" class="fa fa-users fa-2x"> Settings</span></a>
+						<a href="#"><span aria-hidden="true" class="fa fa-cogs fa-2x"> Settings</span></a>
 					</div>
 			    </div><br />
 				<div class="row">

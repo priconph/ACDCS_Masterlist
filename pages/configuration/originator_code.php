@@ -50,12 +50,12 @@
 				<div class="col-sm-12">
 					<div class="row" style="display:none;">
 						<div class="col-sm-12">				
-								<label>Originator Code ID</label>
-							</div>
-							<div class="col-sm-12">
-								<input type="text" class="form-control" id="text_originator_code_id" name="originator_code_id" style="width:100%;">
-							</div>
+							<label>Originator Code ID</label>
 						</div>
+						<div class="col-sm-12">
+							<input type="text" class="form-control" id="text_originator_code_id" name="originator_code_id" style="width:100%;">
+						</div>
+					</div>
 					<div class="row">
 						<div class="col-sm-12">				
 							<label>Department</label>

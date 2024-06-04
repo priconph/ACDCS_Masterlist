@@ -32,6 +32,8 @@ use Handler\DocuReviewDisposition;
 				case "read_doc_review_masterlist" 					: read_doc_review_masterlist(); break; 
 				case "advanced_search" 								: advanced_search(); break; 
 				case "dcc_review_again" 							: dcc_review_again(); break; 
+				case "get_view_disposition_history_by_id" 			: get_view_disposition_history_by_id(); break; 
+
 				case "get_dept_originator_code_by_originator_code" 	: get_dept_originator_code_by_originator_code(); break; 
 				case "save_originator_code" 						: save_originator_code(); break; 
 			}	
@@ -44,6 +46,23 @@ use Handler\DocuReviewDisposition;
 	/*
 		TODO: Enable the Email to PO and Approvers | FIND: EmailDetail:: Mailer::getInstance()
 	*/
+	require_once('../class/oop_acdcs.php');
+	if(file_exists('../class/oop_acdcs.php')) {
+		require_once('../class/oop_acdcs.php');
+	}else if(file_exists('../../class/oop_acdcs.php')) {
+		require_once('../../class/oop_acdcs.php');
+	}else {
+		require_once('../../../class/oop_acdcs.php');
+	}
+		
+	function get_view_disposition_history_by_id(){
+		try {
+			$get_doc_review_disposition_by_id = DocReviewDisposition::getDocReviewDispositionHistory($_POST['doc_review_masterlist_id']);
+			echo json_encode($get_doc_review_disposition_by_id);
+		} catch (\Throwable $th) {
+			throw $th;
+		}
+	}
 	function save_originator_code(){
 		try {
 			require_once('../class/oop_acdcs.php');
