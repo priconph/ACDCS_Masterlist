@@ -200,6 +200,7 @@
 			"action"	: "get_page_link",
 			"link_id"	: linkId
 		}
+		
 		call_ajax(data, 'handler/route_handler.php', function (result) {
 			window.location.href = "index.php?page="+result['page'];
 		});

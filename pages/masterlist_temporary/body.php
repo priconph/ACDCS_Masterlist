@@ -1,7 +1,7 @@
 <?php
 use Pages\GetUserRoles\Rapid;
 $is_dcc_staff = Rapid::getIsDccStaff();
-$is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR $is_dcc_staff['section'][0] == "EMO/QMS" OR $is_dcc_staff['division'][0] =="Quality Assurance Di" OR $is_dcc_staff['section'][0] =='QAS') ? 'true': 'false';
+$is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR $is_dcc_staff['section'][0] == "EMO/QMS" OR $is_dcc_staff['division'][0] =="Quality Assurance Di" OR $is_dcc_staff['division'][0] =='QAS') ? 'true': 'false';
 ?>
 <section class="main">
 	<section class="tab-content" id="tab-content">
@@ -361,6 +361,22 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 		$(tbl_masterlist_temporary).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
 		
 		$(tbl_masterlist_temporary).on('click','#btnEditDocReviewDisposition' ,getDocReviewDisposition);
+
+		const getViewDispositionHistoryById = function (){
+			let doc_review_masterlist_id = $(this).attr('doc-review-masterlist-id');
+			console.log(doc_review_masterlist_id);
+
+			let data = {
+				'action' : 'get_view_disposition_history_by_id',
+				'doc_review_masterlist_id' : doc_review_masterlist_id,
+			}
+			
+			call_ajax(data, masterlist_temporary_handler,function(result){
+				console.log(result);
+			})
+		}
+
+		$(tbl_masterlist_temporary).on('click','#btnViewDispositionHistory' ,getViewDispositionHistoryById);
 
 		$('#'+tbl_masterlist_temporary_obsolete).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
 

@@ -17,10 +17,46 @@
 	$database_config = '../db_config/config_acdcs.php';
 	$active_document_class = '../model/active_document.php';
 	$doc_review_disposition_class = '../model/doc_review_disposition.php';
+	$systemone = '../model/systemone.php';
+	$doc_review_originator_code = '../model/doc_review_originator_code.php';
 
+
+	if(file_exists($database_config)){
+		require_once($database_config);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
+	if(file_exists($active_document_class)){
+		require_once($active_document_class);
+	} else {
+		echo "active_document_class file does not exist!";
+		exit;
+	}
+	if(file_exists($doc_review_disposition_class)){
+		require_once($doc_review_disposition_class);
+	} else {
+		echo "doc_review_disposition_class file does not exist!";
+		exit;
+	}
+	if(file_exists($systemone)){
+		require_once($systemone);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
+	if(file_exists($doc_review_originator_code)){
+		require_once($doc_review_originator_code);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
 
 	use Model\DocReviewDisposition;
 	use Model\ActiveDocument;
+	use Model\Hris;
+	use Model\DocReviewOriginatorCode;
+
 
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
@@ -81,27 +117,8 @@
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
-
-	if(file_exists($database_config)){
-		require_once($database_config);
-	} else {
-		echo "config file does not exist!";
-		exit;
-	}
-
-	if(file_exists($active_document_class)){
-		require_once($active_document_class);
-	} else {
-		echo "active_document_class file does not exist!";
-		exit;
-	}
-
-	if(file_exists($doc_review_disposition_class)){
-		require_once($doc_review_disposition_class);
-	} else {
-		echo "doc_review_disposition_class file does not exist!";
-		exit;
-	}
+	
+	
 
 	/* Database connection information */
 	$gaSql['user']       = $username;
@@ -219,15 +236,29 @@
 	}else{
 		$sWhere .= "AND ";
 	}
+	$user_name = $_GET['username'];
 	/* Default WHERE query without search inputs */
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
-	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "false")';
+	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "false"';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
-	// $sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
-	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
-
-
+	if($user_name == "mclegaspi" || $user_name == "dormarm"){
+		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
+	}else{
+		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
+		$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
+		$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
+		$arr_sql_or = array();
+		
+		foreach ($arr_dept_id as $key => $value) {
+			$arr_sql_or[] = ' active.`originator_code` = "'.$arr_dept_id[$key].'" ';
+		}
+		if(count($arr_dept_id) == 1){
+			$sWhere 	.= ' AND active.`originator_code` = "'.$arr_dept_id[0].'" )';
+		}else if(count($arr_dept_id) > 1){
+			$sWhere 	.= ' AND '.implode(' OR',$arr_sql_or).' )';
+		}
+	}
 	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
 		// ilagay dito kung pwede based sa date, or customized advance search
@@ -280,6 +311,7 @@
 		"iTotalRecords" => $iTotal,
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
+		"script" => $script,
 	);
 	/*
 		Class Object

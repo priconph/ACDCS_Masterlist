@@ -26,6 +26,7 @@ error_reporting(E_ALL);
 			case "temporaryDocu"  	: $return['page'] = "temporaryDocu"; break;
 			case "permanentDocu"  	: $return['page'] = "permanentDocu"; break;
 			case "forApproval"  	: $return['page'] = "forApproval"; break;
+			case "settings"  		: $return['page'] = "settings"; break;
 			default					: $return['page'] = "";
 		}
 		echo json_encode($return);

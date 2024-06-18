@@ -1,4 +1,6 @@
 ﻿<?php
+	error_reporting(E_ALL);
+	ini_set('display_errors', 1);
 	/*
 	 * Script:    DataTables server-side script for PHP and MySQL
 	 * Copyright: 2010 - Allan Jardine
@@ -12,30 +14,43 @@
 	/* Array of database columns which should be read and sent back to DataTables. Use a space where
 	 * you want to insert a non-database field (for example a counter or static image)
 	 */
-	// error_reporting(E_ALL);
-	// ini_set('display_errors', 1);
+	$doc_review_originator_code = '../../model/doc_review_originator_code.php';
+	if(file_exists($doc_review_originator_code)){
+		require_once($doc_review_originator_code);
 
-	$aColumns = array(  'name',
-						'position',
-						'department',
-						'section',
-						'division',
-						'username',
-						'fk_system'
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
+	$systemone = '../../model/systemone.php';
+	if(file_exists($systemone)){
+		require_once($systemone);
+
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
+	use Model\DocReviewOriginatorCode;
+	use Model\Hris;
+	
+
+	$aColumns = array(  'id',
+						'department_id',
+						'originator_code',
 						);
 	
 	/* used this field for searching data typed in the search box */
 	// $array_search = array('empno', 'LastName',
 							// 'date', 'date_out');
-	// $array_search = array('empno', 'LastName');
+	$array_search = array('originator_code');
 							
 	/* Indexed column (used for fast and accurate table cardinality) */
 	$sIndexColumn = "id";
 	
 	/* DB table to use */
-	$sTable = "db_rapid.vw_user_access";
+	$sTable = "tbl_doc_review_originator_code";
 	
-	require_once('../../db_config/config_tqts.php');
+	require_once('../../db_config/config_acdcs.php');
 	/* Database connection information */
 	$gaSql['user']       = $username;
 	$gaSql['password']   = $password;
@@ -71,6 +86,7 @@
 	/*
 	 * Ordering
 	 */
+	$sOrder = "ORDER BY  id ASC";
 	if ( isset( $_GET['iSortCol_0'] ) )
 	{
 		$sOrder = "ORDER BY  ";
@@ -103,10 +119,10 @@
 	if ( $_GET['sSearch'] != "" )
 	{
 		$sWhere = "WHERE (";
-		for ( $i=0 ; $i<count($aColumns) ; $i++ )
+		for ( $i=0 ; $i<count($array_search) ; $i++ )
 		{
-			// if( in_array($aColumns[$i],$array_search) ){
-			$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
+			// if( in_array($array_search[$i],$array_search) ){
+			$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
 			// }
 		}
 		$sWhere = substr_replace( $sWhere, "", -3 );
@@ -136,28 +152,34 @@
 	*/
 	
 	if($sWhere == ""){
-		$sWhere .= "WHERE  ";
+		$sWhere .= "WHERE  1=1";
 	}else{
-		$sWhere .= "AND ";
+		$sWhere .= " AND 1=1";
 	}
-	$fk_system = $_GET['fk_system'];
-	$fk_module = $_GET['fk_module'];
-	$sWhere .= " fk_system = '$fk_system' AND fk_module= '$fk_module'";
-	// $sWhere .= " fk_system = '$fk_system' ";
-	
-	// $date_start = $_GET['date_start'];
-	// $date_end 	= $_GET['date_end'];
-	
-	// $sWhere .= "((date BETWEEN '" . $date_start . "' AND '" . $date_end . "') OR (date_out BETWEEN '" . $date_start . "' AND '" . $date_end . "')) AND `empno` LIKE '%".$empno."%'";
+	$sWhere .= ' AND deleted_at IS NULL';
+
+	$sGroupBy = 'GROUP BY originator_code';
 	
 	/*
 	 * SQL queries
 	 * Get data to display
 	 */
-	$sQuery = "
-		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
+	$script = "
+		SELECT DISTINCT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
 		FROM   $sTable
 		$sWhere
+		$sGroupBy
+		$sOrder
+		$sLimit
+	";
+	// $dsd = DocReviewOriginatorCode::getDeptIdById(51);
+	// echo json_encode($dsd);
+	// return;
+	$sQuery = "
+		SELECT DISTINCT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
+		FROM   $sTable
+		$sWhere
+		$sGroupBy
 		$sOrder
 		$sLimit
 	";
@@ -191,22 +213,20 @@
 		"sEcho" => intval($_GET['sEcho']),
 		"iTotalRecords" => $iTotal,
 		"iTotalDisplayRecords" => $iFilteredTotal,
-		"aaData" => array()
+		"aaData" => array(),
+		"script" => $script,
 	);
-
-	
 	while ( $aRow = mysql_fetch_array( $rResult ) )
 	{
 		$row = array();
 		unset($row);
-		$row[] = $aRow['name'];
-		$row[] = $aRow['position'];
-		$row[] = $aRow['department'];
-		$row[] = $aRow['section'];
-		$row[] = $aRow['division'];
-		$row[] = $aRow['username'];
-		$row[] = '<button type="button" class="btn btn-primary fa fa-cogs" value="'.$aRow['username'].'"> View / Edit Role</button>';
+		$get_originator_code_by_dept_id = DocReviewOriginatorCode::getOriginatorCodeByOriginatorCode($aRow['originator_code']);
+		
+		$row[] = '<button type="button" class="btn btn-primary fa fa-cogs" tbl_doc_review_originator_code_originator_code="'.$aRow['originator_code'].'"> View / Edit </button>';
+		$row[] = Hris::getDepartmentByDeptId($get_originator_code_by_dept_id);
+		$row[] = $aRow['originator_code'];
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
+
 ?>

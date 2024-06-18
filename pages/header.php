@@ -8,6 +8,7 @@
 require_once('libraries/includes.php'); 
 // require_once('get_is_approver.php');
 require_once('get_user_roles.php');
+
 echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 
 ?>
@@ -77,6 +78,19 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 						</a>
 					</li>
 				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li>
+						<a href="#" class="navbar-brand">
+							<?php 
+								use Pages\GetUserRoles\Hris;
+								// fullname
+								$get_dept_id_by_user_name = Hris::getDeptIdByUserName($_SESSION['username']); 
+								echo '<span class="hidden-xs">' . $get_dept_id_by_user_name['fullname']. '</span>';
+								echo '( '.$get_dept_id_by_user_name['department'] . ' ) ';
+							?>
+						</a>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</nav>
@@ -88,8 +102,7 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 			<li class="active" link-id="dashboard"><a href="#dashboard" data-toggle="tab"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
 		</ul>
 	</aside>
-	<!-- <script src="./js/common_functions.js?n=4324234"></script> -->
-
+	<script src="./js/common_functions.js?n=4324234"></script>
 	<script>
 		var script_url = '';
 		var username = '<?php echo $_SESSION['username']?>';
@@ -104,6 +117,7 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 		
 		$('.sidebar li').click( function (){
 			let linkId = $(this).attr('link-id');
+			
 			fnGetPageLink(linkId);
 		});
 		

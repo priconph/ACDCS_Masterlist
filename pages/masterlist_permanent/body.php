@@ -1,8 +1,7 @@
 <?php
 use Pages\GetUserRoles\Rapid;
 $is_dcc_staff = Rapid::getIsDccStaff();
-$is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR $is_dcc_staff['section'][0] == "EMO/QMS" OR $is_dcc_staff['division'][0] =="Quality Assurance Di" OR $is_dcc_staff['division'][0] =='Quality Management Department') ? 'true': 'false';
-
+$is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR $is_dcc_staff['section'][0] == "EMO/QMS" OR $is_dcc_staff['division'][0] =="Quality Assurance Di" OR $is_dcc_staff['division'][0] =='QAS') ? 'true': 'false';
 ?>
 
 <section class="main">
@@ -463,7 +462,6 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 			console.log(arr_dcc_review_again_masterlist_id);
 			arr_dcc_review_again_masterlist_id = [];
 			console.log('after',arr_dcc_review_again_masterlist_id);
-
 		});
 		$('.modal').on('hidden.bs.modal', function (e) {
 			/* Allows the overlayed modal to be scrollable */

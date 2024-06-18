@@ -12,15 +12,50 @@
 	/* Array of database columns which should be read and sent back to DataTables. Use a space where
 	 * you want to insert a non-database field (for example a counter or static image)
 	 */
-	// echo 
 	/* Model */
 	$database_config = '../db_config/config_acdcs.php';
 	$active_document_class = '../model/active_document.php';
 	$doc_review_disposition_class = '../model/doc_review_disposition.php';
+	$systemone = '../model/systemone.php';
+	$doc_review_originator_code = '../model/doc_review_originator_code.php';
 
+	if(file_exists($database_config)){
+		require_once($database_config);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
+
+	if(file_exists($active_document_class)){
+		require_once($active_document_class);
+	} else {
+		echo "active_document_class file does not exist!";
+		exit;
+	}
+
+	if(file_exists($doc_review_disposition_class)){
+		require_once($doc_review_disposition_class);
+	} else {
+		echo "doc_review_disposition_class file does not exist!";
+		exit;
+	}
+	if(file_exists($systemone)){
+		require_once($systemone);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
+	if(file_exists($doc_review_originator_code)){
+		require_once($doc_review_originator_code);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
 
 	use Model\DocReviewDisposition;
 	use Model\ActiveDocument;
+	use Model\Hris;
+	use Model\DocReviewOriginatorCode;
 
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
@@ -82,27 +117,7 @@
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
 
-	if(file_exists($database_config)){
-		require_once($database_config);
-	} else {
-		echo "config file does not exist!";
-		exit;
-	}
-
-	if(file_exists($active_document_class)){
-		require_once($active_document_class);
-	} else {
-		echo "active_document_class file does not exist!";
-		exit;
-	}
-
-	if(file_exists($doc_review_disposition_class)){
-		require_once($doc_review_disposition_class);
-	} else {
-		echo "doc_review_disposition_class file does not exist!";
-		exit;
-	}
-
+	
 	/* Database connection information */
 	$gaSql['user']       = $username;
 	$gaSql['password']   = $password;
@@ -219,19 +234,43 @@
 	}else{
 		$sWhere .= "AND ";
 	}
+	$user_name = $_GET['username'];
 	/* Default WHERE query without search inputs */
-	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
-	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
-	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "true")';
+	//? NOTE: According to QAS/requestor active permanent document has no exp date but as per checking obsolete permanent has exp date,
+	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column
+	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "true" ';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
-	// $sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""';
-	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !=""))';
 
-	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
+	if($user_name == "mclegaspi" || $user_name == "dormarm"){ // display all document for the Super User
+		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
+	}else{
+		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
+		$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
+		$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
+		$arr_sql_or = array();
+		
+		foreach ($arr_dept_id as $key => $value) {
+			$arr_sql_or[] = ' active.`originator_code` = "'.$arr_dept_id[$key].'" ';
+		}
+		if(count($arr_dept_id) == 1){
+			$sWhere 	.= ' AND active.`originator_code` = "'.$arr_dept_id[0].'" )';
+		}else if(count($arr_dept_id) > 1){
+			$sWhere 	.= ' AND '.implode(' OR',$arr_sql_or).' )';
+		}
+	}
+	
+	/* 
+			SELECT SQL_CALC_FOUND_ROWS obsolete.expiration_date AS obsolete_expiration_date, obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model, obsolete.doc_title AS obsolete_doc_title, obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no, obsolete.effectivity_date AS obsolete_effectivity_date, active.expiration_date, masterlist.id, masterlist.fkid_document, masterlist.document_status, masterlist.is_expiration_date_exist, masterlist.deleted_at, active.date_received, active.model, active.doc_title, active.doc_no, active.rev_no, active.effectivity_date, masterlist.originator_code, disposition.reviewed_by, disposition.disposition, disposition.dcc_email
+		FROM   tbl_doc_review_masterlist masterlist
+		LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id
+		WHERE   masterlist.deleted_at IS NULL AND masterlist.document_status < 3  AND masterlist.is_expiration_date_exist = "false" AND disposition.deleted_at IS NULL AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""
+		ORDER BY masterlist.document_status ASC
+		LIMIT 0, 10
+	
+	NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
 		// ilagay dito kung pwede based sa date, or customized advance search
 	}
-	
 	/*
 	 * SQL queries
 	 * Get data to display
@@ -280,8 +319,21 @@
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
 		"script" => $script,
+		// "getSectionByUserName" => $arr_dept_id,
+		"sWhere" => $sWhere, //modify
+
 	);
+
 	/*
+
+	
+		SELECT SQL_CALC_FOUND_ROWS obsolete.expiration_date AS obsolete_expiration_date, obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model, obsolete.doc_title AS obsolete_doc_title, obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no, obsolete.effectivity_date AS obsolete_effectivity_date, active.expiration_date, masterlist.id, masterlist.fkid_document, masterlist.document_status, masterlist.is_expiration_date_exist, masterlist.deleted_at, active.date_received, active.model, active.doc_title, active.doc_no, active.rev_no, active.effectivity_date, masterlist.originator_code, disposition.reviewed_by, disposition.disposition, disposition.dcc_email
+		FROM   tbl_doc_review_masterlist masterlist
+		LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id
+		WHERE masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "true"  AND disposition.deleted_at IS NULL AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""
+		ORDER BY masterlist.document_status ASC
+		LIMIT 0, 10
+	
 		Class Object
 	*/
 	$get_doc_review_disposition = new DocReviewDisposition;
@@ -332,7 +384,7 @@
 		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
 
 		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
-
+		//$button .= '<br><center><button btn-type="view" doc-review-masterlist-id="'.$doc_review_masterlist_id.'" id="btnViewDispositionHistory" class="btn btn-sm btn-default fa fa-file" type="button"> View History</button></center>';
 		$row[]= $button;
 		// $row[]= $aRow['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
@@ -359,6 +411,10 @@
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
+
+	
+
+
 	/* 
 		Functions 
 	*/

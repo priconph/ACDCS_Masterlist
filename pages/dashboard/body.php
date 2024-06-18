@@ -92,6 +92,34 @@
 															</div>
 														</a>
 													</div>';
+												echo '<div class="col-xs-3">
+														<a href="#" id="router" link-id="settings">
+															<div class="panel panel-primary" style="padding:0px;">
+																<div class="panel-heading">
+																	<div class="row">
+																		<div class="col-xs-5">
+																		<i class="fa fa-cogs fa-5x"></i>
+																		</div>
+																		<div class="col-xs-7 text-right">
+																		<p class="announcement-heading"></p>
+																		<p class="announcement-text fa-2x"> Settings</p>
+																		</div>
+																	</div>
+																	<br/>
+																</div>
+																<div class="panel-footer announcement-bottom">
+																	<div class="row">
+																		<div class="col-xs-6">
+																			Open
+																		</div>
+																		<div class="col-xs-6 text-right">
+																			<i class="fa fa-arrow-circle-right"></i>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</a>
+													</div>';
 												if( $is_approver > 0 ){
 													echo '<div class="col-xs-3">
 														<a href="#" id="router" link-id="forApproval">
@@ -137,13 +165,12 @@
 		</section>
 	</section>
 </article>
-<script src="js/common_functions.js?1234"></script>
+<script src="js/common_functions.js?12345"></script>
 <script>
 	$(document).ready(function () {
 		$('a').click(function (e) { 
 			e.preventDefault();
 			let linkId = $(this).attr('link-id');
-
 			if(linkId != undefined){
 				fnGetPageLink(linkId)
 			}

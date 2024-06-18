@@ -1,5 +1,6 @@
 <?php
 namespace Pages\GetUserRoles;
+use SYSTEMONE;
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -82,4 +83,40 @@ class Rapid{
 		return $return;
 	}
 }
+
+class Hris{
+	public static function getDeptIdByUserName($user_name){
+		$oop = 'db_config/config_hris.php';
+		// $oop = 'class/oop_acdcs.php';
+		if(!file_exists($oop)){
+			if(file_exists('../../'.$oop)) {
+				require_once('../../'.$oop);
+			} else {
+				echo '<br><br><br>
+						<h1><center>'.$oop.' does not exist! Please contact the ISS! </center>
+					</h1>';
+				exit;
+			}
+		}else{
+			require_once($oop);
+		}
+		
+		/* connect to database  */
+		$conn 		= mysqli_connect($server,$username,$password) or die("cannot connect server");
+
+		$database 	= mysqli_select_db($conn,$db_name) or die("cannot connect database");
+
+
+		/* Query Here  */
+		$return =array();
+		$sql  = 'SELECT * FROM `vw_ACDCS` WHERE `username` = "'.$_SESSION['username'].'" LIMIT 0,1';
+		$result = mysqli_query($conn,$sql);
+		while($data = mysqli_fetch_array($result)){
+			$return['department'] 	= $data['Department'];
+			$return['fullname'] 	= $data['firstname'] .' '. $data['lastname'];
+		}
+		return $return;
+	}
+}
+
 ?>
