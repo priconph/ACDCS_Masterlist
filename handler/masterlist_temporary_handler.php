@@ -629,7 +629,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
 				$date_start = $email_due_date;
 				$frequency = 2;
-				// return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
+				return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
 			} catch (\Throwable $th) {
 				throw $th;
 			}
