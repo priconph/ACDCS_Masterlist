@@ -338,6 +338,7 @@
 		//? NOTE: If Obsolete or Revision disposition & Obsolete document means DCC Conformed
 		$row[]= '<center><span class="badge highlight-color-green">DCC Conformed</span></center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
+		$row[]= '<center> ' .$aRow['dcc_email'] !=NULL ? date('Y-m-d',strtotime($aRow['dcc_email'])) : "" . ' </center>';
 		$row[]= $aRow['obsolete_date_received'];
 		$row[]= $aRow['obsolete_model'];
 		$row[]= $aRow['obsolete_doc_title'];
@@ -346,7 +347,6 @@
 		$row[]= '<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
 		$row[]= $aRow['obsolete_effectivity_date'];
 		$row[]= $aRow['obsolete_expiration_date'];
-		$row[]= '<center> ' .$aRow['dcc_email'] !=NULL ? date('Y-m-d',strtotime($aRow['dcc_email'])) : "" . ' </center>';
 		$row[]= '<span class="badge highlight-color-red">OBSOLETE</span>';
 		array_push($output['aaData'],$row);
 	}

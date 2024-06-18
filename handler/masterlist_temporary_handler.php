@@ -712,8 +712,10 @@ use Handler\DocuReviewDisposition;
 		{
 			try {
 				require_once('../class/oop_acdcs.php');
-				$getDocReviewDisposition =  DocReviewDisposition::getDocReviewDisposition($docu_review_disposition_id);
-				$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($getDocReviewDisposition['tbl_doc_review_masterlist_id']);
+				$get_doc_review_disposition =  DocReviewDisposition::getDocReviewDisposition($docu_review_disposition_id);
+				$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($get_doc_review_disposition['tbl_doc_review_masterlist_id']);
+				$get_doc_review_disposition =  DocReviewDisposition::getDocReviewDisposition($docu_review_disposition_id);
+
 				$active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']);
 				$email_due_date = date( "Y-m-d", strtotime( "-5 days", strtotime($due_date) ) );
 				$tbl_name = 'tbl_doc_review_disposition';
@@ -722,7 +724,8 @@ use Handler\DocuReviewDisposition;
 				// $cc = '';
 				$to = RapidEmailer::get_user_email_add_by_username($person_in_charge);
 				$from = 'issinfoservice@pricon.ph';
-				$cc = RapidEmailer::get_user_email_add_by_username($username);
+				$arr_email_cc = array(	RapidEmailer::get_user_email_add_by_username($username),RapidEmailer::get_user_email_add_by_username('mclegaspi')	);
+				$cc = implode(',',$arr_email_cc);
 				$subject = 'FOR REVISION: ACDCS Document Review Processs'.' | Doc No. : '.$active_docs['doc_no'].' ';
 				$message = 'Please be informed that you have ACDCS Document Review for revision. <br><br>';
 				$message .= 'Request Details	: <br>';
@@ -735,7 +738,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
 				$date_start = $email_due_date;
 				$frequency = 2;
-				// return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
+				return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
 			} catch (\Throwable $th) {
 				throw $th;
 			}

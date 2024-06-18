@@ -384,25 +384,29 @@
 		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
 
 		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
-		
-		$button .= '<br><center><button btn-type="view" doc-review-masterlist-id="'.$doc_review_masterlist_id.'" id="btnViewDispositionHistory" class="btn btn-sm btn-default fa fa-file" type="button"> View History</button></center>';
+		//$button .= '<br><center><button btn-type="view" doc-review-masterlist-id="'.$doc_review_masterlist_id.'" id="btnViewDispositionHistory" class="btn btn-sm btn-default fa fa-file" type="button"> View History</button></center>';
 		$row[]= $button;
+		// $row[]= $aRow['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
-		$row[]= $aRow['date_received'];
-		$row[]= $aRow['model'] ;
-		$row[]= $aRow['doc_title'];
-		$row[]= '<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>';
-		$row[]= $aRow['rev_no'];
-		$row[]='<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>';
-		$row[]= $aRow['effectivity_date'];
-		$row[]= $aRow['expiration_date'];
 		if (($aRow['dcc_email'] != NULL && $aRow['dcc_email'] != '0000-00-00 00:00:00')){
 			$dcc_email_date = date('Y-m-d',strtotime($aRow['dcc_email']));
 		}else{
 			$dcc_email_date = "";
 		}
 		$row[]= '<center> ' .$dcc_email_date. ' </center>';
+		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
+		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
+		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
+		$row[]= ( $aRow['doc_no'] != NULL ) ? 
+					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>'  :
+					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
+		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
+		$row[]= ( $aRow['originator_code'] != NULL ) ? 
+					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
+					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
+		$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
+		$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];
 		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
 		array_push($output['aaData'],$row);
 	}

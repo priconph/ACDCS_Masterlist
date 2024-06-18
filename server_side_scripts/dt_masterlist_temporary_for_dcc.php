@@ -335,6 +335,7 @@
 		$row[]= $button;
 		$row[]= '<center> '.$status.' </center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
+		$row[]= '<center> ' .$aRow['dcc_email'] !=NULL ? date('Y-m-d',strtotime($aRow['dcc_email'])) : "" . ' </center>';
 		$row[]= $aRow['date_received'];
 		$row[]= $aRow['model'] ;
 		$row[]= $aRow['doc_title'];
@@ -343,7 +344,6 @@
 		$row[]='<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>';
 		$row[]= $aRow['effectivity_date'];
 		$row[]= $aRow['expiration_date'];
-		$row[]= '<center> ' .$aRow['dcc_email'] !=NULL ? date('Y-m-d',strtotime($aRow['dcc_email'])) : "" . ' </center>';
 		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
 		array_push($output['aaData'],$row);
 	}
