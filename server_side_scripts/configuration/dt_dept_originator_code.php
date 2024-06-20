@@ -158,7 +158,7 @@
 	}
 	$sWhere .= ' AND deleted_at IS NULL';
 
-	$sGroupBy = 'GROUP BY originator_code';
+	$sGroupBy = 'GROUP BY originator_code ASC';
 	
 	/*
 	 * SQL queries

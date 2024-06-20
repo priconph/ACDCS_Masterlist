@@ -1,7 +1,13 @@
 <?php
 use Pages\GetUserRoles\Rapid;
 $is_dcc_staff = Rapid::getIsDccStaff();
-$is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR $is_dcc_staff['section'][0] == "EMO/QMS" OR $is_dcc_staff['division'][0] =="Quality Assurance Di" OR $is_dcc_staff['division'][0] =='QAS') ? 'true': 'false';
+$is_dcc_access = (
+	$is_dcc_staff['department'][0] =="Quality Assurance Dept." 
+	OR $is_dcc_staff['section'][0] == "EMO/QMS" 
+	OR $is_dcc_staff['division'][0] =="Quality Assurance Di" 
+	OR $is_dcc_staff['division'][0] =='QAS' 
+	OR $is_dcc_staff['section'][0] == 'Information Systems Section' 
+) ? 'true': 'false';
 ?>
 
 <section class="main">
@@ -23,7 +29,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 					<div class="">
 						<ul class="nav nav-tabs" role="tablist">
 						<?php 
-							if($is_dcc_access == 'true' || $_SESSION['username'] == 'mclegaspi'){
+							if($is_dcc_access == 'true'){
 								echo '
 									<li class="nav-item active">
 											<a class="nav-link" data-toggle="tab" href="#menu1">Pending</a>
@@ -37,6 +43,7 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 									<li class="nav-item">
 										<a class="nav-link" data-toggle="tab" href="#menu4">Obsolete Tab</a>
 									</li>
+									
 								';
 								$dcc_active = 'active';
 								$process_owner_active = '';
@@ -44,6 +51,9 @@ $is_dcc_access = ($is_dcc_staff['department'][0] =="Quality Assurance Dept." OR 
 								echo '
 									<li class="nav-item  active">
 										<a class="nav-link " data-toggle="tab" href="#menu2">For Review</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#menu4">Obsolete Tab</a>
 									</li>
 								';
 								$dcc_active = '';

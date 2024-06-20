@@ -29,8 +29,18 @@
 											/* Check if there is a read role on one IQC modules */
 											// echo $query;
 											use Pages\GetUserRoles\DocReviewDispositionApprovalDetails;
+											use Pages\GetUserRoles\Rapid;
 											$is_approver = DocReviewDispositionApprovalDetails::getIsApprover();
+											$is_dcc_staff = Rapid::getIsDccStaff();
+											$is_dcc_access = (
+												$is_dcc_staff['department'][0] =="Quality Assurance Dept." 
+												OR $is_dcc_staff['section'][0] == "EMO/QMS" 
+												OR $is_dcc_staff['division'][0] =="Quality Assurance Di" 
+												OR $is_dcc_staff['division'][0] =='QAS' 
+												OR $is_dcc_staff['section'][0] == 'Information Systems Section' 
+											) ? 'true': 'false';
 											$is_username_exist = isset($_SESSION['username']) ? 'true' : 'false';
+
 											if($is_username_exist == 'true'){
 												echo '<div class="col-xs-3">
 														<a href="#" id="router" link-id="temporaryDocu">
@@ -92,34 +102,36 @@
 															</div>
 														</a>
 													</div>';
-												echo '<div class="col-xs-3">
-														<a href="#" id="router" link-id="settings">
-															<div class="panel panel-primary" style="padding:0px;">
-																<div class="panel-heading">
-																	<div class="row">
-																		<div class="col-xs-5">
-																		<i class="fa fa-cogs fa-5x"></i>
+												if($is_dcc_access == 'true'){
+													echo '<div class="col-xs-3">
+															<a href="#" id="router" link-id="settings">
+																<div class="panel panel-primary" style="padding:0px;">
+																	<div class="panel-heading">
+																		<div class="row">
+																			<div class="col-xs-5">
+																			<i class="fa fa-cogs fa-5x"></i>
+																			</div>
+																			<div class="col-xs-7 text-right">
+																			<p class="announcement-heading"></p>
+																			<p class="announcement-text fa-2x"> Settings</p>
+																			</div>
 																		</div>
-																		<div class="col-xs-7 text-right">
-																		<p class="announcement-heading"></p>
-																		<p class="announcement-text fa-2x"> Settings</p>
+																		<br/>
+																	</div>
+																	<div class="panel-footer announcement-bottom">
+																		<div class="row">
+																			<div class="col-xs-6">
+																				Open
+																			</div>
+																			<div class="col-xs-6 text-right">
+																				<i class="fa fa-arrow-circle-right"></i>
+																			</div>
 																		</div>
 																	</div>
-																	<br/>
 																</div>
-																<div class="panel-footer announcement-bottom">
-																	<div class="row">
-																		<div class="col-xs-6">
-																			Open
-																		</div>
-																		<div class="col-xs-6 text-right">
-																			<i class="fa fa-arrow-circle-right"></i>
-																		</div>
-																	</div>
-																</div>
-															</div>
-														</a>
-													</div>';
+															</a>
+														</div>';
+												}
 												if( $is_approver > 0 ){
 													echo '<div class="col-xs-3">
 														<a href="#" id="router" link-id="forApproval">
