@@ -144,7 +144,7 @@ class DocReviewDisposition{
             foreach ($sec_heads_username as $key => $value) {
                 $array_data_app 				= array();
                 $array_data_app['id'] 			= $value;
-                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value) == "Ni-An Alcazar"? "Ni-An Lim" : Hris::get_emp_name_by_username_systemone($value);;
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value) == "Ni-An Alcazar"? "Ni-An Lim" : Hris::get_emp_name_by_username_systemone($value);
                 $return['sec_heads_username'][]	= $array_data_app;
             }
             foreach ($reviewed_by as $key => $value) {

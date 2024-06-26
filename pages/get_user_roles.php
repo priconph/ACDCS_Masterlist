@@ -51,9 +51,14 @@ class Rapid{
 	public static function getIsDccStaff(){
 		$oop = 'db_config/config_rapid.php';
 		if(!file_exists($oop)){
-			if(file_exists('../../'.$oop)) {
+			if(file_exists('../'.$oop)){
+				require_once('../'.$oop);
+			}else if(file_exists('../../'.$oop)) {
 				require_once('../../'.$oop);
-			} else {
+			} else if(file_exists('../../../'.$oop)){
+                require_once('../../../'.$oop);
+            }
+			else {
 				echo '<br><br><br>
 						<h1><center>'.$oop.' does not exist! Please contact the ISS! </center>
 					</h1>';
@@ -75,7 +80,45 @@ class Rapid{
 		$sql  = 'SELECT * FROM `tbl_useraccounts` WHERE `username` = "'.$_SESSION['username'].'" LIMIT 0,1';
 		$result = mysqli_query($conn,$sql);
 		while($data = mysqli_fetch_array($result)){
-			$return['username'][] 	= $_SESSION['username'];
+			$return['username'][] 		= $_SESSION['username'];
+			$return['department'][] 	= $data['department'];
+			$return['section'][] 		= $data['section'];
+			$return['division'][] 		= $data['division'];
+		}
+		return $return;
+	}
+	public static function getIsDccStaffValid($user_name){
+		$oop = 'db_config/config_rapid.php';
+		if(!file_exists($oop)){
+			if(file_exists('../'.$oop)){
+				require_once('../'.$oop);
+			}
+			else if(file_exists('../../'.$oop)) {
+				require_once('../../'.$oop);
+			} else if(file_exists('../../../'.$oop)){
+                require_once('../../../'.$oop);
+            }else {
+				echo '<br><br><br>
+						<h1><center>'.$oop.' does not exist! Please contact the ISS! </center>
+					</h1>';
+				exit;
+			}
+		}else{
+			require_once($oop);
+		}
+		/* connect to database  */
+		$conn 		= mysqli_connect($server,$username,$password) or die("cannot connect server");
+
+		$database 	= mysqli_select_db($conn,$db_name) or die("cannot connect database");
+
+
+		/* Query Here  */
+		$return =array();
+		// $sql  = 'SELECT COUNT(*) as approver_count FROM tbl_doc_review_disposition_approval_details WHERE sec_heads_username = "'.$username.'"';
+		$sql  = 'SELECT * FROM `tbl_useraccounts` WHERE `username` = "'.$user_name.'" LIMIT 0,1';
+		$result = mysqli_query($conn,$sql);
+		if($data = mysqli_fetch_array($result)){
+			$return['username'][] 	= $user_name;
 			$return['department'][] 	= $data['department'];
 			$return['section'][] 		= $data['section'];
 			$return['division'][] 	= $data['division'];
@@ -111,9 +154,13 @@ class Hris{
 		$return =array();
 		$sql  = 'SELECT * FROM `vw_ACDCS` WHERE `username` = "'.$_SESSION['username'].'" LIMIT 0,1';
 		$result = mysqli_query($conn,$sql);
-		while($data = mysqli_fetch_array($result)){
+		if($data = mysqli_fetch_array($result)){
 			$return['department'] 	= $data['Department'];
-			$return['fullname'] 	= $data['firstname'] .' '. $data['lastname'];
+			$return['fullname'] 	= $data['firstname'] .' '. $data['lastname'] ;
+			$return['fullname']		= ($return['fullname'] == "Ni-An Alcazar" ) ? "Ni-An Lim" : $return['fullname'];
+		}else{
+			$return['department'] 	= "-";
+			$return['fullname'] = $_SESSION['username'];
 		}
 		return $return;
 	}

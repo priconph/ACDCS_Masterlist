@@ -83,8 +83,8 @@ echo '<input type="hidden" id="txt_selected_menu" value="'.$selected_menu.'">';
 						<a href="#" class="navbar-brand">
 							<?php 
 								use Pages\GetUserRoles\Hris;
-								// fullname
 								$get_dept_id_by_user_name = Hris::getDeptIdByUserName($_SESSION['username']); 
+								// if($_SESSION['username'] == 'stomela')
 								echo '<span class="hidden-xs">' . $get_dept_id_by_user_name['fullname']. '</span>';
 								echo '( '.$get_dept_id_by_user_name['department'] . ' ) ';
 							?>

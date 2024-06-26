@@ -1,4 +1,6 @@
 <?php
+	error_reporting(E_ALL);
+	ini_set('display_errors', 1);
 	/*
 	 * Script:    DataTables server-side script for PHP and MySQL
 	 * Copyright: 2010 - Allan Jardine
@@ -19,6 +21,7 @@
 	$doc_review_disposition_class = '../model/doc_review_disposition.php';
 	$systemone = '../model/systemone.php';
 	$doc_review_originator_code = '../model/doc_review_originator_code.php';
+	$get_user_roles = '../model/rapid.php';
 
 
 	if(file_exists($database_config)){
@@ -51,15 +54,30 @@
 		echo "config file does not exist!";
 		exit;
 	}
+	if(file_exists($get_user_roles)){
+		require_once($get_user_roles);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
 
 	use Model\DocReviewDisposition;
 	use Model\ActiveDocument;
 	use Model\Hris;
 	use Model\DocReviewOriginatorCode;
+	use Model\Rapid;
 
+	$user_name = $_GET['username'];
 
-	error_reporting(E_ALL);
-	ini_set('display_errors', 1);
+	/* Validated if ISS / QAS - Admin Access */
+	$is_dcc_staff = Rapid::getIsDccStaffValid($user_name);
+	$is_dcc_access = (
+		$is_dcc_staff['department'][0] =="Quality Assurance Dept." 
+		OR $is_dcc_staff['section'][0] == "EMO/QMS" 
+		OR $is_dcc_staff['division'][0] =="Quality Assurance Di" 
+		OR $is_dcc_staff['section'][0] =='QAS' 
+		OR $is_dcc_staff['section'][0] == 'Information Systems Section' 
+	) ? 'true': 'false';
     
 	$aColumns = array(
 		'obsolete.expiration_date AS obsolete_expiration_date',
@@ -88,7 +106,6 @@
 
 	);
 	/* used this field for searching data typed in the search box */
-
 	$array_search = array(
 		'obsolete.date_received',
 		'obsolete.model',
@@ -236,20 +253,23 @@
 	}else{
 		$sWhere .= "AND ";
 	}
-	$user_name = $_GET['username'];
+	
+
 	/* Default WHERE query without search inputs */
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
 	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "false"';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
-	if($user_name == "mclegaspi" || $user_name == "dormarm"){
+	
+	if($is_dcc_access == "true"){ // Validated if ISS / QAS - Admin Access
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
 	}else{
+		//Filtered based on Originator Code matched by Department Code from SystemOne
 		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
 		$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
 		$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
 		$arr_sql_or = array();
-		
+
 		foreach ($arr_dept_id as $key => $value) {
 			$arr_sql_or[] = ' active.`originator_code` = "'.$arr_dept_id[$key].'" ';
 		}
@@ -312,6 +332,7 @@
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
 		"script" => $script,
+		"is_dcc_access" => $is_dcc_staff,
 	);
 	/*
 		Class Object

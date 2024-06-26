@@ -5,7 +5,7 @@ $is_dcc_access = (
 	$is_dcc_staff['department'][0] =="Quality Assurance Dept." 
 	OR $is_dcc_staff['section'][0] == "EMO/QMS" 
 	OR $is_dcc_staff['division'][0] =="Quality Assurance Di" 
-	OR $is_dcc_staff['division'][0] =='QAS' 
+	OR $is_dcc_staff['section'][0] =='QAS' 
 	OR $is_dcc_staff['section'][0] == 'Information Systems Section' 
 ) ? 'true': 'false';
 ?>

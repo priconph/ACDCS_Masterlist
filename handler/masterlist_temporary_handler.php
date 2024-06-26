@@ -164,11 +164,17 @@ use Handler\DocuReviewDisposition;
 			$sec_heads_username = $return['sec_heads_username'];
 			$datetime_today = date('Y-m-d H:i:s');
 			$doc_review_masterlist_id = $return['doc_review_masterlist_id'];
-			
 			$doc_review_masterlist = $common_class->docReviewMasterlist($doc_review_masterlist_id);
 			$dcc_emailed_at = $doc_review_masterlist['updated_at']; //NOTE: When DCC Email the For Review Document
 			$new_status = 2;
 			$table = 'tbl_doc_review_disposition';
+
+			if( $return['sec_heads_username'] == $username ){
+				$response['is_success'] ='false';
+				$response['result_msg'] = 'Invalid Approver, Please Select your Dept/Section Head !';
+				echo json_encode($response);
+				return;
+			}
 			/* Get the document disposition then delete the previous disposition to count as review history */
 			$get_doc_review_disposition_descending_id =  DocReviewDisposition::getDocReviewDispositionDescending($doc_review_masterlist_id);
 			if( $get_doc_review_disposition_descending_id['is_exist'] == 1 ){
@@ -294,12 +300,18 @@ use Handler\DocuReviewDisposition;
 			$datetime_today = date('Y-m-d H:i:s');
 			$doc_review_masterlist_id = $return['doc_review_masterlist_id'];
 			$docu_review_disposition_id = $return['docu_review_disposition_id'];
-			
+
 			$doc_review_masterlist = $common_class->docReviewMasterlist($doc_review_masterlist_id);
 			$dcc_emailed_at = $doc_review_masterlist['created_at'];
 			$new_status = 2;
-
 			$table = 'tbl_doc_review_disposition';
+
+			if( $return['sec_heads_username'] == $username ){
+				$response['is_success'] ='false';
+				$response['result_msg'] = 'Invalid Approver, Please Select your Dept/Section Head !';
+				echo json_encode($response);
+				return;
+			}
 			if($disposition == 1){ //Revision
 				
 				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','remarks','updated_at');
@@ -482,7 +494,6 @@ use Handler\DocuReviewDisposition;
 					$arr_expiration_date_from_to = explode('-',$return['expiration_date_from_to']);
 					$arr_sql_where = ' ' . "AND disposition.`dcc_email` BETWEEN ' " .date('Y-m-d', strtotime($arr_expiration_date_from_to[0])). " ' AND ' " .date('Y-m-d', strtotime($arr_expiration_date_from_to[1])). " '";
 				}
-				
 				/*
 				!Where active exp date or obsolete exp date
 					if($return['expiration_date_from_to'] != ''){

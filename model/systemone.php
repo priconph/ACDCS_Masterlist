@@ -34,9 +34,12 @@ class Hris {
 			// $emp_name			= TQTS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 			if($row = mysqli_fetch_array($result)) {
 				$emp_name = $row['emp_name'];
+			}else{
+				$emp_name = $username;
 			}
 		}
-		return $emp_name;
+		//$array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value) == "Ni-An Alcazar"? "Ni-An Lim" : Hris::get_emp_name_by_username_systemone($value);
+		return ( $emp_name == "Ni-An Alcazar" ) ? "Ni-An Lim" : $emp_name;
 	}
     function get_section_by_username_systemone($username) {
 		if(file_exists('../class/oop_acdcs.php')) {

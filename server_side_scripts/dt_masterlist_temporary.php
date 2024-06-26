@@ -1,4 +1,6 @@
 <?php
+	error_reporting(E_ALL);
+	ini_set('display_errors', 1);
 	/*
 	 * Script:    DataTables server-side script for PHP and MySQL
 	 * Copyright: 2010 - Allan Jardine
@@ -18,6 +20,7 @@
 	$doc_review_disposition_class = '../model/doc_review_disposition.php';
 	$systemone = '../model/systemone.php';
 	$doc_review_originator_code = '../model/doc_review_originator_code.php';
+	$get_user_roles = '../model/rapid.php';
 
 	if(file_exists($database_config)){
 		require_once($database_config);
@@ -25,14 +28,12 @@
 		echo "config file does not exist!";
 		exit;
 	}
-
 	if(file_exists($active_document_class)){
 		require_once($active_document_class);
 	} else {
 		echo "active_document_class file does not exist!";
 		exit;
 	}
-
 	if(file_exists($doc_review_disposition_class)){
 		require_once($doc_review_disposition_class);
 	} else {
@@ -51,15 +52,31 @@
 		echo "config file does not exist!";
 		exit;
 	}
+	if(file_exists($get_user_roles)){
+		require_once($get_user_roles);
+	} else {
+		echo "config file does not exist!";
+		exit;
+	}
 
 	use Model\DocReviewDisposition;
 	use Model\ActiveDocument;
 	use Model\Hris;
 	use Model\DocReviewOriginatorCode;
+	use Model\Rapid;
 
-	error_reporting(E_ALL);
-	ini_set('display_errors', 1);
-    
+	$user_name = $_GET['username'];
+
+	/* Validated if ISS / QAS - Admin Access */
+	$is_dcc_staff = Rapid::getIsDccStaffValid($user_name);
+	$is_dcc_access = (
+		$is_dcc_staff['department'][0] =="Quality Assurance Dept." 
+		OR $is_dcc_staff['section'][0] == "EMO/QMS" 
+		OR $is_dcc_staff['division'][0] =="Quality Assurance Di" 
+		OR $is_dcc_staff['section'][0] =='QAS' 
+		OR $is_dcc_staff['section'][0] == 'Information Systems Section' 
+	) ? 'true': 'false';
+
 	$aColumns = array(
 		'obsolete.expiration_date AS obsolete_expiration_date',
 		'obsolete.date_received AS obsolete_date_received',
@@ -229,20 +246,19 @@
 		kasama where kapag naman may laman na AND na syempre diba :)
 	*/
 
+	/* Default WHERE query without search inputs */
 	if($sWhere == ""){
 		$sWhere .= "WHERE  ";
 	}else{
 		$sWhere .= "AND ";
 	}
-	$user_name = $_GET['username'];
-	/* Default WHERE query without search inputs */
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but as per checking obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column
 	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "true" ';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
 
-	// if($user_name == "mclegaspi" || $user_name == "dormarm"){ // display all document for the Super User
+	// if($is_dcc_access == "true"){ // Validated if ISS / QAS - Admin Access
 	// 	$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
 	// }else{
 	// 	$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
@@ -261,15 +277,8 @@
 	// }
 	
 	
-	/* 
-			SELECT SQL_CALC_FOUND_ROWS obsolete.expiration_date AS obsolete_expiration_date, obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model, obsolete.doc_title AS obsolete_doc_title, obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no, obsolete.effectivity_date AS obsolete_effectivity_date, active.expiration_date, masterlist.id, masterlist.fkid_document, masterlist.document_status, masterlist.is_expiration_date_exist, masterlist.deleted_at, active.date_received, active.model, active.doc_title, active.doc_no, active.rev_no, active.effectivity_date, masterlist.originator_code, disposition.reviewed_by, disposition.disposition, disposition.dcc_email
-		FROM   tbl_doc_review_masterlist masterlist
-		LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id
-		WHERE   masterlist.deleted_at IS NULL AND masterlist.document_status < 3  AND masterlist.is_expiration_date_exist = "false" AND disposition.deleted_at IS NULL AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""
-		ORDER BY masterlist.document_status ASC
-		LIMIT 0, 10
-	
-	NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
+
+	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
 		// ilagay dito kung pwede based sa date, or customized advance search
 	}
