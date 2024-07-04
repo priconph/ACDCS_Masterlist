@@ -138,7 +138,7 @@ class DocReviewDisposition{
             foreach ($person_in_charge as $key => $value) {
                 $array_data_app 				= array();
                 $array_data_app['id'] 			= $value;
-                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value) == "Ni-An Alcazar"? "Ni-An Lim" : Hris::get_emp_name_by_username_systemone($value);
                 $return['person_in_charge'][]	= $array_data_app;
             }
             foreach ($sec_heads_username as $key => $value) {
@@ -150,7 +150,7 @@ class DocReviewDisposition{
             foreach ($reviewed_by as $key => $value) {
                 $array_data_app 				= array();
                 $array_data_app['id'] 			= $value;
-                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value) == "Ni-An Alcazar"? "Ni-An Lim" : Hris::get_emp_name_by_username_systemone($value);
                 $return['reviewed_by'][]	= $array_data_app;
             }
 
@@ -192,7 +192,7 @@ class DocReviewDisposition{
             foreach ($person_in_charge as $key => $value) {
                 $array_data_app 				= array();
                 $array_data_app['id'] 			= $value;
-                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value) == "Ni-An Alcazar"? "Ni-An Lim" : Hris::get_emp_name_by_username_systemone($value);
                 $return['person_in_charge'][]	= $array_data_app;
             }
             foreach ($sec_heads_username as $key => $value) {
@@ -204,7 +204,7 @@ class DocReviewDisposition{
             foreach ($reviewed_by as $key => $value) {
                 $array_data_app 				= array();
                 $array_data_app['id'] 			= $value;
-                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value);
+                $array_data_app['text'] 		= Hris::get_emp_name_by_username_systemone($value) == "Ni-An Alcazar"? "Ni-An Lim" : Hris::get_emp_name_by_username_systemone($value);
                 $return['reviewed_by'][]	= $array_data_app;
             }
 

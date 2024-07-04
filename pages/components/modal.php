@@ -279,6 +279,14 @@
 						<input type="file" class="form-control" id="file_memo" name="file_memo" style="width:100%;">
 					</div>
 				</div>
+				<div class="row">
+					<div class="col-sm-12">				
+						<label>Process Owner Remarks:</label>
+					</div>
+					<div class="col-sm-12">	
+						<input type="text" name="remarks" id="remarks" class="form-control">
+					</div>
+				</div>
 		  </div>
 		  <div class="modal-footer">
 			<button type="submit" class="btn btn-primary fa fa-save" id="btn_yes_remove_attachment"> Save</button>

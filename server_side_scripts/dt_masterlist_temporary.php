@@ -74,7 +74,7 @@
 		OR $is_dcc_staff['section'][0] == "EMO/QMS" 
 		OR $is_dcc_staff['division'][0] =="Quality Assurance Di" 
 		OR $is_dcc_staff['section'][0] =='QAS' 
-		OR $is_dcc_staff['section'][0] == 'Information Systems Section' 
+		// OR $is_dcc_staff['section'][0] == 'Information Systems Section' 
 	) ? 'true': 'false';
 
 	$aColumns = array(
@@ -256,25 +256,26 @@
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column
 	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "true" ';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
-	$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
+	// $sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
 
-	// if($is_dcc_access == "true"){ // Validated if ISS / QAS - Admin Access
-	// 	$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
-	// }else{
-	// 	$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
-	// 	$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
-	// 	$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
-	// 	$arr_sql_or = array();
+	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
+
+		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
+	}else{
+		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
+		$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
+		$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
+		$arr_sql_or = array();
 		
-	// 	foreach ($arr_dept_id as $key => $value) {
-	// 		$arr_sql_or[] = ' active.`originator_code` = "'.$arr_dept_id[$key].'" ';
-	// 	}
-	// 	if(count($arr_dept_id) == 1){
-	// 		$sWhere 	.= ' AND active.`originator_code` = "'.$arr_dept_id[0].'" )';
-	// 	}else if(count($arr_dept_id) > 1){
-	// 		$sWhere 	.= ' AND '.implode(' OR',$arr_sql_or).' )';
-	// 	}
-	// }
+		foreach ($arr_dept_id as $key => $value) {
+			$arr_sql_or[] = ' active.`originator_code` = "'.$arr_dept_id[$key].'" ';
+		}
+		if(count($arr_dept_id) == 1){
+			$sWhere 	.= ' AND active.`originator_code` = "'.$arr_dept_id[0].'" )';
+		}else if(count($arr_dept_id) > 1){
+			$sWhere 	.= ' AND '.implode(' OR',$arr_sql_or).' )';
+		}
+	}
 	
 	
 

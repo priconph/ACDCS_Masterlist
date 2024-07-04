@@ -161,6 +161,7 @@ use Handler\DocuReviewDisposition;
 			$response = array();
 			$username = $_SESSION['username'];
 			$disposition = $return['disposition'];
+			$remarks = $return['remarks'];
 			$sec_heads_username = $return['sec_heads_username'];
 			$datetime_today = date('Y-m-d H:i:s');
 			$doc_review_masterlist_id = $return['doc_review_masterlist_id'];
@@ -184,8 +185,9 @@ use Handler\DocuReviewDisposition;
 				$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
 			}
 			if($disposition == 1){ //Revision
-				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','created_at');
-				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$datetime_today);
+				$array_fields = array('tbl_doc_review_masterlist_id','disposition','person_in_charge','due_date','reviewed_by','dcc_email','remarks','created_at');
+				$array_values = array($doc_review_masterlist_id,$disposition,$return['person_in_charge'],$return['due_date'],$username,$dcc_emailed_at,$remarks,$datetime_today);
+
 				$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values);
 
 				/* Scheduled email to Process owner */
@@ -203,8 +205,8 @@ use Handler\DocuReviewDisposition;
 				return;
 			}
 			if($disposition == 2 || $disposition == 3 ){ //Retain & Obsolete
-				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','created_at');
-				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$datetime_today);
+				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','remarks','created_at');
+				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$remarks,$datetime_today);
 				$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values); 
 
 				/* Approval Details	and Send Email to Approvers */
@@ -239,8 +241,8 @@ use Handler\DocuReviewDisposition;
 						return;
 					}
 					/* saved extended disposition w/ memo file */
-					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_filtered_name','extension_date','reviewed_by','dcc_email');
-					$array_values = array($doc_review_masterlist_id,$disposition,$file_memo_name,$filtered_filename,$return['extension_date'],$username,$dcc_emailed_at);
+					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_filtered_name','extension_date','reviewed_by','remarks','dcc_email');
+					$array_values = array($doc_review_masterlist_id,$disposition,$file_memo_name,$filtered_filename,$return['extension_date'],$username,$remarks,$dcc_emailed_at);
 					$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values);
 					/* Uploading of Data */
 					$tbl_folder_path = $common_class->folderPath('memo'); //change temporary_document to memo
@@ -265,8 +267,8 @@ use Handler\DocuReviewDisposition;
 						return;
 					}
 					/* saved extended disposition w/o memo file */
-					$array_fields = array('tbl_doc_review_masterlist_id','disposition','extension_date','reviewed_by','dcc_email','created_at');
-					$array_values = array($doc_review_masterlist_id,$disposition,$return['extension_date'],$username,$dcc_emailed_at,$datetime_today);
+					$array_fields = array('tbl_doc_review_masterlist_id','disposition','extension_date','reviewed_by','dcc_email','remarks','created_at');
+					$array_values = array($doc_review_masterlist_id,$disposition,$return['extension_date'],$username,$dcc_emailed_at,$remarks,$datetime_today);
 					$docu_review_disposition_id = ACDCS::getInstance()->insert_query_id($table,$array_fields,$array_values);
 					
 					/* Approval Details	and Send Email to Approvers	*/
@@ -337,8 +339,9 @@ use Handler\DocuReviewDisposition;
 			}
 
 			if($disposition == 2 || $disposition == 3 ){ //Retain & Obsolete
-				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','remarks','created_at');
+				$array_fields = array('tbl_doc_review_masterlist_id','disposition','reviewed_by','dcc_email','remarks','updated_at');
 				$array_values = array($doc_review_masterlist_id,$disposition,$username,$dcc_emailed_at,$remarks,$datetime_today);
+				
 				$where = 'WHERE id = '.$docu_review_disposition_id.'';
 				//Before updating the disposition, clear the doc review disposition table.
 				$clear_tbl_disposition[] = $common_class->clearTblDocReviewDispositionColumn($docu_review_disposition_id);
@@ -378,8 +381,8 @@ use Handler\DocuReviewDisposition;
 						return;
 					}
 					/* saved extended disposition w/ memo file */
-					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_filtered_name','extension_date','reviewed_by','remarks','dcc_email');
-					$array_values = array($doc_review_masterlist_id,$disposition,$file_memo_name,$filtered_filename,$return['extension_date'],$username,$remarks,$dcc_emailed_at);
+					$array_fields = array('tbl_doc_review_masterlist_id','disposition','memo_file_name','memo_file_filtered_name','extension_date','reviewed_by','remarks','dcc_email','updated_at');
+					$array_values = array($doc_review_masterlist_id,$disposition,$file_memo_name,$filtered_filename,$return['extension_date'],$username,$remarks,$dcc_emailed_at,$datetime_today);
 					$where = 'WHERE id = '.$docu_review_disposition_id.'';
 					$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
 					/* Uploading of Data */
@@ -405,7 +408,7 @@ use Handler\DocuReviewDisposition;
 						return;
 					}
 					/* saved extended disposition w/o memo file */
-					$array_fields = array('tbl_doc_review_masterlist_id','disposition','extension_date','reviewed_by','dcc_email','remarks','created_at');
+					$array_fields = array('tbl_doc_review_masterlist_id','disposition','extension_date','reviewed_by','dcc_email','remarks','updated_at');
 					$array_values = array($doc_review_masterlist_id,$disposition,$return['extension_date'],$username,$dcc_emailed_at,$remarks,$datetime_today);
 					$where = 'WHERE id = '.$docu_review_disposition_id.'';
 					$update_query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);

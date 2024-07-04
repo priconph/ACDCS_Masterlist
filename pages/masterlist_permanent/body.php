@@ -231,19 +231,9 @@ $is_dcc_access = (
 		var tbl_permanent_masterlist = 'tbl_permanent_masterlist';
 		var tbl_permanent_masterlist_obsolete = 'tbl_permanent_masterlist_obsolete';
 		
-		/* DataTables 
-		
-		SELECT SQL_CALC_FOUND_ROWS obsolete.expiration_date AS obsolete_expiration_date, obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model, obsolete.doc_title AS obsolete_doc_title, obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no, obsolete.effectivity_date AS obsolete_effectivity_date, active.expiration_date, masterlist.id, masterlist.fkid_document, masterlist.document_status, masterlist.is_expiration_date_exist, masterlist.deleted_at, active.date_received, active.model, active.doc_title, active.doc_no, active.rev_no, active.effectivity_date, masterlist.originator_code, disposition.reviewed_by, disposition.disposition
-		FROM   tbl_doc_review_masterlist masterlist
-		LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id
-		WHERE  masterlist.deleted_at IS NULL AND masterlist.document_status = 3 AND disposition.deleted_at IS NULL AND MONTH(disposition.dcc_email) = 2 AND ( (active.`view_status` = 1 AND active.`logdel` = 0) OR (obsolete.`logdel` = 0) )
-		ORDER BY masterlist.id ASC
-		LIMIT 0, 10
-	
-		
-		*/
+		/* DataTables */
 		var dt_permanent_masterlist = $('#'+tbl_permanent_masterlist).DataTable({
-			"aaSorting"	: [],
+			"a0aSorting"	: [],
 			"bProcessing": true,
 			"bServerSide": true,
 			"sAjaxSource": "server_side_scripts/dt_permanent_masterlist.php?username="+"<?php echo $_SESSION['username'];?>",
@@ -283,7 +273,7 @@ $is_dcc_access = (
 			}
 		});
 
-		/* FUNCTION */
+		/*FUNCTION */
 		const dccReviewAgain = (doc_review_masterlist_id) => {
 			let data = {'action':'dcc_review_again','doc_review_masterlist_id':doc_review_masterlist_id}
 			call_ajax(data, masterlist_temporary_handler,function(result){

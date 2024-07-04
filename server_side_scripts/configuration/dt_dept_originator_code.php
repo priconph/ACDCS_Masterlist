@@ -86,7 +86,7 @@
 	/*
 	 * Ordering
 	 */
-	$sOrder = "ORDER BY  id ASC";
+	$sOrder = "ORDER BY  originator_code ASC";
 	if ( isset( $_GET['iSortCol_0'] ) )
 	{
 		$sOrder = "ORDER BY  ";

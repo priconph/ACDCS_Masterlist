@@ -76,7 +76,7 @@
 		OR $is_dcc_staff['section'][0] == "EMO/QMS" 
 		OR $is_dcc_staff['division'][0] =="Quality Assurance Di" 
 		OR $is_dcc_staff['section'][0] =='QAS' 
-		OR $is_dcc_staff['section'][0] == 'Information Systems Section' 
+		// OR $is_dcc_staff['section'][0] == 'Information Systems Section' 
 	) ? 'true': 'false';
     
 	$aColumns = array(
@@ -261,7 +261,7 @@
 	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "false"';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	
-	if($is_dcc_access == "true"){ // Validated if ISS / QAS - Admin Access
+	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
 	}else{
 		//Filtered based on Originator Code matched by Department Code from SystemOne
