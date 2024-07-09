@@ -280,6 +280,7 @@ $is_dcc_access = (
 		var $formAdvanceSearch = $('#formAdvanceSearch');
 		var tbl_masterlist_temporary_for_dcc = 'tbl_masterlist_temporary_for_dcc';
 		var tbl_masterlist_temporary_obsolete = 'tbl_masterlist_temporary_obsolete';
+		var tbl_masterlist_temporary_permanent_history = 'tbl_masterlist_temporary_permanent_history';
 		/* DataTables */
 		var dt_masterlist_temporary = $(tbl_masterlist_temporary).DataTable({
 			"aaSorting"	: [],
@@ -308,6 +309,7 @@ $is_dcc_access = (
 				$('#tbl_masterlist_temporary_for_dcc').attr('style','width:100%;')
 			}
 		});
+
 		var dt_masterlist_temporary_obsolete = $('#'+tbl_masterlist_temporary_obsolete).DataTable({
 			"aaSorting"	: [],
 			"bProcessing": true,
@@ -321,7 +323,8 @@ $is_dcc_access = (
 				$('#'+tbl_masterlist_temporary_obsolete).attr('style','width:100%;')
 			}
 		});
-		
+
+
 		/* FUNCTION */
 		const dccReviewAgain = (doc_review_masterlist_id) => {
 			let data = {'action':'dcc_review_again','doc_review_masterlist_id':doc_review_masterlist_id}
@@ -387,6 +390,26 @@ $is_dcc_access = (
 		}
 
 		$(tbl_masterlist_temporary).on('click','#btnViewDispositionHistory' ,getViewDispositionHistoryById);
+		var dt_masterlist_temporary_permanent_history = $('#'+tbl_masterlist_temporary_permanent_history).DataTable({
+			"aaSorting"	: [],
+			"bProcessing": true,
+			"bServerSide": true,
+			"sAjaxSource": "server_side_scripts/dt_masterlist_history_temporary_permanent.php?doc_review_masterlist_id=0",
+			"columnDefs":[
+				{"orderable":false,"targets":[0]}
+			],
+			"ordering":false,
+			"drawCallback": function( settings ) {
+				$('#'+tbl_masterlist_temporary_permanent_history).attr('style','width:100%;')
+			}
+		});
+		$('#'+tbl_masterlist_temporary_obsolete).on('click','#btnViewDispositionHistory' ,function (){
+			// alert($(this).attr('doc-review-masterlist-id'));
+			let doc_review_masterlist_id =  $(this).attr('doc-review-masterlist-id')
+			
+			dt_masterlist_temporary_permanent_history.ajax.url("server_side_scripts/dt_masterlist_history_temporary_permanent.php?doc_review_masterlist_id="+doc_review_masterlist_id).draw();
+			$('#modal_masterlist_temporary_permanent_history').modal();
+		}); //nmodify
 
 		$('#'+tbl_masterlist_temporary_obsolete).on('click','#btnViewDocReviewDisposition' ,getDocReviewDisposition);
 
@@ -409,16 +432,13 @@ $is_dcc_access = (
 		$('#yes_dcc_review_again').click(function (e) { 
 			e.preventDefault();
 			dccReviewAgain(arr_dcc_review_again_masterlist_id);
-			
 		});
 
 		
 		$('#btnBatchApproval').click(function (e) { 
 			e.preventDefault();
 			const filtered_doc_review_masterlist_id = Array.from(new Set(arr_doc_review_masterlist_id));
-			console.log(filtered_doc_review_masterlist_id);
 			$('#modal_approver_decision').modal();
-
 		});
 
 		$('#btnExportDocReviewMasterlist').click(function (e) { 
@@ -437,9 +457,6 @@ $is_dcc_access = (
 			( $(this).attr('href') === '#menu2' ) ? dt_masterlist_temporary.draw() : '';
 			( $(this).attr('href') === '#menu3' ) ? dt_masterlist_temporary_for_dcc.draw() : '';
 			( $(this).attr('href') === '#menu4' ) ? dt_masterlist_temporary_obsolete.draw() : '';
-
-
-
 		});
 
 		$('#link_file_memo').click(function (e) { 

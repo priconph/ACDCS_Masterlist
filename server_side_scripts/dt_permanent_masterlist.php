@@ -103,6 +103,7 @@
 		'disposition.reviewed_by',
 		'disposition.disposition',
 		'disposition.dcc_email',
+		'disposition.created_at',
 
 	);
 	/* used this field for searching data typed in the search box */
@@ -194,7 +195,7 @@
 	}
 	if($sOrder == ""){
 		// $sOrder = "ORDER BY masterlist.id ASC";
-		$sOrder = "ORDER BY masterlist.document_status ASC";
+		$sOrder = "ORDER BY disposition.created_at DESC";
 	}
 
 	/* 
@@ -385,16 +386,16 @@
 		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
 
 		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
-		
-		$row[]= $button;
-		// $row[]= $aRow['fkid_document'];
-		$row[]= '<center> '.$status.' </center>';
-		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
 		if (($aRow['dcc_email'] != NULL && $aRow['dcc_email'] != '0000-00-00 00:00:00')){
 			$dcc_email_date = date('Y-m-d',strtotime($aRow['dcc_email']));
 		}else{
 			$dcc_email_date = "";
 		}
+
+		$row[]= $button;
+		// $row[]= $aRow['fkid_document'];
+		$row[]= '<center> '.$status.' </center>';
+		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
 		$row[]= '<center> ' .$dcc_email_date. ' </center>';
 		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
 		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];

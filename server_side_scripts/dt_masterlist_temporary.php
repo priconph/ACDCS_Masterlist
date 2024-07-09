@@ -192,7 +192,8 @@
 	}
 	if($sOrder == ""){
 		// $sOrder = "ORDER BY masterlist.id ASC";
-		$sOrder = "ORDER BY masterlist.document_status ASC";
+		// $sOrder = "ORDER BY masterlist.document_status ASC";
+		$sOrder = "ORDER BY disposition.created_at DESC";
 	}
 
 	/* 
@@ -396,7 +397,7 @@
 		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
 
 		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
-		//$button .= '<br><center><button btn-type="view" doc-review-masterlist-id="'.$doc_review_masterlist_id.'" id="btnViewDispositionHistory" class="btn btn-sm btn-default fa fa-file" type="button"> View History</button></center>';
+		// $button .= '<br><center><button btn-type="view" doc-review-masterlist-id="'.$doc_review_masterlist_id.'" id="btnViewDispositionHistory" class="btn btn-sm btn-default fa fa-file" type="button"> View History</button></center>';
 		$row[]= $button;
 		// $row[]= $aRow['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
