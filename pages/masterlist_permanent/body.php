@@ -217,8 +217,8 @@ $is_dcc_access = (
 	include_once('pages/components/modal.php');
 ?>
 
-<script src="js/common_functions.js?12345"></script>
-<script src="js/doc_review_masterlist.js?123456"></script>
+<script src="js/common_functions.js?98765"></script>
+<script src="js/doc_review_masterlist.js?98765"></script>
 <script>
 	$(document).ready(function () {
 		var arr_dcc_review_again_masterlist_id = [];
@@ -258,7 +258,6 @@ $is_dcc_access = (
 				$('#'+tbl_masterlist_permanent_for_dcc).attr('style','width:100%;')
 			}
 		});
-
 		var dt_permanent_masterlist_obsolete = $('#'+tbl_permanent_masterlist_obsolete).DataTable({
 			"aaSorting"	: [],
 			"bProcessing": true,
@@ -444,6 +443,16 @@ $is_dcc_access = (
 				$('#modalAdvanceSearch').modal('hide');
 			});
 		});
+
+		$('#'+tbl_permanent_masterlist_obsolete).on('click','#btnViewDispositionHistory' ,function (){
+			let doc_review_masterlist_id =  $(this).attr('doc-review-masterlist-id')
+			getViewDispositionHistoryById(doc_review_masterlist_id);
+
+		}); //nmodify
+		$('#'+tbl_masterlist_permanent_for_dcc).on('click','#btnViewDispositionHistory' ,function (){
+			let doc_review_masterlist_id =  $(this).attr('doc-review-masterlist-id')
+			getViewDispositionHistoryById(doc_review_masterlist_id);
+		}); //nmodify
 
 		/* ***************************
 			Closing of Modal

@@ -1,4 +1,19 @@
 // $(document).ready(function () {
+    var tbl_masterlist_temporary_permanent_history = 'tbl_masterlist_temporary_permanent_history';
+
+    var dt_masterlist_temporary_permanent_history = $('#'+tbl_masterlist_temporary_permanent_history).DataTable({ //APPLY TO PERMANENT
+        "aaSorting"	: [],
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": "server_side_scripts/dt_masterlist_history_temporary_permanent.php?doc_review_masterlist_id=0",
+        "columnDefs":[
+            { "orderable":false,"targets":[0] }
+        ],
+        "ordering":false,
+        "drawCallback": function( settings ) {
+            $('#'+tbl_masterlist_temporary_permanent_history).attr('style','width:100%;')
+        }
+    });
 
     /* Global Variable */
     $(document).ready(function () {
@@ -91,7 +106,10 @@
         dispositionStatus($formId,disposition);
     }
 
-    
+    const getViewDispositionHistoryById = function (doc_review_masterlist_id){
+        dt_masterlist_temporary_permanent_history.ajax.url("server_side_scripts/dt_masterlist_history_temporary_permanent.php?doc_review_masterlist_id="+doc_review_masterlist_id).draw();
+        $('#modal_masterlist_temporary_permanent_history').modal();
+    }
 
 // });
         

@@ -42,6 +42,7 @@
 		'disposition.reviewed_by',
 		'disposition.disposition',
 		'disposition.dcc_email',
+		'disposition.due_date',
 	);
 	/* used this field for searching data typed in the search box */
 
@@ -317,10 +318,10 @@
 		$arr_doc_review_disposition = $get_doc_review_disposition->getDocReviewDispositionById($doc_review_masterlist_id);
 		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
 		
-		// $row[]= '<center><input data-id="'.$doc_review_masterlist_id.'" id="cBoxBatchSelect" class="form-control" type="checkbox"> </center>';
+		$button .= '<br><center><button btn-type="view" doc-review-masterlist-id="'.$doc_review_masterlist_id.'" id="btnViewDispositionHistory" class="btn btn-sm btn-default fa fa-file" type="button"> View History</button></center>';
 		$row[]= $button;
 		$row[]= '<center> '.$status.' </center>';
-		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
+		$row[]= '<center> ' . $aRow['due_date'] . $doc_review_disposition .  ' </center>';
 		$row[]= '<center> ' .$aRow['dcc_email'] !=NULL ? date('Y-m-d',strtotime($aRow['dcc_email'])) : "" . ' </center>';
 		$row[]= $aRow['date_received'];
 		$row[]= $aRow['model'] ;

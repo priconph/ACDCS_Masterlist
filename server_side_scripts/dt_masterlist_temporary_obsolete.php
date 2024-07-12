@@ -50,6 +50,7 @@
 		'disposition.reviewed_by',
 		'disposition.disposition',
 		'disposition.dcc_email',
+		'disposition.dcc_email',
 	);
 	/* used this field for searching data typed in the search box */
 
@@ -334,6 +335,7 @@
 		$doc_review_disposition = $get_doc_review_disposition->getDispositionCode($arr_doc_review_disposition['disposition']);
 
 		$button .= '<br><center><button btn-type="view" doc-review-masterlist-id="'.$doc_review_masterlist_id.'" id="btnViewDispositionHistory" class="btn btn-sm btn-default fa fa-file" type="button"> View History</button></center>';
+		
 		$row[]= $button;
 		//? NOTE: If Obsolete or Revision disposition & Obsolete document means DCC Conformed
 		$row[]= '<center><span class="badge highlight-color-green">DCC Conformed</span></center>';
