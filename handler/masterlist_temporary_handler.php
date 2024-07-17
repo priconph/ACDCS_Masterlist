@@ -442,21 +442,21 @@ use Handler\DocuReviewDisposition;
 				$status = 2;
 			}
 			foreach ($return['filtered_arr_approval_id'] as $key => $arr_approval_id) {
-				/* Deactivate the Auto Email For Process Owner */
-				$common_class->deactivateAutoEmailToProcessOwner($arr_approval_id);
+				/* Deactivate the Auto Email For Process Owner */ //TODO: Disposition Id NOT Approval Id
 				$table = 'tbl_doc_review_disposition_approval_details';
 				$array_fields = array('status','remarks','updated_at');
 				$array_values = array($status, $return['approver_remarks'], date('Y-m-d H:i:s') );
 				$where = ' WHERE id = '.$arr_approval_id.' ';
 				$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where);
-				$doc_review_masterlist_id = DocReviewDispositionApprovalDetails::getDocReviewDispositionById($arr_approval_id);
+				$get_doc_review_disposition_by_id = DocReviewDispositionApprovalDetails::getDocReviewDispositionById($arr_approval_id);
 				if($status == 1){
-					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],3);
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($get_doc_review_disposition_by_id['tbl_doc_review_masterlist_id'],3);
 				}else if($status == 2){
-					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($doc_review_masterlist_id['tbl_doc_review_masterlist_id'],0);
+					$change_status[]= $common_class->changeStatusByDocReviewMasterlistById($get_doc_review_disposition_by_id['tbl_doc_review_masterlist_id'],0);
 					/* Email from Approver to Process Owner */
 					$common_class->sendScheduledEmailApproverToProcessOwner($arr_approval_id);
 				}
+				$common_class->deactivateAutoEmailToProcessOwner($get_doc_review_disposition_by_id['tblDocReviewDispositionId']);
 			}
 			$response['is_success'] = 'true';
 			$response['msg'] = 'Saved Successfully';
