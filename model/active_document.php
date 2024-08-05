@@ -13,7 +13,7 @@ class ActiveDocument {
             );
             $table 	   	= 'tbl_active_docs active';
             $joins 	   	= 'LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document';
-            $joins 	   	.=' RIGHT JOIN tbl_doc_review_masterlist masterlist ON masterlist.fkid_document = docs.pkid';
+            $joins 	   	.=' LEFT JOIN tbl_doc_review_masterlist masterlist ON masterlist.fkid_document = docs.pkid';
             $sql_where 	=  'WHERE active.view_status = 1';
             $sql_where 	.= ' AND active.logdel = 0';
             $sql_where 	.= ' AND masterlist.fkid_document = '.$fkid_document.'';
@@ -37,10 +37,49 @@ class ActiveDocument {
             }
             return $return;
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
+    public static function getDispositionById($fkid_document)
+    {
+        try {
+            require_once('../class/oop_acdcs.php');
+            $return = $_POST;
+            $array_fields = array('	masterlist.id AS doc_review_masterlist_id,masterlist.document_status,
+                                    masterlist.created_at, active. *,docs.pkid AS doc_pkid,docs.section,disposition.due_date'
+            );
+            $table 	   	= 'tbl_active_docs active';
+            $joins 	   	= 'LEFT JOIN tbl_documents docs ON docs.pkid = active.fkid_document';
+            $joins 	   	.=' LEFT JOIN tbl_doc_review_masterlist masterlist ON masterlist.fkid_document = docs.pkid';
+            $joins 	   	.=' LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id';
+            $sql_where 	=  'WHERE active.view_status = 1';
+            $sql_where 	.= ' AND active.logdel = 0';
+            $sql_where 	.= ' AND masterlist.fkid_document = '.$fkid_document.'';
+            $sql_where 	.= ' AND masterlist.deleted_at IS NULL';
+            $sql_where 	.= ' AND disposition.disposition = 1 AND disposition.deleted_at IS NULL AND disposition.review_count IS NULL';
+            $sql_order 	= 'ORDER BY active.doc_no DESC';
+            $sql_limit 	= '';
+            $script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+            $query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+            while($row = mysqli_fetch_array($query)){
+                $request['date_received'] 			= $row['date_received'];
+                $request['model'] 					= $row['model'];
+                $request['originator_code'] 		= $row['originator_code'];
+                $request['doc_title'] 				= $row['doc_title'];
+                $request['doc_no'] 					= $row['doc_no'];
+                $request['rev_no'] 					= $row['rev_no'];
+                $request['page_no'] 		        = $row['page_no'];
+                $request['expiration_date'] 		= $row['expiration_date'];
+                $request['effectivity_date'] 		= $row['effectivity_date'];
+                $return['due_date'] = $row['due_date'];
+            }
+            return $return;
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+    
     public static function activeDocsByFkid($fkid_document) 
 	{
 		require_once('../class/oop_acdcs.php');

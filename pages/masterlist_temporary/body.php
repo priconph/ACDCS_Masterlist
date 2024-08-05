@@ -280,6 +280,12 @@ $is_dcc_access = (
 		var $formAdvanceSearch = $('#formAdvanceSearch');
 		var tbl_masterlist_temporary_for_dcc = 'tbl_masterlist_temporary_for_dcc';
 		var tbl_masterlist_temporary_obsolete = 'tbl_masterlist_temporary_obsolete';
+		
+		// function test() {
+			
+		// }
+		// test();
+
 		/* DataTables */
 		var dt_masterlist_temporary = $(tbl_masterlist_temporary).DataTable({
 			"aaSorting"	: [],
@@ -404,6 +410,7 @@ $is_dcc_access = (
 			let doc_review_masterlist_id = $(this).attr('data-id');
 			arr_dcc_review_again_masterlist_id.push(doc_review_masterlist_id);
 			$('#modal_dcc_review_again').modal();
+		
 		});
 		
 		$('#yes_dcc_review_again').click(function (e) { 
@@ -528,6 +535,13 @@ $is_dcc_access = (
 				$('body').addClass('modal-open');
 			}    
 		});
+
+		/* API FOR DEBUG CODE
+			let data = {'action':'test_query','fkid':5754}
+			call_ajax(data, masterlist_temporary_handler,function(result){
+				console.log(result);
+			})
+		*/
 		
 	});
 </script>

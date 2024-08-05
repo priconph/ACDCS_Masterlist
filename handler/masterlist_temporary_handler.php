@@ -36,6 +36,7 @@ use Handler\DocuReviewDisposition;
 
 				case "get_dept_originator_code_by_originator_code" 	: get_dept_originator_code_by_originator_code(); break; 
 				case "save_originator_code" 						: save_originator_code(); break; 
+				case "test_query" 									: test_query(); break; 
 			}	
 		}
 	}
@@ -558,7 +559,7 @@ use Handler\DocuReviewDisposition;
 		}
 		return $string;
 	}
-
+	//Class
 	class CommonClass{
 		public function docReviewMasterlist($doc_review_masterlist_id) 
 		{
@@ -582,7 +583,6 @@ use Handler\DocuReviewDisposition;
 				throw $th;
 			}
 		}
-
 		public static function folderPath($folder_name) 
 		{
 			// tbl_folder_path
@@ -730,7 +730,8 @@ use Handler\DocuReviewDisposition;
 				$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($get_doc_review_disposition['tbl_doc_review_masterlist_id']);
 				$get_doc_review_disposition =  DocReviewDisposition::getDocReviewDisposition($docu_review_disposition_id);
 
-				$active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']);
+				// $active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']); //active only
+				$active_docs = ActiveDocument::getDispositionById($get_doc_review_masterlist_id['fkid_document']); // get disposition due date
 				$email_due_date = date( "Y-m-d", strtotime( "-5 days", strtotime($due_date) ) );
 				$tbl_name = 'tbl_doc_review_disposition';
 				// $to = 'mclegaspi@pricon.ph';
@@ -868,6 +869,11 @@ use Handler\DocuReviewDisposition;
 				throw $th;
 			}
 		}
-	}
+	} //end class
+	// function test_query(){ //nmodify
+			/* API FOR DEBUG CODE */
+	// 	$active = ActiveDocument::getDispositionById($_POST['fkid']);
+	// 	echo json_encode($active);
+	// }
 
 ?>
