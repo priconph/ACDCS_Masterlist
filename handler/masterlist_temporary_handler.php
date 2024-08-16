@@ -713,8 +713,8 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Title				: '.$active_docs['doc_title'].'<br>';
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
-				// $message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
-				$message .= 'Due Date 			: '.$get_doc_review_disposition_by_id['due_date'].'<br>';
+				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
+
 				return EmailDetail::send_email($to, $from, $cc, $subject, $message);
 				// print_r($message);
 			} catch (\Throwable $th) {
@@ -730,18 +730,17 @@ use Handler\DocuReviewDisposition;
 				$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($get_doc_review_disposition['tbl_doc_review_masterlist_id']);
 				$get_doc_review_disposition =  DocReviewDisposition::getDocReviewDisposition($docu_review_disposition_id);
 
-				// $active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']); //active only
-				$active_docs = ActiveDocument::getDispositionById($get_doc_review_masterlist_id['fkid_document']); // get disposition due date
+				$active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']); //active only
 				$email_due_date = date( "Y-m-d", strtotime( "-5 days", strtotime($due_date) ) );
 				$tbl_name = 'tbl_doc_review_disposition';
-				// $to = 'mclegaspi@pricon.ph';
+				$to = '';
 				// $from = 'cdcasuyon@pricon.ph';
 				// $cc = '';
 				$to = RapidEmailer::get_user_email_add_by_username($person_in_charge);
 				$from = 'issinfoservice@pricon.ph';
 				$arr_email_cc = array(	RapidEmailer::get_user_email_add_by_username($username),RapidEmailer::get_user_email_add_by_username('mclegaspi')	);
 				$cc = implode(',',$arr_email_cc);
-				$subject = 'FOR REVISION: ACDCS Document Review Processs'.' | Doc No. : '.$active_docs['doc_no'].' ';
+				$subject = 'FOLLOW UP FOR REVISION: ACDCS Document Review Processs'.' | Doc No. : '.$active_docs['doc_no'].' ';
 				$message = 'Please be informed that you have ACDCS Document Review for revision. <br><br>';
 				$message .= 'Request Details	: <br>';
 				$message .= 'Date Received		: '.$active_docs['date_received'].'<br>';
@@ -751,6 +750,7 @@ use Handler\DocuReviewDisposition;
 				$message .= 'Document No. 		: '.$active_docs['doc_no'].' <br>';
 				$message .= 'Rev No. 			: '.$active_docs['rev_no'].'<br>';
 				$message .= 'Expiration Date 	: '.$active_docs['expiration_date'].'<br>';
+				$message .= 'Due Date 			: '.$due_date.'<br>';
 				$date_start = $email_due_date;
 				$frequency = 2;
 				return EmailDetail::send_scheduled_email($tbl_name,$docu_review_disposition_id, $to, $from, $cc, $subject, $message , $date_start, $frequency);
@@ -832,7 +832,7 @@ use Handler\DocuReviewDisposition;
 				// $cc			=	implode(',',$return['send_cc']);
 				
 				/* message: TEST EMAIL*/
-				$to			= 	'dmmarmol@pricon.ph,';
+				$to			= 	'dmmarmol@pricon.ph,stomela@pricon.ph';
 				$from		=	'issinfoservice@pricon.ph';
 				$cc			=	'';
 				$subject	=	"For DCC Conformance";
