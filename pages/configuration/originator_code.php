@@ -30,8 +30,9 @@
 			<i class="fa fa-book fa-lg"></i> FAQs?
 		</div>
 		<div class="panel-body">
-			<p>Please add originator and department code to the Table. The department code can be multiple inputs.</p>
+			<p>Please add originator and department code to the Table. The department code can be multiple inputs to filtered the FOR REVIEW tab based on DEPT. CODE</p>
 			<p>NOTE: BC means Battery Connectors, the new department from Factory 3</p>
+			<p> Dash (-) is the department for Administration </p>
 		</div>
 	</div>
 </div>

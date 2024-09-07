@@ -321,7 +321,8 @@
 		$button .= '<br><center><button btn-type="view" doc-review-masterlist-id="'.$doc_review_masterlist_id.'" id="btnViewDispositionHistory" class="btn btn-sm btn-default fa fa-file" type="button"> View History</button></center>';
 		$row[]= $button;
 		$row[]= '<center> '.$status.' </center>';
-		$row[]= '<center> ' . $aRow['due_date'] . $doc_review_disposition .  ' </center>';
+		$due_date = ($aRow['due_date'] != "0000-00-00") ? $aRow['due_date'] : "";
+		$row[]= '<center> ' . $due_date . $doc_review_disposition .  ' </center>';
 		$row[]= '<center> ' .$aRow['dcc_email'] !=NULL ? date('Y-m-d',strtotime($aRow['dcc_email'])) : "" . ' </center>';
 		$row[]= $aRow['date_received'];
 		$row[]= $aRow['model'] ;

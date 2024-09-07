@@ -104,7 +104,7 @@
 		'disposition.disposition',
 		'disposition.dcc_email',
 		'disposition.created_at',
-
+		'disposition.due_date',
 	);
 	/* used this field for searching data typed in the search box */
 	$array_search = array(
@@ -260,7 +260,7 @@
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
 	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 5 AND masterlist.is_expiration_date_exist = "false"';
-	$sWhere .= ' AND disposition.deleted_at IS NULL';
+	// $sWhere .= ' AND disposition.deleted_at IS NULL';
 	
 	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
@@ -395,7 +395,8 @@
 		$row[]= $button;
 		// $row[]= $aRow['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
-		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
+		$due_date = ($aRow['due_date'] != "0000-00-00") ? $aRow['due_date'] : "";
+		$row[]= '<center> ' . $due_date .$doc_review_disposition. ' </center>';
 		$row[]= '<center> ' .$dcc_email_date. ' </center>';
 		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
 		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];

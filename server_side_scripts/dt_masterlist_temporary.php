@@ -101,6 +101,7 @@
 		'disposition.reviewed_by',
 		'disposition.disposition',
 		'disposition.dcc_email',
+		'disposition.due_date',
 
 	);
 	/* used this field for searching data typed in the search box */
@@ -122,7 +123,6 @@
 	 	'active.expiration_date',
 	 	'masterlist.originator_code',
 		'disposition.dcc_email',
-
 	);
 							
 	/* Indexed column (used for fast and accurate table cardinality) */
@@ -256,7 +256,7 @@
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but as per checking obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column
 	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 5 AND masterlist.is_expiration_date_exist = "true" ';
-	$sWhere .= ' AND disposition.deleted_at IS NULL';
+	// $sWhere .= ' AND disposition.deleted_at IS NULL';
 	// $sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
 
 	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
@@ -401,7 +401,8 @@
 		$row[]= $button;
 		// $row[]= $aRow['fkid_document'];
 		$row[]= '<center> '.$status.' </center>';
-		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
+		$due_date = ($aRow['due_date'] != "0000-00-00") ? $aRow['due_date'] : "";
+		$row[]= '<center> ' . $due_date . $doc_review_disposition. ' </center>';
 		if (($aRow['dcc_email'] != NULL && $aRow['dcc_email'] != '0000-00-00 00:00:00')){
 			$dcc_email_date = date('Y-m-d',strtotime($aRow['dcc_email']));
 		}else{
