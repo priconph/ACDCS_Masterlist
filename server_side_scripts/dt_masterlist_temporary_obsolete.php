@@ -225,9 +225,19 @@
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
 	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status = 3 AND masterlist.is_expiration_date_exist = "true")';
-	$sWhere .= ' AND disposition.deleted_at IS NULL';
-	$sWhere .= ' AND obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date !="" ';
-
+	$sWhere .= ' AND disposition.deleted_at IS NULL';//Diposition 1- Revision and 3- Obsolete Document 
+	$sWhere .= ' AND obsolete.`logdel` = 0';
+	/*
+	
+		SELECT SQL_CALC_FOUND_ROWS obsolete.expiration_date AS obsolete_expiration_date, obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model, obsolete.doc_title AS obsolete_doc_title, obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no, obsolete.effectivity_date AS obsolete_effectivity_date, obsolete.originator_code AS obsolete_originator_code, active.expiration_date, masterlist.id, masterlist.fkid_document, masterlist.document_status, masterlist.is_expiration_date_exist, masterlist.deleted_at, active.date_received, active.model, active.doc_title, active.doc_no, active.rev_no, active.effectivity_date, masterlist.originator_code, disposition.reviewed_by, disposition.disposition, disposition.dcc_email
+		FROM   tbl_doc_review_masterlist masterlist
+		LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id
+		WHERE  ( masterlist.deleted_at IS NULL AND masterlist.document_status = 3 AND masterlist.is_expiration_date_exist = "false") AND disposition.deleted_at IS NULL AND obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date ="" 
+		ORDER BY masterlist.document_status ASC
+		LIMIT 0, 10
+	
+	
+	*/
 	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
 		// ilagay dito kung pwede based sa date, or customized advance search

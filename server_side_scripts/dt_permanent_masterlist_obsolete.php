@@ -224,8 +224,8 @@
 		//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
 	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status = 3 AND masterlist.is_expiration_date_exist = "false")';
-	$sWhere .= ' AND disposition.deleted_at IS NULL';
-	$sWhere .= ' AND obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date ="" ';
+	$sWhere .= ' AND disposition.deleted_at IS NULL'; //Diposition 1- Revision and 3- Obsolete Document 
+	$sWhere .= ' AND obsolete.`logdel` = 0';
 
 	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
@@ -341,6 +341,7 @@
 		//? NOTE: If Obsolete or Revision disposition & Obsolete document means DCC Conformed
 		$row[]= '<center><span class="badge highlight-color-green">DCC Conformed</span></center>';
 		$row[]= '<center> ' .$doc_review_disposition. ' </center>';
+		$row[]= '<center> ' .$aRow['dcc_email'] !=NULL ? date('Y-m-d',strtotime($aRow['dcc_email'])) : "" . ' </center>';
 		$row[]= $aRow['obsolete_date_received'];
 		$row[]= $aRow['obsolete_model'];
 		$row[]= $aRow['obsolete_doc_title'];
@@ -349,13 +350,11 @@
 		$row[]= '<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
 		$row[]= $aRow['obsolete_effectivity_date'];
 		$row[]= $aRow['obsolete_expiration_date'];
-		$row[]= '<center> ' .$aRow['dcc_email'] !=NULL ? date('Y-m-d',strtotime($aRow['dcc_email'])) : "" . ' </center>';
 		$row[]= '<span class="badge highlight-color-red">OBSOLETE</span>';
+		// $row[]= '<span class="badge highlight-color-red">'.$aRow['is_expiration_date_exist'].'</span>';
 
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
-	/* 
-		Functions 
-	*/
+	
 ?>

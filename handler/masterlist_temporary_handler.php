@@ -728,7 +728,7 @@ use Handler\DocuReviewDisposition;
 				require_once('../class/oop_acdcs.php');
 				$get_doc_review_disposition =  DocReviewDisposition::getDocReviewDisposition($docu_review_disposition_id);
 				$get_doc_review_masterlist_id = CommonClass::docReviewMasterlist($get_doc_review_disposition['tbl_doc_review_masterlist_id']);
-				$get_doc_review_disposition =  DocReviewDisposition::getDocReviewDisposition($docu_review_disposition_id);
+				// $get_doc_review_disposition =  DocReviewDisposition::getDocReviewDisposition($docu_review_disposition_id);
 
 				$active_docs = ActiveDocument::activeDocsByFkid($get_doc_review_masterlist_id['fkid_document']); //active only
 				$email_due_date = date( "Y-m-d", strtotime( "-5 days", strtotime($due_date) ) );
