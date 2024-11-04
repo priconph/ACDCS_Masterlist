@@ -19,7 +19,7 @@ use Model\DocReviewDisposition;
 use Model\ActiveDocument;
 use Model\Hris;
 use Model\DocReviewOriginatorCode;
-use Handler\DocuReviewDisposition;
+// use Handler\DocuReviewDisposition;
 
 	if(is_ajax()) {
 		if(isset($_POST["action"]) && !empty($_POST["action"])) {

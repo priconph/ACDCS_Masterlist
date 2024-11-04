@@ -25,7 +25,7 @@
 	if(file_exists($database_config)){
 		require_once($database_config);
 	} else {
-		echo "config file does not exist!";
+		echo "database_config file does not exist!";
 		exit;
 	}
 	if(file_exists($active_document_class)){
@@ -43,19 +43,19 @@
 	if(file_exists($systemone)){
 		require_once($systemone);
 	} else {
-		echo "config file does not exist!";
+		echo "systemone file does not exist!";
 		exit;
 	}
 	if(file_exists($doc_review_originator_code)){
 		require_once($doc_review_originator_code);
 	} else {
-		echo "config file does not exist!";
+		echo "doc_review_originator_code file does not exist!";
 		exit;
 	}
 	if(file_exists($get_user_roles)){
 		require_once($get_user_roles);
 	} else {
-		echo "config file does not exist!";
+		echo "get_user_roles file does not exist!";
 		exit;
 	}
 
@@ -85,18 +85,20 @@
 		'obsolete.doc_no AS obsolete_doc_no',
 		'obsolete.rev_no AS obsolete_rev_no',
 		'obsolete.effectivity_date AS obsolete_effectivity_date',
-		'active.expiration_date',
+		'obsolete.doc_type AS obsolete_doc_type',
 		'masterlist.id',
 		'masterlist.fkid_document',
 		'masterlist.document_status',
 		'masterlist.is_expiration_date_exist',
 		'masterlist.deleted_at',
+		'active.expiration_date',
 		'active.date_received',
 		'active.model',
 		'active.doc_title',
 		'active.doc_no',
 		'active.rev_no',
 		'active.effectivity_date',
+		'active.doc_type',
 		'masterlist.originator_code',
 		'disposition.reviewed_by',
 		'disposition.disposition',
@@ -114,6 +116,7 @@
 		'obsolete.rev_no',
 		'obsolete.effectivity_date',
 		'obsolete.expiration_date',
+		'obsolete.doc_type',
 		'active.date_received',
 		'active.model',
 	 	'active.doc_title',
@@ -121,6 +124,7 @@
 	 	'active.rev_no',
 	 	'active.effectivity_date',
 	 	'active.expiration_date',
+	 	'active.doc_type',
 	 	'masterlist.originator_code',
 		'disposition.dcc_email',
 	);
@@ -245,6 +249,11 @@
 	/* 
 		dito ka mag add ng where mo, una check mo kung may laman na yung $sWhere pag wala append mo yung where mo na meron
 		kasama where kapag naman may laman na AND na syempre diba :)
+		
+		SELECT DISTINCT documents.section FROM tbl_documents documents
+		LEFT JOIN tbl_active_docs active ON active.fkid_document = documents.pkid
+		WHERE 1=1 AND active.`view_status` = 1 AND active.`logdel` = 0
+	
 	*/
 
 	/* Default WHERE query without search inputs */
@@ -415,6 +424,7 @@
 		$row[]= ( $aRow['doc_no'] != NULL ) ? 
 					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>'  :
 					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
+		$row[]= ( $aRow['doc_type'] != NULL ) ? $aRow['doc_type'] : $aRow['obsolete_doc_type'];
 		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
 		$row[]= ( $aRow['originator_code'] != NULL ) ? 
 					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 

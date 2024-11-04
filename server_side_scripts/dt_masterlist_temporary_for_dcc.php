@@ -26,19 +26,12 @@
 	ini_set('display_errors', 1);
     
 	$aColumns = array(
-		'obsolete.expiration_date AS obsolete_expiration_date',
-		'obsolete.date_received AS obsolete_date_received',
-		'obsolete.model AS obsolete_model',
-		'obsolete.doc_title AS obsolete_doc_title',
-		'obsolete.doc_no AS obsolete_doc_no',
-		'obsolete.rev_no AS obsolete_rev_no',
-		'obsolete.effectivity_date AS obsolete_effectivity_date',
-		'active.expiration_date',
 		'masterlist.id',
 		'masterlist.fkid_document',
 		'masterlist.document_status',
 		'masterlist.is_expiration_date_exist',
 		'masterlist.deleted_at',
+		'active.expiration_date',
 		'active.date_received',
 		'active.model',
 		'active.doc_title',
@@ -54,13 +47,6 @@
 	/* used this field for searching data typed in the search box */
 
 	$array_search = array(
-		'obsolete.date_received',
-		'obsolete.model',
-		'obsolete.doc_title',
-		'obsolete.doc_no',
-		'obsolete.rev_no',
-		'obsolete.effectivity_date',
-		'obsolete.expiration_date',
 		'active.date_received',
 		'active.model',
 	 	'active.doc_title',

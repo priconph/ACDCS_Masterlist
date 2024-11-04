@@ -87,6 +87,7 @@
 		'obsolete.doc_no AS obsolete_doc_no',
 		'obsolete.rev_no AS obsolete_rev_no',
 		'obsolete.effectivity_date AS obsolete_effectivity_date',
+		'obsolete.doc_type AS obsolete_doc_type',
 		'active.expiration_date',
 		'masterlist.id',
 		'masterlist.fkid_document',
@@ -99,6 +100,7 @@
 		'active.doc_no',
 		'active.rev_no',
 		'active.effectivity_date',
+		'active.doc_type',
 		'masterlist.originator_code',
 		'disposition.reviewed_by',
 		'disposition.disposition',
@@ -115,6 +117,7 @@
 		'obsolete.rev_no',
 		'obsolete.effectivity_date',
 		'obsolete.expiration_date',
+		'obsolete.doc_type',
 		'active.date_received',
 		'active.model',
 	 	'active.doc_title',
@@ -122,6 +125,7 @@
 	 	'active.rev_no',
 	 	'active.effectivity_date',
 	 	'active.expiration_date',
+	 	'active.doc_type',		
 	 	'masterlist.originator_code',
 		'disposition.dcc_email',
 
@@ -404,6 +408,7 @@
 		$row[]= ( $aRow['doc_no'] != NULL ) ? 
 					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>'  :
 					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
+		$row[]= ( $aRow['doc_type'] != NULL ) ? $aRow['doc_type'] : $aRow['obsolete_doc_type'];
 		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
 		$row[]= ( $aRow['originator_code'] != NULL ) ? 
 					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 

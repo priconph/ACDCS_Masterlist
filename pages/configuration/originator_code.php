@@ -48,34 +48,34 @@
       </div>
       <div class="modal-body">
         <form id="frmEditOriginatorCode">
-			<div class="row">
+			<div class="row" style="display:none;">
+				<div class="col-sm-12">				
+					<label>Originator Code ID</label>
+				</div>
 				<div class="col-sm-12">
-					<div class="row" style="display:none;">
-						<div class="col-sm-12">				
-							<label>Originator Code ID</label>
-						</div>
-						<div class="col-sm-12">
-							<input type="text" class="form-control" id="text_originator_code_id" name="originator_code_id" style="width:100%;">
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12">				
-							<label>Department</label>
-						</div>
-						<div class="col-sm-12">
-							<select class="form-control" id="text_department" name="department[]" style="width:100%;" multiple required></select>
-						</div>
-						<div class="col-sm-12">				
-							<label>Originator Code</label>
-							<input type="text" class="form-control" id="text_originator_code" name="originator_code" style="width:100%;" required>
-						</div>
-						<div class="col-sm-12">				
-						</div>
-					</div>
+					<input type="text" class="form-control" id="text_originator_code_id" name="originator_code_id" style="width:100%;">
 				</div>
 			</div>
-			<br><br><br>
+			<div class="row">
+				<div class="col-sm-12">				
+					<label>Department</label>
+				</div>
+				<div class="col-sm-12">
+					<select class="form-control" id="text_department" name="department[]" style="width:100%;" multiple required></select>
+				</div>
+				<div class="col-sm-12">				
+					<label>Originator Code</label>
+					<input type="text" class="form-control" id="text_originator_code" name="originator_code" style="width:100%;" required>
+				</div>
+			</div>
+	  <br>
+	  <br>
+	  <br>
+	  <br>
+	  <br>
+	  <br>
       </div>
+
       <div class="modal-footer">
 		 <button type="submit" class="btn btn-primary">Save</button> 
 		 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

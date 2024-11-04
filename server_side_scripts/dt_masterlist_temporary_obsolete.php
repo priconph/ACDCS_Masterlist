@@ -34,18 +34,12 @@
 		'obsolete.rev_no AS obsolete_rev_no',
 		'obsolete.effectivity_date AS obsolete_effectivity_date',
 		'obsolete.originator_code AS obsolete_originator_code',
-		'active.expiration_date',
+		'obsolete.doc_type AS obsolete_doc_type',
 		'masterlist.id',
 		'masterlist.fkid_document',
 		'masterlist.document_status',
 		'masterlist.is_expiration_date_exist',
 		'masterlist.deleted_at',
-		'active.date_received',
-		'active.model',
-		'active.doc_title',
-		'active.doc_no',
-		'active.rev_no',
-		'active.effectivity_date',
 		'masterlist.originator_code',
 		'disposition.reviewed_by',
 		'disposition.disposition',
@@ -63,16 +57,9 @@
 		'obsolete.effectivity_date',
 		'obsolete.expiration_date',
 		'obsolete.originator_code',
-		'active.date_received',
-		'active.model',
-	 	'active.doc_title',
-	 	'active.doc_no',
-	 	'active.rev_no',
-	 	'active.effectivity_date',
-	 	'active.expiration_date',
+		'obsolete.doc_type',
 	 	'masterlist.originator_code',
 		'disposition.dcc_email',
-
 	);
 							
 	/* Indexed column (used for fast and accurate table cardinality) */
@@ -355,6 +342,7 @@
 		$row[]= $aRow['obsolete_model'];
 		$row[]= $aRow['obsolete_doc_title'];
 		$row[]= '<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
+		$row[]= $aRow['obsolete_doc_type'];
 		$row[]= $aRow['obsolete_rev_no'];
 		$row[]= '<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
 		$row[]= $aRow['obsolete_effectivity_date'];

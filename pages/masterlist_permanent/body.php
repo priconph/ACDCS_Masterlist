@@ -119,6 +119,7 @@ $is_dcc_access = (
 													<th>Model</th>
 													<th>Title</th>
 													<th>Document No.</th>
+													<th>Document Type</th>
 													<th>Rev No.</th>
 													<th>Orignator Code</th>
 													<th>Effectivity Date</th>
@@ -189,6 +190,7 @@ $is_dcc_access = (
 													<th>Model</th>
 													<th>Title</th>
 													<th>Document No.</th>
+													<th>Document Type</th>
 													<th>Rev No.</th>
 													<th>Orignator Code</th>
 													<th>Effectivity Date</th>
@@ -472,12 +474,12 @@ $is_dcc_access = (
 			arr_dcc_review_again_masterlist_id = [];
 			console.log('after',arr_dcc_review_again_masterlist_id);
 		});
-		$('.modal').on('hidden.bs.modal', function (e) {
+		// $('.modal').on('hidden.bs.modal', function (e) {
 			/* Allows the overlayed modal to be scrollable */
-			if($('.modal').hasClass('in')) {
-				$('body').addClass('modal-open');
-			}    
-		});
+			// if($('.modal').hasClass('in')) {
+				// $('body').addClass('modal-open');
+			// }    
+		// });
 
 	});
 </script>

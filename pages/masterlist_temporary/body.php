@@ -117,13 +117,12 @@ $is_dcc_access = (
 													<th>Model</th>
 													<th>Title</th>
 													<th>Document No.</th>
+													<th>Document Type</th>
 													<th>Rev No.</th>
 													<th>Orignator Code</th>
 													<th>Effectivity Date</th>
 													<th>Expiration Date</th>
 													<th>Active/Obsolete</th>
-													<!--<th>Document Type</th>
-													<th>Expiration Date</th> -->
 													<!-- <th>Reviewed by</th>
 													<th>Date of review</th>
 													<th>Person in charge</th>
@@ -231,6 +230,7 @@ $is_dcc_access = (
 													<th>Model</th>
 													<th>Title</th>
 													<th>Document No.</th>
+													<th>Document Type</th>
 													<th>Rev No.</th>
 													<th>Orignator Code</th>
 													<th>Effectivity Date</th>
@@ -529,12 +529,12 @@ $is_dcc_access = (
 			console.log('after',arr_dcc_review_again_masterlist_id);
 
 		});
-		$('.modal').on('hidden.bs.modal', function (e) {
-			/* Allows the overlayed modal to be scrollable */
-			if($('.modal').hasClass('in')) {
-				$('body').addClass('modal-open');
-			}    
-		});
+		// $('.modal').on('hidden.bs.modal', function (e) {
+		// 	/* Allows the overlayed modal to be scrollable */
+		// 	if($('.modal').hasClass('in')) {
+		// 		$('body').addClass('modal-open');
+		// 	}    
+		// });
 
 		/* API FOR DEBUG CODE
 			let data = {'action':'test_query','fkid':5754}
