@@ -219,7 +219,6 @@ $is_dcc_access = (
 	include_once('pages/components/modal.php');
 ?>
 
-<script src="js/common_functions.js?98765"></script>
 <script src="js/doc_review_masterlist.js?98765"></script>
 <script>
 	$(document).ready(function () {
@@ -238,6 +237,7 @@ $is_dcc_access = (
 			"a0aSorting"	: [],
 			"bProcessing": true,
 			"bServerSide": true,
+			"paging": true,
 			"sAjaxSource": "server_side_scripts/dt_permanent_masterlist.php?username="+"<?php echo $_SESSION['username'];?>",
 			"columnDefs":[
 				{"orderable":false,"targets":[0]}

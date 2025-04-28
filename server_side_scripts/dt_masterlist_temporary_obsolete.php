@@ -212,7 +212,7 @@
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
 	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status = 3 AND masterlist.is_expiration_date_exist = "true")';
-	$sWhere .= ' AND disposition.deleted_at IS NULL';//Diposition 1- Revision and 3- Obsolete Document 
+	$sWhere .= ' AND disposition.deleted_at IS NULL'; //Diposition 1- Revision and 3- Obsolete Document 
 	$sWhere .= ' AND obsolete.`logdel` = 0';
 	/*
 	

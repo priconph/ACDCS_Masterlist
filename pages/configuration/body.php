@@ -33,4 +33,4 @@ var username 				= $('#hd_username') .val();
 var handler_configuration 	= 'handler/handler_configuration.php';
 </script>
 
-<script src="js/common_functions.js?n="+<?php echo date("YmdHis");?>></script>
+<!-- <script src="js/common_functions.js?n="+<?php echo date("YmdHis");?>></script> -->

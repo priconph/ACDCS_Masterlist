@@ -263,8 +263,8 @@
 	/* Default WHERE query without search inputs */
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
-	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 5 AND masterlist.is_expiration_date_exist = "false"';
-	// $sWhere .= ' AND disposition.deleted_at IS NULL';
+	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status <=2 AND masterlist.is_expiration_date_exist = "false"';
+	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	
 	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
