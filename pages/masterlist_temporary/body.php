@@ -264,7 +264,6 @@ $is_dcc_access = (
 		background-color:green
 	}
 </style>
-<script src="js/common_functions.js?09876"></script>
 <script src="js/doc_review_masterlist.js?0987"></script>
 <script>
 	$(document).ready(function () {

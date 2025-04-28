@@ -26,14 +26,13 @@
 								   </div>
 									<div class="panel-body" style="height:750px;overflow:auto;">
 										<?php 
-											/* Check if there is a read role on one IQC modules */
-											// echo $query;
 											use Pages\GetUserRoles\DocReviewDispositionApprovalDetails;
 											use Pages\GetUserRoles\Rapid;
 											$is_approver = DocReviewDispositionApprovalDetails::getIsApprover();
 											$is_dcc_staff = Rapid::getIsDccStaff();
 											$is_dcc_access = (
 												$is_dcc_staff['department'][0] =="Quality Assurance Dept." 
+												OR $is_dcc_staff['section'][0] =='QAS' 
 												OR $is_dcc_staff['section'][0] == "EMO/QMS" 
 												OR $is_dcc_staff['division'][0] =="Quality Assurance Di" 
 												OR $is_dcc_staff['division'][0] =='QAS' 
@@ -177,7 +176,7 @@
 		</section>
 	</section>
 </article>
-<script src="js/common_functions.js?12345"></script>
+<!-- <script src="js/common_functions.js?12345"></script> -->
 <script>
 	$(document).ready(function () {
 		$('a').click(function (e) { 

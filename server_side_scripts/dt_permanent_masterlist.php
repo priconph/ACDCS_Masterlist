@@ -107,6 +107,8 @@
 		'disposition.dcc_email',
 		'disposition.created_at',
 		'disposition.due_date',
+		'approval.sec_heads_username',
+
 	);
 	/* used this field for searching data typed in the search box */
 	$array_search = array(
@@ -139,7 +141,8 @@
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
-	
+	$sJoin .= " LEFT JOIN  tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id";
+
 	
 
 	/* Database connection information */
@@ -263,8 +266,8 @@
 	/* Default WHERE query without search inputs */
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
-	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 5 AND masterlist.is_expiration_date_exist = "false"';
-	// $sWhere .= ' AND disposition.deleted_at IS NULL';
+	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status <=2 AND masterlist.is_expiration_date_exist = "false"';
+	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	
 	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
@@ -355,6 +358,7 @@
 	
 		/* Document Status */
 		switch ($aRow['document_status']) {
+			
 			case 0:
 				if($_GET['username'] == $aRow['reviewed_by']){
 					$button = '<center><button btn-type="edit" data-id="'.$doc_review_masterlist_id.'" id="btnEditDocReviewDisposition" class="btn btn-sm fa fa-edit" type="button" style="background-color:skyblue;color:black;"> Edit Review </button></center><br>';
@@ -375,7 +379,10 @@
 					$button = '';
 				}
 				$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center> <br>';
-				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
+				$status = '';
+				$status .= '<span class="badge highlight-color-lime">FOR APPROVAL by</span>';
+				$status .= '<br>';
+				$status .= ''.Hris::get_emp_name_by_username_systemone($aRow['sec_heads_username']).'';
 				break;
 			case 3:
             	$button = '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';

@@ -80,6 +80,7 @@
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
+	//
 
 	if(file_exists($database_config)){
 		require_once($database_config);
@@ -219,7 +220,7 @@
 		$sWhere .= "AND ";
 	}
 	/* Default WHERE query without search inputs */
-	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status < 3 )';
+	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status <=2 )';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date ="") OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0 AND obsolete.expiration_date =""))';
 

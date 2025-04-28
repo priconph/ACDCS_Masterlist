@@ -147,7 +147,7 @@ class EmailDetail extends RapidEmailer
 		$mail_data  = array(
 			"`to`"				=> $to,
 			"cc"				=> $cc,
-			"bcc"				=> 'mclegaspi@pricon.ph',
+			"bcc"				=> 'mclegaspi@pricon.ph,dmmarmol@pricon.ph,stomela@pricon.ph',
 			"`from`"			=> $from,
 			"from_name"			=> 'ACDCSystemNotification@pricon.ph',
 			"subject"			=> $subject,

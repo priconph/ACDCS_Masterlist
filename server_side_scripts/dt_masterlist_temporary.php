@@ -21,6 +21,7 @@
 	$systemone = '../model/systemone.php';
 	$doc_review_originator_code = '../model/doc_review_originator_code.php';
 	$get_user_roles = '../model/rapid.php';
+	
 
 	if(file_exists($database_config)){
 		require_once($database_config);
@@ -104,6 +105,7 @@
 		'disposition.disposition',
 		'disposition.dcc_email',
 		'disposition.due_date',
+		'approval.sec_heads_username',
 
 	);
 	/* used this field for searching data typed in the search box */
@@ -137,7 +139,7 @@
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
-
+	$sJoin .= " LEFT JOIN  tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id";
 	
 	/* Database connection information */
 	$gaSql['user']       = $username;
@@ -264,12 +266,11 @@
 	}
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but as per checking obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column
-	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status < 5 AND masterlist.is_expiration_date_exist = "true" ';
-	// $sWhere .= ' AND disposition.deleted_at IS NULL';
+	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status <=2 AND masterlist.is_expiration_date_exist = "true" ';
+	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	// $sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
 
 	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
-
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
 	}else{
 		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
@@ -391,7 +392,10 @@
 					$button = '';
 				}
 				$button .= '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center> <br>';
-				$status = '<span class="badge highlight-color-lime">FOR APPROVAL</span>';
+				$status = '';
+				$status .= '<span class="badge highlight-color-lime">FOR APPROVAL by</span>';
+				$status .= '<br>';
+				$status .= ''.Hris::get_emp_name_by_username_systemone($aRow['sec_heads_username']).'';
 				break;
 			case 3:
             	$button = '<center><button btn-type="view" data-id="'.$doc_review_masterlist_id.'" id="btnViewDocReviewDisposition" class="btn btn-sm btn-default fa fa-eye" type="button"> View</button></center>';

@@ -861,7 +861,7 @@ use Model\DocReviewOriginatorCode;
 				require_once('../class/oop_mailer.php');
 				$table = 'tbl_auto_mailer';
 				$array_fields = array('logdel');
-				$array_values = array(1);
+				$array_values = array(0);
 				$where = 'WHERE fkid = '.$docu_review_disposition_id.' AND system_name = "ACDCS_DRM"';
 				$query = Mailer::getInstance()->update_query_script($table,$array_fields,$array_values,$where);
 				return $query = Mailer::getInstance()->update_query($table,$array_fields,$array_values,$where);

@@ -5,7 +5,10 @@
 		</div>
 		<div class="panel-body">
 			<div class="row">
-				<div class="col-12">
+				<div class="col-6">
+					<button class="btn btn-primary fa fa-file pull-left" id="btnDepartmentSetting" modal-target> MOP </button>
+				</div>
+				<div class="col-6">
 					<button class="btn btn-success fa fa-plus pull-right" id="btnAddOriginatorCode" modal-target> Add New </button>
 				</div>
 			</div>
@@ -150,6 +153,10 @@
 			$frmEditOriginatorCode[0].reset()
 			$frmEditOriginatorCode.find('#text_department').empty()
 		});
-		
+		/* Global Variable*/
+        $('#btnDepartmentSetting').click(function (e) { 
+            e.preventDefault();
+            window.open("reports/pdf_download/department_settings.php");
+        });
 	});
 </script>
