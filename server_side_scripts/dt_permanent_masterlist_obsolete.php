@@ -33,8 +33,8 @@
 		'obsolete.doc_no AS obsolete_doc_no',
 		'obsolete.rev_no AS obsolete_rev_no',
 		'obsolete.effectivity_date AS obsolete_effectivity_date',
-		'obsolete.originator_code AS obsolete_originator_code',
 		'obsolete.doc_type AS obsolete_doc_type',
+		'obsolete.originator_code as obsolete_originator_code',
 		'masterlist.id',
 		'masterlist.fkid_document',
 		'masterlist.document_status',
@@ -47,7 +47,6 @@
 		// 'active.doc_no',
 		// 'active.rev_no',
 		// 'active.effectivity_date',
-		'masterlist.originator_code',
 		'disposition.reviewed_by',
 		'disposition.disposition',
 		'disposition.dcc_email',
@@ -64,16 +63,6 @@
 		'obsolete.expiration_date',
 		'obsolete.originator_code',
 		'obsolete.doc_type',
-		// 'active.date_received',
-		// 'active.model',
-	 	// 'active.doc_title',
-	 	// 'active.doc_no',
-	 	// 'active.rev_no',
-	 	// 'active.effectivity_date',
-	 	// 'active.expiration_date',
-	 	// 'masterlist.originator_code',
-		// 'disposition.dcc_email',
-
 	);
 							
 	/* Indexed column (used for fast and accurate table cardinality) */

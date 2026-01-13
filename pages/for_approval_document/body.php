@@ -170,13 +170,15 @@
 		var alertOption = $formApproverDecision.find('#alertOption');
 
 		var dt_for_approval_document = $('#'+tbl_for_approval_document).DataTable({
-			"aaSorting"	: [],
+			// "aaSorting"	: [],
 			"bProcessing": true,
 			"bServerSide": true,
 			// "columnDefs":[
 			// 	{"orderable":false,"targets":[0,1,2]}
 			// ],
 			"ordering":false,
+			"paging" : false,
+			// "searching" : false,
 			"sAjaxSource": "server_side_scripts/dt_masterlist_for_approval.php?username="+"<?php echo $_SESSION['username'];?>",
 			"drawCallback": function( settings ) {
 				$('#'+tbl_for_approval_document).attr('style','width:100%;')

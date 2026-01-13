@@ -31,6 +31,7 @@
 		'masterlist.document_status',
 		'masterlist.is_expiration_date_exist',
 		'masterlist.deleted_at',
+		'active.originator_code as active_originator_code',
 		'active.expiration_date',
 		'active.date_received',
 		'active.model',
@@ -38,7 +39,6 @@
 		'active.doc_no',
 		'active.rev_no',
 		'active.effectivity_date',
-		'masterlist.originator_code',
 		'disposition.reviewed_by',
 		'disposition.disposition',
 		'disposition.dcc_email',
@@ -54,7 +54,6 @@
 	 	'active.rev_no',
 	 	'active.effectivity_date',
 	 	'active.expiration_date',
-	 	'masterlist.originator_code',
 		'disposition.dcc_email',
 	);
 							
@@ -330,7 +329,7 @@
 		$row[]= $aRow['doc_title'];
 		$row[]= '<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>';
 		$row[]= $aRow['rev_no'];
-		$row[]='<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>';
+		$row[]='<span class="badge highlight-color-green">'.$aRow['active_originator_code'].'</span>';
 		$row[]= $aRow['effectivity_date'];
 		$row[]= $aRow['expiration_date'];
 		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';

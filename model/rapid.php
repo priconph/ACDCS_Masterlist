@@ -41,11 +41,10 @@ class Rapid{
 			$return['department'][] 	= $data['department'];
 			$return['section'][] 		= $data['section'];
 			$return['division'][] 	= $data['division'];
+			$return['empno'][] 	= $data['empno'];
 		}
 		return $return;
 	}
+	
 }
-
-
-
 ?>

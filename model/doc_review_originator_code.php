@@ -17,6 +17,7 @@ class DocReviewOriginatorCode {
         $joins			= '';
         $sql_where		= 'WHERE 1=1';
         $sql_where		.= ' AND department_id='.$department_id.' ';
+        $sql_where		.= ' AND deleted_at IS NULL';
         if($department_id != 51 && $department_id != 5){ // Administration dept cannot access operation documents
             $sql_where		.= ' OR department_id = 0';
         }
@@ -26,9 +27,9 @@ class DocReviewOriginatorCode {
         $sql_order		= '';
         $sql_limit		= '';
         $html_select	= '';
-        $script			= ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+        $script	= ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
         $result			= ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
-        while($row = mysqli_fetch_array($result)) {
+        while($row = mysqli_fetch_array( $result)) {
             $return[] = $row['originator_code'];
         }
         return $return;

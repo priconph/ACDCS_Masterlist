@@ -455,9 +455,6 @@ class RAPID extends mysqli
 		parent::set_charset('utf-8');
 	}
 
-	////////////////////////////////////UP TO HERE////////////////////////////////////////
-	
-	////////////////////////////////////PUBLIC FUNCTIONS STARTS HERE//////////////////////////////////////////////
 	public function select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit){
 		$query = "SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $array_fields) . " FROM {$table} {$joins} {$sql_where} {$sql_order} {$sql_limit};";
 		return $this->query($query);

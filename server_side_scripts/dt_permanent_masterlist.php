@@ -88,6 +88,7 @@
 		'obsolete.rev_no AS obsolete_rev_no',
 		'obsolete.effectivity_date AS obsolete_effectivity_date',
 		'obsolete.doc_type AS obsolete_doc_type',
+		'obsolete.originator_code as obsolete_originator_code',
 		'active.expiration_date',
 		'masterlist.id',
 		'masterlist.fkid_document',
@@ -101,7 +102,7 @@
 		'active.rev_no',
 		'active.effectivity_date',
 		'active.doc_type',
-		'masterlist.originator_code',
+		'active.originator_code as active_originator_code',
 		'disposition.reviewed_by',
 		'disposition.disposition',
 		'disposition.dcc_email',
@@ -269,11 +270,16 @@
 	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status <=2 AND masterlist.is_expiration_date_exist = "false"';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	
+	$arr_dept_id = array(); // added 8/11/25 due to undefined variable error see ticket #3143 for reference - mdr
+	
 	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
 	}else{
 		//Filtered based on Originator Code matched by Department Code from SystemOne
 		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
+		if($user_name == "srborres"){ //different username, rapid vs. systemone - follow the systemone username, or change the username of systemone, same as rapid, if possible.
+			$user_name = "sanborr";
+		}
 		$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
 		$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
 		$arr_sql_or = array();
@@ -340,7 +346,7 @@
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
 		"script" => $script,
-		"is_dcc_access" => $is_dcc_staff,
+		"is_dcc_access" => $arr_dept_id,
 	);
 	/*
 		Class Object
@@ -417,8 +423,8 @@
 					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
 		$row[]= ( $aRow['doc_type'] != NULL ) ? $aRow['doc_type'] : $aRow['obsolete_doc_type'];
 		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
-		$row[]= ( $aRow['originator_code'] != NULL ) ? 
-					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
+		$row[]= ( $aRow['active_originator_code'] != NULL ) ? 
+					'<span class="badge highlight-color-green">'.$aRow['active_originator_code'].'</span>' : 
 					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
 		$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
 		$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];

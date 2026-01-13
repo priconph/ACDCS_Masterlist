@@ -219,7 +219,7 @@ $is_dcc_access = (
 	include_once('pages/components/modal.php');
 ?>
 
-<script src="js/doc_review_masterlist.js?98765"></script>
+<script src="js/doc_review_masterlist.js?646546"></script>
 <script>
 	$(document).ready(function () {
 		var arr_dcc_review_again_masterlist_id = [];
@@ -234,14 +234,14 @@ $is_dcc_access = (
 		
 		/* DataTables */
 		var dt_permanent_masterlist = $('#'+tbl_permanent_masterlist).DataTable({
-			"a0aSorting"	: [],
+			"aaSorting"	: [],
 			"bProcessing": true,
 			"bServerSide": true,
 			"paging": true,
 			"sAjaxSource": "server_side_scripts/dt_permanent_masterlist.php?username="+"<?php echo $_SESSION['username'];?>",
-			"columnDefs":[
-				{"orderable":false,"targets":[0]}
-			],
+			// "columnDefs":[
+			// 	{"orderable":false,"targets":[0]}
+			// ],
 			"ordering":false,
 			"drawCallback": function( settings ) {
 				$('#'+tbl_permanent_masterlist).attr('style','width:100%;')

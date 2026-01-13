@@ -24,14 +24,14 @@
 	ini_set('display_errors', 1);
 
 	$aColumns = array( 
-		'obsolete.expiration_date AS obsolete_expiration_date',
-		'obsolete.date_received AS obsolete_date_received',
-		'obsolete.model AS obsolete_model',
-		'obsolete.doc_title AS obsolete_doc_title',
-		'obsolete.doc_no AS obsolete_doc_no',
-		'obsolete.doc_type AS obsolete_doc_type',
-		'obsolete.rev_no AS obsolete_rev_no',
-		'obsolete.effectivity_date AS obsolete_effectivity_date',
+		// 'obsolete.expiration_date AS obsolete_expiration_date',
+		// 'obsolete.date_received AS obsolete_date_received',
+		// 'obsolete.model AS obsolete_model',
+		// 'obsolete.doc_title AS obsolete_doc_title',
+		// 'obsolete.doc_no AS obsolete_doc_no',
+		// 'obsolete.doc_type AS obsolete_doc_type',
+		// 'obsolete.rev_no AS obsolete_rev_no',
+		// 'obsolete.effectivity_date AS obsolete_effectivity_date',
 
 		'approval.id',
 		'approval.sec_heads_username',
@@ -56,14 +56,14 @@
 	/* used this field for searching data typed in the search box */
 
 	$array_search = array(
-		'obsolete.date_received',
-		'obsolete.model',
-		'obsolete.doc_title',
-		'obsolete.doc_no',
-		'obsolete.rev_no',
-		'obsolete.effectivity_date',
-		'obsolete.doc_type',
-		'obsolete.expiration_date',
+		// 'obsolete.date_received',
+		// 'obsolete.model',
+		// 'obsolete.doc_title',
+		// 'obsolete.doc_no',
+		// 'obsolete.rev_no',
+		// 'obsolete.effectivity_date',
+		// 'obsolete.doc_type',
+		// 'obsolete.expiration_date',
 		'active.date_received',
 		'active.model',
 	 	'active.doc_title',
@@ -79,11 +79,28 @@
 	$sIndexColumn = "approval.id";
 	
 	/* DB table to use */
-	$sTable = "tbl_doc_review_masterlist masterlist";
-	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
-	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
-	$sJoin .= " RIGHT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
-	$sJoin .= " RIGHT JOIN tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id";
+	$sTable = " (
+			SELECT id, tbl_doc_review_disposition_id, sec_heads_username
+			FROM tbl_doc_review_disposition_approval_details
+			WHERE deleted_at IS NULL
+			AND sec_heads_username = '".$_GET['username']."'
+			AND status = 0
+			ORDER BY id DESC  
+			LIMIT 0,30
+		) approval";
+	$sJoin = "";
+	$sJoin .= "JOIN tbl_doc_review_disposition disposition
+		ON disposition.id = approval.tbl_doc_review_disposition_id 
+		AND disposition.deleted_at IS NULL";
+	// $sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
+	$sJoin .= " JOIN tbl_doc_review_masterlist masterlist
+			ON masterlist.id = disposition.tbl_doc_review_masterlist_id 
+		AND masterlist.deleted_at IS NULL 
+		AND masterlist.document_status = 2";
+	$sJoin .= " JOIN tbl_active_docs active
+		ON active.fkid_document = masterlist.fkid_document 
+		AND active.view_status = 1 
+		AND active.logdel = 0";
 	
 
 
@@ -209,8 +226,11 @@
 	$sWhere .= '(masterlist.deleted_at IS NULL AND masterlist.document_status = 2)';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	$sWhere .= ' AND (approval.deleted_at IS NULL AND approval.sec_heads_username= "'.$_GET['username'].'" AND approval.status = 0 )';
-	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0) OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0))';
+	// $sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0) OR (obsolete.`view_status` = 1 AND obsolete.`logdel` = 0))';
+	$sWhere .= ' AND ( (active.`view_status` = 1 AND active.`logdel` = 0) )';
 
+
+	
     
 	// $sWhere .= " `status` = 0 OR `status` = 2 OR `status` = 8 OR `status` = 'A' AND `logdel` = 0";
 	/*
@@ -218,22 +238,19 @@
 	 * Get data to display
 	 */
 	$script = "
-		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
+		SELECT ".implode(", ", $aColumns)."
 		FROM   $sTable
 		$sJoin
-		$sWhere
 		$sOrder
-		$sLimit
-	";
-	$sQuery = "
-		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
-		FROM   $sTable
-		$sJoin
-		$sWhere
-		$sOrder
-		$sLimit
 	";
 	
+	$sQuery = "
+		SELECT ".implode(", ", $aColumns)."
+		FROM   $sTable
+		$sJoin
+		$sOrder
+	";
+
 	$rResult = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
 	
 	/* Data set length after filtering */
@@ -249,9 +266,7 @@
 		SELECT COUNT(".$sIndexColumn.")
 		FROM   $sTable
 		$sJoin
-		$sWhere
 		$sOrder
-		$sLimit
 	";
 	$rResultTotal = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
 	$aResultTotal = mysql_fetch_array($rResultTotal);
@@ -265,7 +280,7 @@
 		"iTotalRecords" => $iTotal,
 		"iTotalDisplayRecords" => $iFilteredTotal,
 		"aaData" => array(),
-		"script" => array(),
+		"script" => $script,
 	);
 
 	
@@ -287,20 +302,16 @@
 		// $row[]= $getActiveDocumentById['fkid_document'];
 		// $row[]= '<center> '.$status.' </center>';
 		$row[]= '<center>  '.$disposition.' </center>';
-		$row[]= ( $aRow['date_received'] != NULL ) ? $aRow['date_received'] : $aRow['obsolete_date_received'];
-		$row[]= ( $aRow['model'] != NULL ) ? $aRow['model'] : $aRow['obsolete_model'];
-		$row[]= ( $aRow['doc_title'] != NULL ) ? $aRow['doc_title'] : $aRow['obsolete_doc_title'];
-		$row[]= ( $aRow['doc_no'] != NULL ) ? 
-			'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>'  :
-			'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
-		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
-		$row[]= ( $aRow['originator_code'] != NULL ) ? 
-					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
-					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
-		$row[]= ( $aRow['doc_type'] != NULL ) ? $aRow['doc_type'] : $aRow['obsolete_doc_type'];
-		$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
-		$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];+
-		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
+		$row[]= $aRow['date_received'];
+		$row[]= $aRow['model'];
+		$row[]= $aRow['doc_title'];
+		$row[]= '<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['doc_no']. '" doc-type="active" style="font-size:130%;">'.' '.$aRow['doc_no'].'</a>' ;
+		$row[]= $aRow['rev_no'];
+		$row[]= '<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>';
+		$row[]= $aRow['doc_type'];
+		$row[]= $aRow['effectivity_date'];
+		$row[]= $aRow['expiration_date'];
+		$row[]= 'ACTIVE';
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );

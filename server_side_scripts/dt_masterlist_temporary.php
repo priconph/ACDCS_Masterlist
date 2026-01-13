@@ -65,11 +65,13 @@
 	use Model\Hris;
 	use Model\DocReviewOriginatorCode;
 	use Model\Rapid;
+	use Model\RapidEmp;
 
 	$user_name = $_GET['username'];
 
 	/* Validated if ISS / QAS - Admin Access */
 	$is_dcc_staff = Rapid::getIsDccStaffValid($user_name);
+	
 	$is_dcc_access = (
 		$is_dcc_staff['department'][0] =="Quality Assurance Dept." 
 		OR $is_dcc_staff['section'][0] == "EMO/QMS" 
@@ -87,6 +89,7 @@
 		'obsolete.rev_no AS obsolete_rev_no',
 		'obsolete.effectivity_date AS obsolete_effectivity_date',
 		'obsolete.doc_type AS obsolete_doc_type',
+		'obsolete.originator_code AS obsolete_originator_code',
 		'masterlist.id',
 		'masterlist.fkid_document',
 		'masterlist.document_status',
@@ -100,7 +103,7 @@
 		'active.rev_no',
 		'active.effectivity_date',
 		'active.doc_type',
-		'masterlist.originator_code',
+		'active.originator_code as active_originator_code',
 		'disposition.reviewed_by',
 		'disposition.disposition',
 		'disposition.dcc_email',
@@ -119,6 +122,7 @@
 		'obsolete.effectivity_date',
 		'obsolete.expiration_date',
 		'obsolete.doc_type',
+		'obsolete.originator_code',
 		'active.date_received',
 		'active.model',
 	 	'active.doc_title',
@@ -127,7 +131,7 @@
 	 	'active.effectivity_date',
 	 	'active.expiration_date',
 	 	'active.doc_type',
-	 	'masterlist.originator_code',
+	 	'active.originator_code',
 		'disposition.dcc_email',
 	);
 							
@@ -251,11 +255,6 @@
 	/* 
 		dito ka mag add ng where mo, una check mo kung may laman na yung $sWhere pag wala append mo yung where mo na meron
 		kasama where kapag naman may laman na AND na syempre diba :)
-		
-		SELECT DISTINCT documents.section FROM tbl_documents documents
-		LEFT JOIN tbl_active_docs active ON active.fkid_document = documents.pkid
-		WHERE 1=1 AND active.`view_status` = 1 AND active.`logdel` = 0
-	
 	*/
 
 	/* Default WHERE query without search inputs */
@@ -266,15 +265,26 @@
 	}
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but as per checking obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column
-	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status <=2 AND masterlist.is_expiration_date_exist = "true" ';
+	$sWhere .= '1=1';
+	$sWhere .= ' AND masterlist.deleted_at IS NULL AND masterlist.document_status <=2 AND masterlist.is_expiration_date_exist = "true" ';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
+	$sWhere .= ' AND approval.deleted_at IS NULL';
+
 	// $sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
 
 	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
+		
 	}else{
 		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
-		$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
+		
+		if(	count($is_dcc_staff['empno']) == 0){
+			$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
+		}else{
+			$get_dept_id_by_user_name =  Hris::selectEmployeeInfoByEmpno($is_dcc_staff['empno'][0]);
+
+		}
+		// $get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name); CNPPCK0596
 		$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
 		$arr_sql_or = array();
 		
@@ -348,15 +358,6 @@
 	);
 
 	/*
-
-	
-		SELECT SQL_CALC_FOUND_ROWS obsolete.expiration_date AS obsolete_expiration_date, obsolete.date_received AS obsolete_date_received, obsolete.model AS obsolete_model, obsolete.doc_title AS obsolete_doc_title, obsolete.doc_no AS obsolete_doc_no, obsolete.rev_no AS obsolete_rev_no, obsolete.effectivity_date AS obsolete_effectivity_date, active.expiration_date, masterlist.id, masterlist.fkid_document, masterlist.document_status, masterlist.is_expiration_date_exist, masterlist.deleted_at, active.date_received, active.model, active.doc_title, active.doc_no, active.rev_no, active.effectivity_date, masterlist.originator_code, disposition.reviewed_by, disposition.disposition, disposition.dcc_email
-		FROM   tbl_doc_review_masterlist masterlist
-		LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id
-		WHERE masterlist.deleted_at IS NULL AND masterlist.document_status < 3 AND masterlist.is_expiration_date_exist = "true"  AND disposition.deleted_at IS NULL AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""
-		ORDER BY masterlist.document_status ASC
-		LIMIT 0, 10
-	
 		Class Object
 	*/
 	$get_doc_review_disposition = new DocReviewDisposition;
@@ -430,17 +431,49 @@
 					'<a class="fa fa-file fa-sm" href="#" id="btnSearchDocNum" doc-no="' .$aRow['obsolete_doc_no']. '" doc-type="obsolete" style="font-size:130%;">'.' '.$aRow['obsolete_doc_no'].'</a>' ;
 		$row[]= ( $aRow['doc_type'] != NULL ) ? $aRow['doc_type'] : $aRow['obsolete_doc_type'];
 		$row[]= ( $aRow['rev_no'] != NULL ) ? $aRow['rev_no'] : $aRow['obsolete_rev_no'];
-		$row[]= ( $aRow['originator_code'] != NULL ) ? 
-					'<span class="badge highlight-color-green">'.$aRow['originator_code'].'</span>' : 
+		$row[]= ( $aRow['active_originator_code'] != NULL ) ? 
+					'<span class="badge highlight-color-green">'.$aRow['active_originator_code'].'</span>' : 
 					'<span class="badge highlight-color-green">'.$aRow['obsolete_originator_code'].'</span>';
 		$row[]= ( $aRow['effectivity_date'] != NULL ) ? $aRow['effectivity_date'] : $aRow['obsolete_effectivity_date'];
 		$row[]= ( $aRow['expiration_date'] != NULL ) ? $aRow['expiration_date'] : $aRow['obsolete_expiration_date'];
 		$row[]= ( $aRow['date_received'] != NULL ) ? 'ACTIVE' : 'OBSOLETE';
+		$disposition = getDisposition($doc_review_masterlist_id['']);
+		// $row[]= $disposition['disposition'];
 		array_push($output['aaData'],$row);
 	}
 	echo json_encode( $output );
 
-	
+	function getDisposition($masterlist_id){
+		try {
+			if(file_exists('../class/oop_acdcs.php')) {
+				require_once('../class/oop_acdcs.php');
+			} else {
+				require_once('../../class/oop_acdcs.php');
+			}
+			$response		= array();
+			$table = 'tbl_doc_review_disposition';
+			$array_fields = array('*');
+			$joins			= '';
+			$sql_where		= 'WHERE 1=1';
+			$sql_where		.= ' AND tbl_doc_review_masterlist_id ='.$masterlist_id.'';
+			$sql_where		.= ' AND deleted_at IS NULL';
+			$sql_order		= '';
+			$sql_limit		= '';
+			$html_select	= '';
+			$script			= ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+			$result			= ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
+			if ($row = mysqli_fetch_array($result)) {
+				$response['disposition'] = $row['disposition'];
+				$response['reviewed_by'] = $row['reviewed_by'];
+			} else {
+				$response['disposition'] = 'N/A';
+				$response['reviewed_by'] = 'N/A';
+			}
+			return $response;
+		} catch (Exception $e) {
+			throw $e;
+		}
+	}
 
 
 	/* 

@@ -670,7 +670,7 @@ use Model\DocReviewOriginatorCode;
 				$script = ACDCS::getInstance()->select_query_script($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 				$query = ACDCS::getInstance()->select_query($array_fields,$table,$joins,$sql_where,$sql_order,$sql_limit);
 				if($query->num_rows > 0){
-					$array_fields = array('deleted_at');
+				$array_fields = array('deleted_at');
 					$array_values = array(date('Y-m-d H:i:s'));
 					$where 	= 'WHERE tbl_doc_review_disposition_id = '.$doc_review_disposition_id.' AND deleted_at IS NULL';
 					$query = ACDCS::getInstance()->update_query($table,$array_fields,$array_values,$where); 
