@@ -267,7 +267,7 @@
 	/* Default WHERE query without search inputs */
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
-	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status <=2 AND masterlist.is_expiration_date_exist = "false"';
+	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status <=2';
 	$sWhere .= ' AND disposition.deleted_at IS NULL';
 	
 	$arr_dept_id = array(); // added 8/11/25 due to undefined variable error see ticket #3143 for reference - mdr

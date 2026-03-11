@@ -832,7 +832,7 @@ use Model\DocReviewOriginatorCode;
 				// $cc			=	implode(',',$return['send_cc']);
 				
 				/* message: TEST EMAIL*/
-				$to			= 	'dmmarmol@pricon.ph,stomela@pricon.ph';
+				$to			= 	'dmmarmol@pricon.ph,nvquidlat@pricon.ph';
 				$from		=	'issinfoservice@pricon.ph';
 				$cc			=	'';
 				$subject	=	"For DCC Conformance";

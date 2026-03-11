@@ -17,7 +17,7 @@ class DocReviewOriginatorCode {
         $joins			= '';
         $sql_where		= 'WHERE 1=1';
         $sql_where		.= ' AND department_id='.$department_id.' ';
-        $sql_where		.= ' AND deleted_at IS NULL';
+        $sql_where		.= ' AND deleted_at IS NULL OR deleted_at=""';
         if($department_id != 51 && $department_id != 5){ // Administration dept cannot access operation documents
             $sql_where		.= ' OR department_id = 0';
         }
