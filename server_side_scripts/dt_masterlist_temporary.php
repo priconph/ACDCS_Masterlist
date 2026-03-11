@@ -275,11 +275,11 @@
 	// $sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
 
 	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
-		$TEST= 'TEST';
+		$TEST= 'is_dcc_access true';
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
 		
 	}else{
-		$TEST= 'FALSE';
+		$TEST= 'is_dcc_access false';
 		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
 		
 		if(	count($is_dcc_staff['empno']) == 0){
