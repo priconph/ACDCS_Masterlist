@@ -269,7 +269,7 @@
 	$sWhere .= '1=1';
 	// $sWhere .= ' AND masterlist.deleted_at IS NULL AND masterlist.document_status <=2 AND masterlist.is_expiration_date_exist = "true" ';
 	$sWhere .= ' AND masterlist.deleted_at IS NULL AND masterlist.document_status <=2 ';
-	$sWhere .= ' AND disposition.deleted_at IS NULL';
+	// $sWhere .= ' AND disposition.deleted_at IS NULL';
 	$sWhere .= ' AND approval.deleted_at IS NULL';
 
 	// $sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
@@ -308,6 +308,9 @@
 	if ( $_GET['sSearch'] == "" ){
 		// ilagay dito kung pwede based sa date, or customized advance search
 	}
+
+	$sGroupBy = ' GROUP BY active.doc_no';
+	
 	/*
 	 * SQL queries
 	 * Get data to display
@@ -317,6 +320,7 @@
 		FROM   $sTable
 		$sJoin
 		$sWhere
+		$sGroupBy
 		$sOrder
 		$sLimit
 	";
@@ -325,6 +329,7 @@
 		FROM   $sTable
 		$sJoin
 		$sWhere
+		$sGroupBy
 		$sOrder
 		$sLimit
 	";

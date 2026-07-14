@@ -90,8 +90,7 @@
 		) approval";
 	$sJoin = "";
 	$sJoin .= "JOIN tbl_doc_review_disposition disposition
-		ON disposition.id = approval.tbl_doc_review_disposition_id 
-		AND disposition.deleted_at IS NULL";
+		ON disposition.id = approval.tbl_doc_review_disposition_id";
 	// $sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
 	$sJoin .= " JOIN tbl_doc_review_masterlist masterlist
 			ON masterlist.id = disposition.tbl_doc_review_masterlist_id 
@@ -231,7 +230,8 @@
 
 
 	
-    
+    $sGroupBy = ' GROUP BY active.doc_no';
+	
 	// $sWhere .= " `status` = 0 OR `status` = 2 OR `status` = 8 OR `status` = 'A' AND `logdel` = 0";
 	/*
 	 * SQL queries
@@ -241,6 +241,7 @@
 		SELECT ".implode(", ", $aColumns)."
 		FROM   $sTable
 		$sJoin
+		$sGroupBy
 		$sOrder
 	";
 	
@@ -248,6 +249,7 @@
 		SELECT ".implode(", ", $aColumns)."
 		FROM   $sTable
 		$sJoin
+		$sGroupBy
 		$sOrder
 	";
 

@@ -268,7 +268,7 @@
 	//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
 	$sWhere .= ' masterlist.deleted_at IS NULL AND masterlist.document_status <=2';
-	$sWhere .= ' AND disposition.deleted_at IS NULL';
+	// $sWhere .= ' AND disposition.deleted_at IS NULL';
 	
 	$arr_dept_id = array(); // added 8/11/25 due to undefined variable error see ticket #3143 for reference - mdr
 	
@@ -298,6 +298,8 @@
 		// ilagay dito kung pwede based sa date, or customized advance search
 	}
 	
+	$sGroupBy = ' GROUP BY active.doc_no';
+	
 	/*
 	 * SQL queries
 	 * Get data to display
@@ -307,6 +309,7 @@
 		FROM   $sTable
 		$sJoin
 		$sWhere
+		$sGroupBy
 		$sOrder
 		$sLimit
 	";
@@ -315,9 +318,11 @@
 		FROM   $sTable
 		$sJoin
 		$sWhere
+		$sGroupBy
 		$sOrder
 		$sLimit
 	";
+	
 	$rResult = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
 	
 	/* Data set length after filtering */

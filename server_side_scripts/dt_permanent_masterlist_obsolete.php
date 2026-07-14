@@ -215,13 +215,15 @@
 		//? NOTE: According to QAS/requestor active permanent document has no exp date but obsolete permanent has exp date,
 	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column BOOLEAN
 	$sWhere .= '( masterlist.deleted_at IS NULL AND masterlist.document_status = 3 AND masterlist.is_expiration_date_exist = "false")';
-	$sWhere .= ' AND disposition.deleted_at IS NULL'; //Diposition 1- Revision and 3- Obsolete Document 
+	// $sWhere .= ' AND disposition.deleted_at IS NULL'; //Diposition 1- Revision and 3- Obsolete Document 
 	$sWhere .= ' AND obsolete.`logdel` = 0';
 
 	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/
 	if ( $_GET['sSearch'] == "" ){
 		// ilagay dito kung pwede based sa date, or customized advance search
 	}
+	
+	$sGroupBy = ' GROUP BY active.doc_no';
 	
 	/*
 	 * SQL queries
@@ -232,6 +234,7 @@
 		FROM   $sTable
 		$sJoin
 		$sWhere
+		$sGroupBy
 		$sOrder
 		$sLimit
 	";
@@ -240,9 +243,11 @@
 		FROM   $sTable
 		$sJoin
 		$sWhere
+		$sGroupBy
 		$sOrder
 		$sLimit
 	";
+	
 	$rResult = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
 	
 	/* Data set length after filtering */
