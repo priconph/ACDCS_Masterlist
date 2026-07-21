@@ -82,12 +82,12 @@ class Hris {
 		} else {
 			require_once('../../class/oop_acdcs.php');
 		}
-
 		$section		= 'Not found!';
 		$array_fields 	= array('`Dept_id`,`Department`');
 		$table			= 'vw_ACDCS';
 		$joins			= '';
 		$sql_where		= 'WHERE username="'.$user_name.'"';
+		// $sql_where		= 'WHERE username="mclegaspi"';
 		$sql_order		= '';
 		$sql_limit		= 'LIMIT 0,1';
 		$html_select	= '';
@@ -152,17 +152,12 @@ class Hris {
 		}
 		return $section;
 	}
-	// public function selectEmployeeInfoByEmpno($empno) {
-	// 	$query = "SELECT * FROM `vw_EmpInfo_Rapid` WHERE EmpNo='$empno';";
-	// 	return $this->query($query);
-	// }
 	function selectEmployeeInfoByEmpno($empno){
 		if(file_exists('../class/oop_acdcs.php')) {
 			require_once('../class/oop_acdcs.php');
 		} else {
 			require_once('../../class/oop_acdcs.php');
 		}
-		// return $empno;
 		$section		= 'Not found!';
 		$array_fields 	= array('`Dept_id`,`Department`');
 		$table			= 'vw_ACDCS';
@@ -176,7 +171,7 @@ class Hris {
 		if($row = mysqli_fetch_array($result)) {
 			$section = $row['Dept_id'];
 		}else{
-			$section = 'Username Not Found !';
+			$section = 'false'; //Username Not Found !
 		}
 		return $section;
 	}

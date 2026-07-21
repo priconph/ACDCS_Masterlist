@@ -276,11 +276,15 @@
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
 	}else{
 		//Filtered based on Originator Code matched by Department Code from SystemOne
-		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
-		if($user_name == "srborres"){ //different username, rapid vs. systemone - follow the systemone username, or change the username of systemone, same as rapid, if possible.
-			$user_name = "sanborr";
-		}
+		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date =""'; 
+		// if($user_name == "srborres"){ //different username, rapid vs. systemone - follow the systemone username, or change the username of systemone, same as rapid, if possible.
+		// 	$user_name = "sanborr";
+		// }
+				
 		$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
+		if(	$get_dept_id_by_user_name === 'false'){
+			$get_dept_id_by_user_name =  Hris::selectEmployeeInfoByEmpno($is_dcc_staff['empno'][0]);
+		}
 		$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
 		$arr_sql_or = array();
 

@@ -228,78 +228,44 @@
 		$sWhere .= ')';
 	}
 
-    /* The number of UI column is required to be equal to table column
-        Ex. 5 db table column == 5 UI column. Uncomment the script below to show.
-        echo json_encode($aColumns);
-        return;
-    */
-
-	/* Individual column filtering */
-	// for ( $i=0 ; $i<count($array_search) ; $i++ )
-	// {
-	// 	//NOTE: $_GET['bSearchable_'.$i] accept only 11  $array_search
-	// 	if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
-	// 	{
-	// 		if ( $sWhere == "" )
-	// 		{
-	// 			$sWhere = "WHERE ";
-	// 		}
-	// 		else
-	// 		{
-	// 			$sWhere .= " AND ";
-	// 		}
-	// 		$sWhere .= $array_search[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
-			
-	// 	}
-	// }
-	
-	/* 
-		dito ka mag add ng where mo, una check mo kung may laman na yung $sWhere pag wala append mo yung where mo na meron
-		kasama where kapag naman may laman na AND na syempre diba :)
-	*/
 
 	/* Default WHERE query without search inputs */
-	if($sWhere == ""){
-		$sWhere .= "WHERE  ";
-	}else{
+	if ($sWhere == "") {
+    	$sWhere .= "WHERE ";
+	} else {
 		$sWhere .= "AND ";
 	}
-	//? NOTE: According to QAS/requestor active permanent document has no exp date but as per checking obsolete permanent has exp date,
-	//? so to check if the document is temporary or permanent document, save to  tbl_doc_review_masterlist - is_expiration_date_exist column
+
+	// Base condition
 	$sWhere .= '1=1';
-	// $sWhere .= ' AND masterlist.deleted_at IS NULL AND masterlist.document_status <=2 AND masterlist.is_expiration_date_exist = "true" ';
-	$sWhere .= ' AND masterlist.deleted_at IS NULL AND masterlist.document_status <=2 ';
-	// $sWhere .= ' AND disposition.deleted_at IS NULL';
+	$sWhere .= ' AND masterlist.deleted_at IS NULL AND masterlist.document_status <= 2';
 	$sWhere .= ' AND approval.deleted_at IS NULL';
 
-	// $sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
-
-	if($is_dcc_access == "true" || $user_name == "mclegaspi"){ // Validated if ISS / QAS - Admin Access
-		$TEST= 'is_dcc_access true';
-		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
+	if ($is_dcc_access == "true" || $user_name == "mclegaspi") { // Validated if ISS / QAS - Admin Access
+		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date != ""'; 
+	} else {
+		// Open grouping for active conditions
+		$sWhere .= ' AND ( active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date != "" '; 
 		
-	}else{
-		$TEST= 'is_dcc_access false';
-		$sWhere .= ' AND (active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date !=""'; 
-		
-		if(	count($is_dcc_staff['empno']) == 0){
-			$get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name);
-		}else{
-			$get_dept_id_by_user_name =  Hris::selectEmployeeInfoByEmpno($is_dcc_staff['empno'][0]);
-
+		$get_dept_id_by_user_name = Hris::getDeptIdByUserName($user_name);
+		if ($get_dept_id_by_user_name === 'false') {
+			$get_dept_id_by_user_name = Hris::selectEmployeeInfoByEmpno($is_dcc_staff['empno'][0]);
 		}
-		// $get_dept_id_by_user_name =  Hris::getDeptIdByUserName($user_name); CNPPCK0596
+		
 		$arr_dept_id = DocReviewOriginatorCode::getDeptIdById($get_dept_id_by_user_name);
-		$arr_sql_or = array();
 		
-		foreach ($arr_dept_id as $key => $value) {
-			$arr_sql_or[] = ' active.originator_code = "'.$arr_dept_id[$key].'" ';
+		// Using IN (...) clean syntax if department codes exist
+		if (!empty($arr_dept_id)) {
+			// Sanitize array values for SQL string
+			$escaped_dept_ids = array_map(function($item) {
+				return "'" . addslashes($item) . "'";
+			}, $arr_dept_id);
+			
+			$sWhere .= ' AND active.originator_code IN (' . implode(', ', $escaped_dept_ids) . ')';
 		}
-		if(count($arr_dept_id) == 1){
-			$sWhere 	.= ' AND active.originator_code = "'.$arr_dept_id[0].'" )';
-		}else if(count($arr_dept_id) > 1){
-			$sWhere 	.= ' AND '.implode(' OR',$arr_sql_or).' )';
-		}
+
+		// Close the grouping parenthesis opened above
+		$sWhere .= ' )'; 
 	}
 	
 	
@@ -324,6 +290,7 @@
 		$sOrder
 		$sLimit
 	";
+	
 	$sQuery = "
 		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
 		FROM   $sTable
@@ -362,7 +329,7 @@
 		"aaData" => array(),
 		"script" => $script,
 		// "getSectionByUserName" => $arr_dept_id,
-		"TEST" => $TEST,
+		"test-get-dept-id-by-user-name" => $get_dept_id_by_user_name,
 		"sWhere" => $sWhere, //modify
 
 	);
