@@ -241,6 +241,8 @@
 	$sWhere .= ' AND masterlist.deleted_at IS NULL AND masterlist.document_status <= 2';
 	$sWhere .= ' AND approval.deleted_at IS NULL';
 
+	$get_dept_id_by_user_name = '';
+
 	if ($is_dcc_access == "true" || $user_name == "mclegaspi") { // Validated if ISS / QAS - Admin Access
 		$sWhere .= ' AND active.`view_status` = 1 AND active.`logdel` = 0 AND active.expiration_date != ""'; 
 	} else {
@@ -265,7 +267,8 @@
 		}
 
 		// Close the grouping parenthesis opened above
-		$sWhere .= ' )'; 
+		$sWhere .= ' )';
+		
 	}
 	
 	
@@ -329,7 +332,7 @@
 		"aaData" => array(),
 		"script" => $script,
 		// "getSectionByUserName" => $arr_dept_id,
-		"test-get-dept-id-by-user-name" => $get_dept_id_by_user_name,
+		// "test-get-dept-id-by-user-name" => $get_dept_id_by_user_name,
 		"sWhere" => $sWhere, //modify
 
 	);

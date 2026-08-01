@@ -24,7 +24,7 @@
 										// }
 									?>
 									<button class="btn btn-primary btn-lg fa pull-right" id="btnBatchApproval" disabled> For Approval <span id="countApproval">(0)</span> </button>
-									<button class="btn btn-info fa fa-file-pdf-o pull-left" id="btnUserManual"> User Manual </button>
+									<button class="btn btn-danger fa fa-file-pdf-o pull-left" id="btnApproverManual"> User Manual </button>
 								</div>
 								</div> <br><br><br>
 									<div class="col-sm-12">

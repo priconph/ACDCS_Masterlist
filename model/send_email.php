@@ -177,7 +177,7 @@ class EmailDetail extends RapidEmailer
 		$return 	= array();
 		$mail_data  = array();
 		$message .= "<br><br>
-					 For more info, please log-in to your Rapid account. Go to http://rapid/ and click http://rapid/ACDCS_Masterlist/index.php ACDCS Document Review Process
+					 For more info, please log-in to your Rapid account. Go to http://rapid/ and click  ACDCS Document Review Process
 					 <br><br>Notice of Disclaimer:<br>
                      This message (including any attachments) contains confidential information intended for a specific individual and purpose, and is protected by law. If you are not the intended recipient, you should delete this message. Any disclosure,copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.";
 		$mail_data  = array(

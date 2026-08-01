@@ -134,7 +134,7 @@
 												if( $is_approver > 0 ){
 													echo '<div class="col-xs-3">
 														<a href="#" id="router" link-id="forApproval">
-															<div class="panel panel-info" style="padding:0px;">
+															<div class="panel panel-danger" style="padding:0px;">
 																<div class="panel-heading">
 																<div class="row">
 																	<div class="col-xs-5">

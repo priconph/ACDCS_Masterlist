@@ -21,6 +21,10 @@
             e.preventDefault();
             window.open("reports/pdf_download/user_manual.php");
         });
+        $('#btnApproverManual').click(function (e) { 
+            e.preventDefault();
+            window.open("reports/pdf_download/for_approval_process.php");
+        });
     });
     
     
