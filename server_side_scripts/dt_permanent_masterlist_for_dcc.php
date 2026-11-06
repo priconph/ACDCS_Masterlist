@@ -64,7 +64,18 @@
 	$sTable = "tbl_doc_review_masterlist masterlist";
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
-	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
+	// $sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
+	//-- 1. Find ONLY the latest non-deleted disposition ID per masterlist row
+	$sJoin .= " LEFT JOIN (
+    SELECT tbl_doc_review_masterlist_id, MAX(id) AS max_disp_id
+    FROM tbl_doc_review_disposition
+    WHERE deleted_at IS NULL
+    GROUP BY tbl_doc_review_masterlist_id
+	) latest_disp 
+    ON latest_disp.tbl_doc_review_masterlist_id = masterlist.id";
+	//-- 2. Join the actual disposition data using that max ID
+	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition 
+    ON disposition.id = latest_disp.max_disp_id";
 
 	if(file_exists($database_config)){
 		require_once($database_config);

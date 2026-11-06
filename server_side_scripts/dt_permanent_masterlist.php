@@ -6,11 +6,9 @@
 	 * Copyright: 2010 - Allan Jardine
 	 * License:   GPL v2 or BSD (3-point)
 	 */
-	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * Easy set variables
 	 */
-	
 	/* Array of database columns which should be read and sent back to DataTables. Use a space where
 	 * you want to insert a non-database field (for example a counter or static image)
 	 */
@@ -141,9 +139,23 @@
 	$sTable = "tbl_doc_review_masterlist masterlist";
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
-	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
-	$sJoin .= " LEFT JOIN  tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id";
-
+	// $sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
+	// $sJoin .= " LEFT JOIN  tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id";
+	//-- 1. Find ONLY the latest non-deleted disposition ID per masterlist row
+	$sJoin .= " LEFT JOIN (
+    SELECT tbl_doc_review_masterlist_id, MAX(id) AS max_disp_id
+    FROM tbl_doc_review_disposition
+    WHERE deleted_at IS NULL
+    GROUP BY tbl_doc_review_masterlist_id
+	) latest_disp 
+    ON latest_disp.tbl_doc_review_masterlist_id = masterlist.id";
+	//-- 2. Join the actual disposition data using that max ID
+	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition 
+    ON disposition.id = latest_disp.max_disp_id";
+	//-- 3. Move approval deleted check to ON clause to prevent filtering masterlist rows
+	$sJoin .= " LEFT JOIN tbl_doc_review_disposition_approval_details approval 
+    ON approval.tbl_doc_review_disposition_id = disposition.id 
+   AND approval.deleted_at IS NULL";
 	
 
 	/* Database connection information */
@@ -291,10 +303,15 @@
 		foreach ($arr_dept_id as $key => $value) {
 			$arr_sql_or[] = ' active.`originator_code` = "'.$arr_dept_id[$key].'" ';
 		}
-		if(count($arr_dept_id) == 1){
-			$sWhere 	.= ' AND active.`originator_code` = "'.$arr_dept_id[0].'" )';
-		}else if(count($arr_dept_id) > 1){
-			$sWhere 	.= ' AND '.implode(' OR',$arr_sql_or).' )';
+		// if(count($arr_dept_id) == 1){
+		// 	$sWhere 	.= ' AND active.`originator_code` = "'.$arr_dept_id[0].'" )';
+		// }else if(count($arr_dept_id) > 1){
+		// 	$sWhere 	.= ' AND '.implode(' OR',$arr_sql_or).' )';
+		// }
+		if (count($arr_dept_id) == 1) {
+			$sWhere .= ' AND active.`originator_code` = "' . $arr_dept_id[0] . '"';
+		} else if (count($arr_dept_id) > 1) {
+			$sWhere .= ' AND (' . implode(' OR ', $arr_sql_or) . ')';
 		}
 	}
 	/* NOTE: Based on the situation, filtered data without searching will activate this WHERE QUERY, but if the sSearch is not NULL show the specific data based on searching inputs*/

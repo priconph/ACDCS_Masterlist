@@ -1,2 +1,56 @@
 /.vscode
 /db_config
+
+# Documents / spreadsheets
+*.xls
+*.xlsx
+*.xlsm
+*.xlsb
+*.csv
+*.doc
+*.docx
+*.ppt
+*.pptx
+*.pdf
+
+# Archives
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+*.tgz
+
+# Images / media (large)
+*.psd
+*.ai
+*.tif
+*.tiff
+*.bmp
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.mp3
+*.wav
+
+# Database dumps / backups
+*.sql
+*.bak
+*.dump
+*.sqlite
+*.db
+
+# Logs / temp
+*.log
+*.tmp
+~$*
+Thumbs.db
+.DS_Store
+
+# Dependencies
+/node_modules
+/vendor
+
+# Uploads
+/uploads

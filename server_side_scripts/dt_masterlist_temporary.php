@@ -143,8 +143,27 @@
 	$sTable = "tbl_doc_review_masterlist masterlist";
 	$sJoin = "LEFT JOIN tbl_active_docs active ON active.fkid_document = masterlist.fkid_document";
 	$sJoin .= " LEFT JOIN tbl_obsolete_docs obsolete ON obsolete.fkid_document = masterlist.fkid_document";
-	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
-	$sJoin .= " LEFT JOIN  tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id";
+	// $sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition ON disposition.tbl_doc_review_masterlist_id = masterlist.id";
+	// $sJoin .= " LEFT JOIN  tbl_doc_review_disposition_approval_details approval ON approval.tbl_doc_review_disposition_id = disposition.id";
+	//-- 1. Find ONLY the latest non-deleted disposition ID per masterlist row
+	$sJoin .= " LEFT JOIN (
+    SELECT tbl_doc_review_masterlist_id, MAX(id) AS max_disp_id
+    FROM tbl_doc_review_disposition
+    WHERE deleted_at IS NULL
+    GROUP BY tbl_doc_review_masterlist_id
+) latest_disp 
+    ON latest_disp.tbl_doc_review_masterlist_id = masterlist.id";
+	//-- 2. Join the actual disposition data using that max ID
+	$sJoin .= " LEFT JOIN tbl_doc_review_disposition disposition 
+    ON disposition.id = latest_disp.max_disp_id";
+	//-- 3. Move approval deleted check to ON clause to prevent filtering masterlist rows
+	$sJoin .= " LEFT JOIN tbl_doc_review_disposition_approval_details approval 
+    ON approval.tbl_doc_review_disposition_id = disposition.id 
+   AND approval.deleted_at IS NULL";
+
+	
+
+
 	
 	/* Database connection information */
 	$gaSql['user']       = $username;
@@ -204,7 +223,7 @@
 	if($sOrder == ""){
 		// $sOrder = "ORDER BY masterlist.id ASC";
 		// $sOrder = "ORDER BY masterlist.document_status ASC";
-		$sOrder = "ORDER BY disposition.created_at DESC";
+		$sOrder = "ORDER BY disposition.id DESC";
 	}
 
 	/* 
